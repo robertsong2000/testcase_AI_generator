@@ -1,4 +1,4 @@
-# Ollama 文件处理器
+# CAPL 测试用例生成器
 
 该程序用于向本地 Ollama 或 LM Studio 服务器发送文件，并根据文件内容生成 CAN 的 CAPL 代码。
 
