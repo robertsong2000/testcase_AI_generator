@@ -10,7 +10,14 @@ def send_file_to_ollama(file_path):
     try:
         # 加载 .env 文件
         load_dotenv()
-        ollama_url = os.getenv('OLLAMA_URL', 'http://192.168.1.2:11434/api/generate')
+        # 获取 API 类型和 URL
+        api_type = os.getenv('API_TYPE', 'ollama')  # 可选值：ollama 或 openai
+        if api_type == 'ollama':
+            default_url = 'http://localhost:11434/api/generate'
+        else:  # openai 兼容的 API
+            default_url = 'http://localhost:1234/v1/chat/completions'
+        
+        api_url = os.getenv('API_URL', default_url)
 
         with open(file_path, "r") as file:
             file_content = file.read()
@@ -38,12 +45,23 @@ def send_file_to_ollama(file_path):
 
 内容如下："""
 
-        payload = {
-              "model": os.getenv("OLLAMA_MODEL", "qwen3:30b-a3b"),
-              "prompt": f"{prompt_template}\n{file_content}",
-              "stream": True,
-        }
-        response = requests.post(ollama_url, json=payload, stream=True)
+        if api_type == 'ollama':
+            payload = {
+                "model": os.getenv("OLLAMA_MODEL", "qwen3:30b-a3b"),
+                "prompt": f"{prompt_template}\n{file_content}",
+                "stream": True,
+            }
+        else:  # openai 兼容的 API
+            payload = {
+                "model": os.getenv("OPENAI_MODEL", "qwen/qwen3-1.7b"),
+                "messages": [
+                    {"role": "system", "content": prompt_template},
+                    {"role": "user", "content": file_content}
+                ],
+                "stream": True,
+                "temperature": 0.7
+            }
+        response = requests.post(api_url, json=payload, stream=True)
         response.raise_for_status()
 
         # 获取脚本所在目录
@@ -63,10 +81,17 @@ def send_file_to_ollama(file_path):
                         data = line.decode('utf-8').lstrip('data: ')
                         if data:
                             json_data = json.loads(data)
-                            if 'response' in json_data:
-                                response_text = json_data['response']
-                                print(response_text, end='', flush=True)
-                                capl_file.write(response_text)
+                            if api_type == 'ollama':
+                                if 'response' in json_data:
+                                    response_text = json_data['response']
+                                    print(response_text, end='', flush=True)
+                                    capl_file.write(response_text)
+                            else:  # openai 兼容的 API
+                                if 'choices' in json_data and len(json_data['choices']) > 0:
+                                    if 'delta' in json_data['choices'][0] and 'content' in json_data['choices'][0]['delta']:
+                                        response_text = json_data['choices'][0]['delta']['content']
+                                        print(response_text, end='', flush=True)
+                                        capl_file.write(response_text)
                     except Exception as e:
                         continue
         return "\n响应完成"
