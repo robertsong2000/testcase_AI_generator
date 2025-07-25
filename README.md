@@ -2,12 +2,47 @@
 
 该程序用于向本地 Ollama 或 LM Studio 服务器发送文件，并根据文件内容生成 CAN 的 CAPL 代码。
 
+## 项目结构
+本项目包含以下主要组件：
+- **CAPL 代码生成器**：根据测试用例生成 CAPL 代码
+- **循环检测器**：检测和清理生成代码中的重复循环
+- **代码清理器**：移除重复的变量定义
+- **CAPL 语法检查器**：集成的 capl_checker 子模块，提供静态语法检查功能
+
 ## 环境准备
 确保你已经安装了 Python 3.x，并且本地运行着 Ollama 或 LM Studio 服务器。
 
 ## 安装依赖
 ```bash
 pip install -r requirements.txt
+
+# 如果是首次克隆项目，需要初始化子模块
+git submodule update --init --recursive
+```
+
+## CAPL 语法检查器
+本项目集成了 [capl_checker](https://github.com/robertsong2000/capl_checker) 作为子模块，提供 CAPL 代码的静态语法检查功能。
+
+### 功能特性
+- **语法检查**：检测基本的语法错误，如括号不匹配、缺少分号等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+- **变量分析**：检测未定义变量、变量重复声明等问题 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+- **函数分析**：检测函数重复声明、参数问题等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+- **代码风格**：检查命名规范、行长度、尾随空白等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+- **CAPL特定检查**：针对CAPL语言特性的专门检查 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+
+### 使用语法检查器
+```bash
+# 检查生成的 CAPL 文件
+python capl_checker/capl_checker.py capl/your_file.can
+
+# 检查多个文件
+python capl_checker/capl_checker.py capl/*.can
+
+# 使用 XML 格式输出
+python capl_checker/capl_checker.py --format xml capl/your_file.can
+
+# 输出到文件
+python capl_checker/capl_checker.py --output report.txt capl/your_file.can
 ```
 
 ## 配置说明
@@ -57,11 +92,46 @@ PROMPT_TEMPLATE_FILE=prompt_template.txt
 3. 重新运行程序即可使用新的提示词
 
 ## 使用方法
+
+### 方法一：完整工作流程（推荐）
+使用集成的工作流程脚本，一次性完成代码生成、清理和语法检查：
+
+```bash
+# 完整工作流程
+python capl_workflow.py /path/to/your/file
+
+# 自定义输出目录
+python capl_workflow.py --output-dir my_capl_output /path/to/your/file
+
+# 跳过某些步骤
+python capl_workflow.py --skip-cleaning /path/to/your/file
+python capl_workflow.py --skip-checking /path/to/your/file
+
+# 指定语法检查器输出格式
+python capl_workflow.py --checker-format xml /path/to/your/file
+python capl_workflow.py --checker-format json /path/to/your/file
+
+# 只进行清理和检查（跳过生成）
+python capl_workflow.py --skip-generation /path/to/existing/file.can
+```
+
+### 方法二：分步执行
 1. 选择并配置 API 类型（见上方配置说明）
 
-2. 运行程序：
+2. 生成 CAPL 代码：
 ```bash
-python ollama_file_processor.py /path/to/your/file
+python capl_generator.py /path/to/your/file
+```
+
+3. 清理生成的代码（可选）：
+```bash
+python loop_detector.py capl/generated_file.can
+python capl_cleaner.py capl/generated_file.can
+```
+
+4. 语法检查（可选）：
+```bash
+python capl_checker/capl_checker.py capl/generated_file.can
 ```
 
 ## 输出说明

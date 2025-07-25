@@ -68,8 +68,7 @@ def send_file_to_ollama(file_path):
                     "temperature": 0.2,
                     "top_p": 0.5,
                     "num_ctx": int(os.getenv("OLLAMA_CONTEXT_LENGTH", "8192")),  # 默认8192，可通过环境变量配置
-                    "num_predict": int(os.getenv("OLLAMA_MAX_TOKENS", "4096")),  # 限制最大输出tokens，防止无限循环
-                    "stop": ["```\n\n", "测试用例结束", "TestCase结束", "// End of test case"]  # 停止词，遇到这些词就停止生成
+                    "num_predict": int(os.getenv("OLLAMA_MAX_TOKENS", "4096"))   # 限制最大输出tokens，防止无限循环
                 }
             )
         else:  # openai 兼容的 API
