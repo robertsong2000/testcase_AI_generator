@@ -1,0 +1,3 @@
+[submodule "capl_checker"]
+	path = capl_checker
+	url = https://github.com/robertsong2000/capl_checker.git
