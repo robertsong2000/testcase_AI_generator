@@ -14,18 +14,46 @@ def run_command(command, description):
     """运行命令并处理错误"""
     print(f"正在执行: {description}")
     print(f"命令: {' '.join(command)}")
+    print("-" * 40)
     
     try:
-        result = subprocess.run(command, capture_output=True, text=True, check=True)
-        if result.stdout:
-            print(f"输出:\n{result.stdout}")
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"错误: {description} 失败")
-        print(f"错误信息: {e.stderr}")
-        return False
+        # 使用 Popen 来实现实时输出
+        process = subprocess.Popen(
+            command, 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+            universal_newlines=True
+        )
+        
+        # 实时读取并输出
+        output_lines = []
+        while True:
+            output = process.stdout.readline()
+            if output == '' and process.poll() is not None:
+                break
+            if output:
+                print(output.strip())
+                output_lines.append(output)
+        
+        # 等待进程完成
+        return_code = process.poll()
+        
+        if return_code == 0:
+            print("-" * 40)
+            print(f"✅ {description} 完成")
+            return True
+        else:
+            print("-" * 40)
+            print(f"❌ {description} 失败 (退出码: {return_code})")
+            return False
+            
     except FileNotFoundError:
-        print(f"错误: 找不到命令 {command[0]}")
+        print(f"❌ 错误: 找不到命令 {command[0]}")
+        return False
+    except Exception as e:
+        print(f"❌ 执行命令时发生错误: {str(e)}")
         return False
 
 def check_file_exists(file_path, description):
