@@ -137,16 +137,3 @@ if __name__ == "__main__":
         
         # 运行 CAPL 提取器
         subprocess.run(["python", os.path.join(script_dir, "capl_extractor.py")])
-        
-        # 运行循环检测器来检测和清理循环
-        print("\n🔍 正在检测循环模式...")
-        capl_dir = os.path.join(script_dir, "capl")
-        if os.path.exists(capl_dir):
-            for file in os.listdir(capl_dir):
-                if file.endswith('.md'):
-                    file_path = os.path.join(capl_dir, file)
-                    subprocess.run(["python", os.path.join(script_dir, "loop_detector.py"), file_path, "--clean"])
-        
-        # 运行 CAPL 清理器来修复重复定义
-        print("\n🔧 正在清理重复的变量定义...")
-        subprocess.run(["python", os.path.join(script_dir, "capl_cleaner.py")])
