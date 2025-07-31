@@ -34,7 +34,8 @@ def run_command(command, description):
             if output == '' and process.poll() is not None:
                 break
             if output:
-                print(output.strip())
+                # 只去除行尾换行符，保留缩进
+                print(output.rstrip('\n\r'))
                 output_lines.append(output)
         
         # 等待进程完成

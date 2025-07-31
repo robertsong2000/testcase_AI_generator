@@ -52,7 +52,7 @@ python capl_checker/capl_checker.py --output report.txt capl/your_file.can
    - 复制配置文件：`cp .env.ollama.sample .env`
    - 配置项说明：
      - `API_TYPE=ollama`：使用 Ollama API
-     - `API_URL`：Ollama 服务器地址，默认为 `http://localhost:11434/api/generate`
+     - `API_URL`：Ollama 服务器地址，默认为 `http://localhost:11434`
      - `OLLAMA_MODEL`：使用的模型名称，默认为 `qwen3:30b-a3b`
      - `OLLAMA_CONTEXT_LENGTH`：上下文长度，默认为 8192
      - `OLLAMA_MAX_TOKENS`：最大输出长度，默认为 4096（防止循环）
@@ -61,7 +61,7 @@ python capl_checker/capl_checker.py --output report.txt capl/your_file.can
    - 复制配置文件：`cp .env.openai.sample .env`
    - 配置项说明：
      - `API_TYPE=openai`：使用 OpenAI 兼容 API
-     - `API_URL`：服务器地址，默认为 `http://localhost:1234/v1/chat/completions`
+     - `API_URL`：服务器地址，默认为 `http://localhost:1234/v1`，程序会自动添加 `/chat/completions` 端点
      - `OPENAI_MODEL`：使用的模型名称，默认为 `qwen/qwen3-1.7b`
 
 ## 提示词配置

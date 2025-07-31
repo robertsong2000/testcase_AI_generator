@@ -14,9 +14,9 @@ def send_file_to_ollama(file_path):
         # 获取 API 类型和 URL
         api_type = os.getenv('API_TYPE', 'ollama')  # 可选值：ollama 或 openai
         if api_type == 'ollama':
-            default_url = 'http://localhost:11434/api/generate'
+            default_url = 'http://localhost:11434'
         else:  # openai 兼容的 API
-            default_url = 'http://localhost:1234/v1/chat/completions'
+            default_url = 'http://localhost:1234/v1'
         
         api_url = os.getenv('API_URL', default_url)
 
@@ -52,10 +52,10 @@ def send_file_to_ollama(file_path):
 
         if api_type == 'ollama':
             # 使用官方 ollama 库
-            # 从API_URL中提取host地址
-            ollama_host = api_url.replace('/api/generate', '').replace('http://', '').replace('https://', '')
+            # 直接使用API_URL作为host地址
+            ollama_host = api_url.rstrip('/')
             # 创建ollama客户端
-            client = ollama.Client(host=f'http://{ollama_host}')
+            client = ollama.Client(host=ollama_host)
             
             stream = client.chat(
                 model=os.getenv("OLLAMA_MODEL", "qwen3:30b-a3b"),
@@ -72,6 +72,12 @@ def send_file_to_ollama(file_path):
                 }
             )
         else:  # openai 兼容的 API
+            # 构建完整的API端点URL
+            if api_url.endswith('/v1'):
+                api_url = f"{api_url}/chat/completions"
+            elif not api_url.endswith('/chat/completions'):
+                api_url = f"{api_url.rstrip('/')}/chat/completions"
+            
             payload = {
                 "model": os.getenv("OPENAI_MODEL", "qwen/qwen3-1.7b"),
                 "messages": [
