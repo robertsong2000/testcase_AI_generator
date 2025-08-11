@@ -73,8 +73,8 @@ def main():
                        help='跳过代码清理步骤')
     parser.add_argument('--skip-checking', action='store_true',
                        help='跳过语法检查步骤')
-    parser.add_argument('--checker-format', default='text', 
-                       choices=['text', 'xml', 'json'],
+    parser.add_argument('--checker-format', default='txt', 
+                       choices=['txt', 'xml', 'json'],
                        help='语法检查器输出格式')
     parser.add_argument('--output-dir', default='capl',
                        help='输出目录（默认: capl）')
