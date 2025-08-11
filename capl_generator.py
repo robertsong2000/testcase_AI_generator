@@ -104,11 +104,35 @@ def send_file_to_ollama(file_path):
         with open(capl_file_path, "w", encoding="utf-8") as capl_file:
             if api_type == 'ollama':
                 # 处理 ollama 库的流式响应
+                think_started = False
+                think_ended = False
+                
+                # 获取模型名称（从环境变量，避免在循环中判断）
+                model_name = os.getenv("OLLAMA_MODEL", "qwen3:30b-a3b")
+                is_gpt_oss = 'gpt-oss' in model_name.lower()
+                print(f"模型名称: {model_name}, 是否为 gpt-oss: {is_gpt_oss}")
                 for chunk in stream:
-                    if 'message' in chunk and 'content' in chunk['message']:
-                        response_text = chunk['message']['content']
-                        print(response_text, end='', flush=True)
-                        capl_file.write(response_text)
+                    if 'message' in chunk:
+                        message = chunk['message']
+                        
+                        if is_gpt_oss and 'thinking' in message and message['thinking'] is not None:
+                            thinking_content = message['thinking']
+                            if thinking_content and not think_ended:
+                                if not think_started:
+                                    print("<think>\n", end='', flush=True)
+                                    capl_file.write("<think>\n")
+                                    think_started = True
+                                print(thinking_content, end='', flush=True)
+                                capl_file.write(thinking_content)
+                        
+                        if 'content' in message and message['content']:
+                            content = message['content']
+                            if think_started and not think_ended:
+                                print("</think>\n", end='', flush=True)
+                                capl_file.write("</think>\n")
+                                think_ended = True
+                            print(content, end='', flush=True)
+                            capl_file.write(content)
             else:
                 # 处理 openai 兼容 API 的流式响应
                 for line in response.iter_lines():
