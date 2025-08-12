@@ -1,3 +1,6 @@
 [submodule "capl_checker"]
 	path = capl_checker
 	url = https://github.com/robertsong2000/capl_checker.git
+[submodule "pdf_converter"]
+	path = pdf_converter
+	url = https://github.com/robertsong2000/pdf_converter.git
