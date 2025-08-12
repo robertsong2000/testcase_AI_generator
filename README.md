@@ -45,6 +45,77 @@ python capl_checker/capl_checker.py --format xml capl/your_file.can
 python capl_checker/capl_checker.py --output report.txt capl/your_file.can
 ```
 
+## 评估框架
+
+项目包含完整的评估框架，用于评估生成的CAPL代码质量和性能：
+
+### 评估文件夹结构
+```
+evaluation/
+├── TODO.txt                  # 优化迭代路线图
+├── evaluation_framework.py   # 评估框架核心代码
+├── run_evaluation.py        # 评估执行脚本
+└── evaluation_config.json   # 评估配置参数
+```
+
+### 使用方法
+```bash
+# 运行完整评估
+python evaluation/run_evaluation.py
+
+# 运行评估框架测试
+python evaluation/evaluation_framework.py
+```
+
+### 评估指标
+- **语法正确性**：检查CAPL语法错误
+- **功能完整性**：验证测试用例覆盖度
+- **代码质量**：评估代码结构和可读性
+- **生成效率**：测量代码生成时间
+
+## 项目结构
+本项目包含以下主要组件：
+- **CAPL 代码生成器**：根据测试用例生成 CAPL 代码
+- **循环检测器**：检测和清理生成代码中的重复循环
+- **代码清理器**：移除重复的变量定义
+- **CAPL 语法检查器**：集成的 capl_checker 子模块，提供静态语法检查功能
+
+## 环境准备
+确保你已经安装了 Python 3.x，并且本地运行着 Ollama 或 LM Studio 服务器。
+
+## 安装依赖
+```bash
+pip install -r requirements.txt
+
+# 如果是首次克隆项目，需要初始化子模块
+git submodule update --init --recursive
+```
+
+## CAPL 语法检查器
+本项目集成了 [capl_checker](https://github.com/robertsong2000/capl_checker) 作为子模块，提供 CAPL 代码的静态语法检查功能。
+
+### 功能特性
+- **语法检查**：检测基本的语法错误，如括号不匹配、缺少分号等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+- **变量分析**：检测未定义变量、变量重复声明等问题 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+- **函数分析**：检测函数重复声明、参数问题等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+- **代码风格**：检查命名规范、行长度、尾随空白等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+- **CAPL特定检查**：针对CAPL语言特性的专门检查 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+
+### 使用语法检查器
+```bash
+# 检查生成的 CAPL 文件
+python capl_checker/capl_checker.py capl/your_file.can
+
+# 检查多个文件
+python capl_checker/capl_checker.py capl/*.can
+
+# 使用 XML 格式输出
+python capl_checker/capl_checker.py --format xml capl/your_file.can
+
+# 输出到文件
+python capl_checker/capl_checker.py --output report.txt capl/your_file.can
+```
+
 ## 配置说明
 程序支持两种 API 类型：
 
