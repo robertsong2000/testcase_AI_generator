@@ -167,3 +167,60 @@ if __name__ == "__main__":
         
         # 运行 CAPL 提取器
         subprocess.run(["python", os.path.join(script_dir, "capl_extractor.py")])
+
+
+class CAPLGenerator:
+    """CAPL代码生成器类，用于评估框架"""
+    
+    def __init__(self):
+        pass
+    
+    def generate_capl_code(self, requirement):
+        """根据需求生成CAPL代码"""
+        from capl_generator import send_file_to_ollama
+        
+        # 创建一个临时文件来存储需求
+        import tempfile
+        import os
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.cin', delete=False, encoding='utf-8') as tmp_file:
+            tmp_file.write(f"// {requirement}\n")
+            tmp_file.write("// 测试用例需求\n")
+            tmp_file.write("variables\n")
+            tmp_file.write("{\n")
+            tmp_file.write("  // 变量定义\n")
+            tmp_file.write("}\n")
+            tmp_file.write("\n")
+            tmp_file.write("on start\n")
+            tmp_file.write("{\n")
+            tmp_file.write("  // 测试逻辑\n")
+            tmp_file.write("}\n")
+            tmp_file_path = tmp_file.name
+        
+        try:
+            # 使用现有的send_file_to_ollama函数
+            result = send_file_to_ollama(tmp_file_path)
+            
+            # 读取生成的CAPL代码
+            import os
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            capl_dir = os.path.join(script_dir, "capl")
+            
+            # 找到最新的生成的文件
+            capl_files = []
+            if os.path.exists(capl_dir):
+                for f in os.listdir(capl_dir):
+                    if f.endswith('.md'):
+                        capl_files.append(os.path.join(capl_dir, f))
+            
+            if capl_files:
+                latest_file = max(capl_files, key=os.path.getmtime)
+                with open(latest_file, 'r', encoding='utf-8') as f:
+                    return f.read()
+            else:
+                return "// 生成的CAPL代码将在这里显示\n"
+                
+        finally:
+            # 清理临时文件
+            if os.path.exists(tmp_file_path):
+                os.unlink(tmp_file_path)
