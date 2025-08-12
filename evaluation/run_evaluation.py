@@ -50,20 +50,57 @@ def load_test_cases():
     
     return test_cases
 
-def run_current_evaluation():
-    """运行当前版本的评估"""
+def load_test_cases_from_file(filepath):
+    """从单个文件加载测试用例"""
+    test_cases = []
+    
+    if not os.path.exists(filepath):
+        print(f"文件不存在: {filepath}")
+        return test_cases
+    
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        # 提取需求描述
+        lines = content.split('\n')
+        requirement = ""
+        for line in lines[:10]:
+            if '//' in line:
+                requirement += line.strip('//').strip() + " "
+        
+        if not requirement:
+            requirement = f"测试用例: {os.path.basename(filepath).replace('.cin', '').replace('.can', '')}"
+        
+        test_cases.append({
+            'test_id': os.path.basename(filepath).replace('.cin', '').replace('.can', ''),
+            'requirement': requirement.strip(),
+            'template_content': content,
+            'source_file': filepath
+        })
+        
+        print(f"从文件加载测试用例: {os.path.basename(filepath)}")
+        
+    except Exception as e:
+        print(f"加载文件 {filepath} 失败: {e}")
+    
+    return test_cases
+
+def run_current_evaluation(single_file=None):
+    """运行当前版本的评估
+    
+    Args:
+        single_file: 指定单个测试文件路径，如果为None则使用默认测试用例
+    """
     print("=== CAPL测试用例生成器评估报告 ===")
     print(f"评估时间: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     
-    # 创建评估器
-    evaluator = CAPLEvaluator()
-    
-    # 创建测试用例生成器
-    generator = CAPLGenerator()
-    
-    # 加载测试用例
-    test_cases = load_test_cases()
-    print(f"找到 {len(test_cases)} 个测试用例")
+    if single_file:
+        print(f"指定测试文件: {single_file}")
+        test_cases = load_test_cases_from_file(single_file)
+    else:
+        print("使用默认测试用例")
+        test_cases = load_test_cases()
     
     if not test_cases:
         print("未找到测试用例，使用默认测试...")
@@ -75,10 +112,18 @@ def run_current_evaluation():
             }
         ]
     
+    print(f"找到 {len(test_cases)} 个测试用例")
+    
+    # 创建评估器
+    evaluator = CAPLEvaluator()
+    
+    # 创建测试用例生成器
+    generator = CAPLGenerator()
+    
     # 运行评估
     evaluation_data = []
     
-    for case in test_cases[:5]:  # 限制前5个测试用例
+    for case in test_cases:
         print(f"\n评估测试用例: {case['test_id']}")
         
         try:
@@ -214,6 +259,8 @@ def main():
                        help='创建基准测试数据集')
     parser.add_argument('--compare', action='store_true', 
                        help='与基线对比')
+    parser.add_argument('--file', type=str, 
+                       help='指定单个测试文件进行评估')
     
     args = parser.parse_args()
     
@@ -222,7 +269,7 @@ def main():
         return
     
     # 运行评估
-    current_metrics = run_current_evaluation()
+    current_metrics = run_current_evaluation(single_file=args.file)
     
     if args.compare and current_metrics:
         compare_with_baseline(current_metrics)
