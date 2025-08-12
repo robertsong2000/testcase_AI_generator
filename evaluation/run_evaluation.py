@@ -13,7 +13,7 @@ import argparse
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from evaluation.evaluation_framework import CAPLEvaluator, create_benchmark_dataset
+from evaluation.evaluation_framework import CAPLEvaluator, create_benchmark_dataset, EvaluationResult
 from capl_generator import CAPLGenerator
 
 def load_test_cases():
@@ -113,7 +113,7 @@ def run_current_evaluation(single_file=None):
         ]
     
     print(f"找到 {len(test_cases)} 个测试用例")
-    
+
     # 创建评估器
     evaluator = CAPLEvaluator()
     
@@ -127,16 +127,24 @@ def run_current_evaluation(single_file=None):
         print(f"\n评估测试用例: {case['test_id']}")
         
         try:
-            # 生成代码
+            # 记录AI模型生成代码的时间
+            start_generation_time = time.time()
             generated_code = generator.generate_capl_code(case['requirement'])
+            ai_generation_time = time.time() - start_generation_time
             
-            # 评估生成的代码
+            # 评估生成的代码（包括评估时间）
             result = evaluator.evaluate_single_case(
                 requirement=case['requirement'],
                 generated_code=generated_code,
                 test_id=case['test_id']
             )
             
+            # 计算总时间 = AI生成时间 + 评估时间
+            total_generation_time = ai_generation_time + result.generation_time
+            
+            print(f"  AI模型生成时间: {ai_generation_time:.2f}秒")
+            print(f"  本地评估时间: {result.generation_time:.2f}秒")
+            print(f"  总生成时间: {total_generation_time:.2f}秒")
             print(f"  语法分数: {result.syntax_score:.2f}")
             print(f"  功能分数: {result.functional_score:.2f}")
             print(f"  质量分数: {result.quality_score:.2f}")
@@ -152,7 +160,9 @@ def run_current_evaluation(single_file=None):
                 'quality_score': result.quality_score,
                 'error_count': result.error_count,
                 'warning_count': result.warning_count,
-                'generation_time': result.generation_time
+                'ai_generation_time': ai_generation_time,
+                'evaluation_time': result.generation_time,
+                'total_generation_time': total_generation_time
             })
             
         except Exception as e:
@@ -166,24 +176,63 @@ def run_current_evaluation(single_file=None):
                 'quality_score': 0.0,
                 'error_count': 1,
                 'warning_count': 0,
-                'generation_time': 0.0
+                'ai_generation_time': 0.0,
+                'evaluation_time': 0.0,
+                'total_generation_time': 0.0
             })
     
     # 生成总结报告
     if evaluation_data:
-        df, summary = evaluator.get_summary_report()
+        # 重新计算包含AI生成时间的统计
+        total_generation_times = [d['total_generation_time'] for d in evaluation_data]
+        syntax_scores = [d['syntax_score'] for d in evaluation_data]
+        functional_scores = [d['functional_score'] for d in evaluation_data]
+        quality_scores = [d['quality_score'] for d in evaluation_data]
+        error_counts = [d['error_count'] for d in evaluation_data]
+        warning_counts = [d['warning_count'] for d in evaluation_data]
+        
+        summary = {
+            'total_tests': len(evaluation_data),
+            'avg_syntax_score': sum(syntax_scores) / len(syntax_scores) if syntax_scores else 0.0,
+            'avg_functional_score': sum(functional_scores) / len(functional_scores) if functional_scores else 0.0,
+            'avg_quality_score': sum(quality_scores) / len(quality_scores) if quality_scores else 0.0,
+            'avg_generation_time': sum(total_generation_times) / len(total_generation_times) if total_generation_times else 0.0,
+            'total_errors': sum(error_counts),
+            'total_warnings': sum(warning_counts),
+            'success_rate': sum(1 for s in syntax_scores if s > 0.8) / len(syntax_scores) if syntax_scores else 0.0
+        }
         
         print("\n=== 评估总结 ===")
         print(f"总测试用例: {summary['total_tests']}")
         print(f"平均语法分数: {summary['avg_syntax_score']:.2f}")
         print(f"平均功能分数: {summary['avg_functional_score']:.2f}")
         print(f"平均质量分数: {summary['avg_quality_score']:.2f}")
-        print(f"平均生成时间: {summary['avg_generation_time']:.2f}秒")
+        print(f"平均总生成时间: {summary['avg_generation_time']:.2f}秒")
         print(f"总错误数: {summary['total_errors']}")
         print(f"总警告数: {summary['total_warnings']}")
         print(f"成功率: {summary['success_rate']:.2%}")
         
         # 保存详细报告
+        evaluator.results = []  # 清空现有结果
+        for data in evaluation_data:
+            from dataclasses import dataclass
+            from datetime import datetime
+            
+            # 创建新的评估结果
+            result = EvaluationResult(
+                test_id=data['test_id'],
+                requirement=data['requirement'],
+                generated_code=data['generated_code'],
+                syntax_score=data['syntax_score'],
+                functional_score=data['functional_score'],
+                quality_score=data['quality_score'],
+                generation_time=data['total_generation_time'],  # 使用总时间
+                error_count=data['error_count'],
+                warning_count=data['warning_count'],
+                timestamp=datetime.now().isoformat()
+            )
+            evaluator.results.append(result)
+        
         report_filename = evaluator.save_report()
         print(f"\n详细报告已保存: {report_filename}")
         
@@ -200,25 +249,26 @@ def run_current_evaluation(single_file=None):
                 'avg_generation_time': summary['avg_generation_time'],
                 'success_rate': summary['success_rate']
             },
-            'test_count': summary['total_tests']
+            'test_count': len(evaluation_data),
+            'time_unit': 'seconds'
         }
         
-        # 使用时间戳命名性能基线文件
-        baseline_filename = f"performance_baseline_{time.strftime('%Y%m%d_%H%M%S')}.json"
-        baseline_path = os.path.join(logs_dir, baseline_filename)
+        baseline_filename = os.path.join(logs_dir, 'performance_baseline.json')
+        with open(baseline_filename, 'w', encoding='utf-8') as f:
+            json.dump(baseline, f, indent=2, ensure_ascii=False)
         
-        with open(baseline_path, 'w') as f:
-            json.dump(baseline, f, indent=2)
+        # 同时保存一份当前基线到根目录用于对比
+        current_baseline = os.path.join(os.path.dirname(__file__), 'performance_baseline.json')
+        with open(current_baseline, 'w', encoding='utf-8') as f:
+            json.dump(baseline, f, indent=2, ensure_ascii=False)
         
-        print(f"性能基线已保存: {baseline_path}")
+        print(f"性能基线已保存: {baseline_filename}")
+        print(f"当前基线已保存: {current_baseline}")
         
-        # 同时保存一份到根目录作为当前基线（用于对比）
-        with open('performance_baseline.json', 'w') as f:
-            json.dump(baseline, f, indent=2)
-        
-        return baseline
-    
-    return None
+        return summary
+    else:
+        print("没有可用的评估数据")
+        return None
 
 def compare_with_baseline(current_metrics):
     """与基线对比"""
