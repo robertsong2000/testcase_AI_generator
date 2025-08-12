@@ -143,6 +143,9 @@ def run_current_evaluation():
         print(f"\n详细报告已保存: {report_filename}")
         
         # 创建性能基线文件
+        logs_dir = os.path.join(os.path.dirname(__file__), 'logs')
+        os.makedirs(logs_dir, exist_ok=True)
+        
         baseline = {
             'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
             'metrics': {
@@ -155,10 +158,18 @@ def run_current_evaluation():
             'test_count': summary['total_tests']
         }
         
-        with open('performance_baseline.json', 'w') as f:
+        # 使用时间戳命名性能基线文件
+        baseline_filename = f"performance_baseline_{time.strftime('%Y%m%d_%H%M%S')}.json"
+        baseline_path = os.path.join(logs_dir, baseline_filename)
+        
+        with open(baseline_path, 'w') as f:
             json.dump(baseline, f, indent=2)
         
-        print("性能基线已保存: performance_baseline.json")
+        print(f"性能基线已保存: {baseline_path}")
+        
+        # 同时保存一份到根目录作为当前基线（用于对比）
+        with open('performance_baseline.json', 'w') as f:
+            json.dump(baseline, f, indent=2)
         
         return baseline
     
@@ -166,17 +177,32 @@ def run_current_evaluation():
 
 def compare_with_baseline(current_metrics):
     """与基线对比"""
-    if not os.path.exists('performance_baseline.json'):
+    logs_dir = os.path.join(os.path.dirname(__file__), 'logs')
+    
+    # 查找最新的基线文件
+    baseline_files = []
+    if os.path.exists(logs_dir):
+        for filename in os.listdir(logs_dir):
+            if filename.startswith('performance_baseline_') and filename.endswith('.json'):
+                baseline_files.append(os.path.join(logs_dir, filename))
+    
+    # 如果没有找到logs中的基线，尝试根目录
+    if not baseline_files and os.path.exists('performance_baseline.json'):
+        baseline_file = 'performance_baseline.json'
+    elif baseline_files:
+        # 使用最新的基线文件
+        baseline_file = max(baseline_files, key=os.path.getctime)
+    else:
         print("未找到基线数据，跳过对比")
         return
     
-    with open('performance_baseline.json', 'r') as f:
+    with open(baseline_file, 'r') as f:
         baseline = json.load(f)
     
-    print("\n=== 性能对比 ===")
+    print(f"\n=== 性能对比（对比文件: {os.path.basename(baseline_file)}）===")
     for metric, current_value in current_metrics['metrics'].items():
         baseline_value = baseline['metrics'][metric]
-        improvement = ((current_value - baseline_value) / baseline_value) * 100
+        improvement = ((current_value - baseline_value) / baseline_value) * 100 if baseline_value != 0 else 0
         
         status = "↑ 提升" if improvement > 0 else "↓ 下降" if improvement < 0 else "→ 持平"
         print(f"{metric}: {current_value:.3f} vs {baseline_value:.3f} ({improvement:+.1f}%) {status}")
