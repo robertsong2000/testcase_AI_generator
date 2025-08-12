@@ -33,3 +33,6 @@ sample/
 
 # 临时测试目录
 test/
+
+# 评估日志目录
+evaluation/logs/

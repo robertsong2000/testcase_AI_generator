@@ -222,9 +222,17 @@ class CAPLEvaluator:
         return df, summary
     
     def save_report(self, filename: str = None):
-        """保存评估报告"""
+        """保存评估报告到logs目录"""
+        # 确保logs目录存在
+        logs_dir = os.path.join(os.path.dirname(__file__), 'logs')
+        os.makedirs(logs_dir, exist_ok=True)
+        
         if filename is None:
             filename = f"evaluation_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        
+        # 确保保存到logs目录
+        if not os.path.isabs(filename):
+            filename = os.path.join(logs_dir, filename)
         
         df, summary = self.get_summary_report()
         
@@ -233,10 +241,6 @@ class CAPLEvaluator:
             'summary': summary,
             'detailed_results': [vars(r) for r in self.results]
         }
-        
-        # 确保保存到评估目录
-        if not os.path.isabs(filename):
-            filename = os.path.join(os.path.dirname(__file__), filename)
         
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(report_data, f, indent=2, ensure_ascii=False)
