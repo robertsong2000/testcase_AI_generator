@@ -24,11 +24,11 @@ git submodule update --init --recursive
 本项目集成了 [capl_checker](https://github.com/robertsong2000/capl_checker) 作为子模块，提供 CAPL 代码的静态语法检查功能。
 
 ### 功能特性
-- **语法检查**：检测基本的语法错误，如括号不匹配、缺少分号等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
-- **变量分析**：检测未定义变量、变量重复声明等问题 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
-- **函数分析**：检测函数重复声明、参数问题等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
-- **代码风格**：检查命名规范、行长度、尾随空白等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
-- **CAPL特定检查**：针对CAPL语言特性的专门检查 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+- **语法检查**：检测基本的语法错误，如括号不匹配、缺少分号等
+- **变量分析**：检测未定义变量、变量重复声明等问题
+- **函数分析**：检测函数重复声明、参数问题等
+- **代码风格**：检查命名规范、行长度、尾随空白等
+- **CAPL特定检查**：针对CAPL语言特性的专门检查
 
 ### 使用语法检查器
 ```bash
@@ -52,7 +52,6 @@ python capl_checker/capl_checker.py --output report.txt capl/your_file.can
 ### 评估文件夹结构
 ```
 evaluation/
-├── TODO.txt                  # 优化迭代路线图
 ├── evaluation_framework.py   # 评估框架核心代码
 ├── run_evaluation.py        # 评估执行脚本
 └── evaluation_config.json   # 评估配置参数
@@ -95,11 +94,11 @@ git submodule update --init --recursive
 本项目集成了 [capl_checker](https://github.com/robertsong2000/capl_checker) 作为子模块，提供 CAPL 代码的静态语法检查功能。
 
 ### 功能特性
-- **语法检查**：检测基本的语法错误，如括号不匹配、缺少分号等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
-- **变量分析**：检测未定义变量、变量重复声明等问题 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
-- **函数分析**：检测函数重复声明、参数问题等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
-- **代码风格**：检查命名规范、行长度、尾随空白等 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
-- **CAPL特定检查**：针对CAPL语言特性的专门检查 <mcreference link="https://github.com/robertsong2000/capl_checker.git" index="0">0</mcreference>
+- **语法检查**：检测基本的语法错误，如括号不匹配、缺少分号等
+- **变量分析**：检测未定义变量、变量重复声明等问题
+- **函数分析**：检测函数重复声明、参数问题等
+- **代码风格**：检查命名规范、行长度、尾随空白等
+- **CAPL特定检查**：针对CAPL语言特性的专门检查
 
 ### 使用语法检查器
 ```bash
