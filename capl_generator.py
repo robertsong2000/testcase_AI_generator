@@ -3,22 +3,29 @@ import requests
 import sys
 import json
 import os
+import argparse
 from dotenv import load_dotenv
 import ollama
 
 
-def send_file_to_ollama(file_path):
+def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, context_length=None, max_tokens=None, temperature=None, top_p=None):
     try:
         # 加载 .env 文件
         load_dotenv()
-        # 获取 API 类型和 URL
-        api_type = os.getenv('API_TYPE', 'ollama')  # 可选值：ollama 或 openai
+        
+        # 命令行参数优先，其次环境变量，最后默认值
+        api_type = api_type or os.getenv('API_TYPE', 'ollama')
         if api_type == 'ollama':
             default_url = 'http://localhost:11434'
         else:  # openai 兼容的 API
             default_url = 'http://localhost:1234/v1'
         
-        api_url = os.getenv('API_URL', default_url)
+        api_url = api_url or os.getenv('API_URL', default_url)
+        model = model or (os.getenv("OLLAMA_MODEL") if api_type == 'ollama' else os.getenv("OPENAI_MODEL"))
+        context_length = context_length or int(os.getenv("OLLAMA_CONTEXT_LENGTH", "8192"))
+        max_tokens = max_tokens or int(os.getenv("OLLAMA_MAX_TOKENS", "4096"))
+        temperature = temperature or float(os.getenv("TEMPERATURE", "0.2"))
+        top_p = top_p or float(os.getenv("TOP_P", "0.5"))
 
         with open(file_path, "r", encoding="utf-8") as file:
             file_content = file.read()
@@ -57,18 +64,24 @@ def send_file_to_ollama(file_path):
             # 创建ollama客户端
             client = ollama.Client(host=ollama_host)
             
+            # 根据api_type设置模型名称
+            if api_type == 'ollama':
+                actual_model = model or os.getenv("OLLAMA_MODEL", "qwen3:30b-a3b")
+            else:
+                actual_model = model or os.getenv("OPENAI_MODEL", "qwen/qwen3-1.7b")
+                
             stream = client.chat(
-                model=os.getenv("OLLAMA_MODEL", "qwen3:30b-a3b"),
+                model=actual_model,
                 messages=[
                     {"role": "system", "content": prompt_template},
                     {"role": "user", "content": file_content}
                 ],
                 stream=True,
                 options={
-                    "temperature": 0.2,
-                    "top_p": 0.5,
-                    "num_ctx": int(os.getenv("OLLAMA_CONTEXT_LENGTH", "8192")),  # 默认8192，可通过环境变量配置
-                    "num_predict": int(os.getenv("OLLAMA_MAX_TOKENS", "4096"))   # 限制最大输出tokens，防止无限循环
+                    "temperature": temperature,
+                    "top_p": top_p,
+                    "num_ctx": context_length,
+                    "num_predict": max_tokens
                 }
             )
         else:  # openai 兼容的 API
@@ -78,15 +91,19 @@ def send_file_to_ollama(file_path):
             elif not api_url.endswith('/chat/completions'):
                 api_url = f"{api_url.rstrip('/')}/chat/completions"
             
+            # 根据api_type设置模型名称
+            actual_model = model or os.getenv("OPENAI_MODEL", "qwen/qwen3-1.7b")
+            
             payload = {
-                "model": os.getenv("OPENAI_MODEL", "qwen/qwen3-1.7b"),
+                "model": actual_model,
                 "messages": [
                     {"role": "system", "content": prompt_template},
                     {"role": "user", "content": file_content}
                 ],
                 "stream": True,
-                "temperature": 0.2,
-                "top_p": 0.5
+                "temperature": temperature,
+                "top_p": top_p,
+                "max_tokens": max_tokens
             }
             response = requests.post(api_url, json=payload, stream=True)
             response.raise_for_status()
@@ -162,29 +179,78 @@ def send_file_to_ollama(file_path):
         else:
             return f"发生错误: {error_msg}"
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("请提供文件路径作为参数，例如：python capl_generator.py /path/to/your/file")
+def main():
+    parser = argparse.ArgumentParser(description='CAPL代码生成器 - 基于测试需求生成CAPL代码')
+    parser.add_argument('file_path', help='输入的测试需求文件路径')
+    parser.add_argument('--api-type', choices=['ollama', 'openai'], 
+                       help='API类型 (ollama 或 openai)')
+    parser.add_argument('--api-url', help='API服务地址')
+    parser.add_argument('--model', help='使用的模型名称')
+    parser.add_argument('--context-length', type=int, 
+                       help='上下文长度 (tokens)')
+    parser.add_argument('--max-tokens', type=int, 
+                       help='最大输出tokens数')
+    parser.add_argument('--temperature', type=float, 
+                       help='生成温度 (0.0-1.0)')
+    parser.add_argument('--top-p', type=float, 
+                       help='top-p采样参数 (0.0-1.0)')
+    parser.add_argument('--no-extract', action='store_true',
+                       help='跳过CAPL代码提取步骤')
+    
+    args = parser.parse_args()
+    
+    # 检查文件是否存在
+    if not os.path.exists(args.file_path):
+        print(f"错误：文件不存在 - {args.file_path}")
         sys.exit(1)
-    file_path = sys.argv[1]
-    result = send_file_to_ollama(file_path)
-    if result.startswith("发生错误"):
+    
+    print(f"正在处理文件: {args.file_path}")
+    if args.api_type:
+        print(f"API类型: {args.api_type}")
+    if args.api_url:
+        print(f"API地址: {args.api_url}")
+    if args.model:
+        print(f"模型: {args.model}")
+    if args.context_length:
+        print(f"上下文长度: {args.context_length}")
+    if args.max_tokens:
+        print(f"最大输出tokens: {args.max_tokens}")
+    
+    result = send_file_to_ollama(
+        args.file_path,
+        api_type=args.api_type,
+        api_url=args.api_url,
+        model=args.model,
+        context_length=args.context_length,
+        max_tokens=args.max_tokens,
+        temperature=args.temperature,
+        top_p=args.top_p
+    )
+    
+    if result.startswith("发生错误") or result.startswith("错误:"):
         print(result)
+        sys.exit(1)
     else:
-        import subprocess
-        import os
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        capl_dir = os.path.join(script_dir, "capl")
+        print(result)
         
-        # 生成对应的文件名
-        base_name = os.path.splitext(os.path.basename(file_path))[0]
-        generated_md_file = os.path.join(capl_dir, f"{base_name}.md")
-        
-        # 运行 CAPL 提取器 - 只提取当前生成的文件
-        if os.path.exists(generated_md_file):
-            subprocess.run(["python", os.path.join(script_dir, "capl_extractor.py"), generated_md_file])
-        else:
-            print(f"警告：未找到生成的文件 {generated_md_file}")
+        if not args.no_extract:
+            import subprocess
+            import os
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            capl_dir = os.path.join(script_dir, "capl")
+            
+            # 生成对应的文件名
+            base_name = os.path.splitext(os.path.basename(args.file_path))[0]
+            generated_md_file = os.path.join(capl_dir, f"{base_name}.md")
+            
+            # 运行 CAPL 提取器 - 只提取当前生成的文件
+            if os.path.exists(generated_md_file):
+                subprocess.run(["python", os.path.join(script_dir, "capl_extractor.py"), generated_md_file])
+            else:
+                print(f"警告：未找到生成的文件 {generated_md_file}")
+
+if __name__ == "__main__":
+    main()
 
 
 class CAPLGenerator:
