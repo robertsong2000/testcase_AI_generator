@@ -174,9 +174,17 @@ if __name__ == "__main__":
         import subprocess
         import os
         script_dir = os.path.dirname(os.path.abspath(__file__))
+        capl_dir = os.path.join(script_dir, "capl")
         
-        # 运行 CAPL 提取器
-        subprocess.run(["python", os.path.join(script_dir, "capl_extractor.py")])
+        # 生成对应的文件名
+        base_name = os.path.splitext(os.path.basename(file_path))[0]
+        generated_md_file = os.path.join(capl_dir, f"{base_name}.md")
+        
+        # 运行 CAPL 提取器 - 只提取当前生成的文件
+        if os.path.exists(generated_md_file):
+            subprocess.run(["python", os.path.join(script_dir, "capl_extractor.py"), generated_md_file])
+        else:
+            print(f"警告：未找到生成的文件 {generated_md_file}")
 
 
 class CAPLGenerator:
