@@ -149,8 +149,18 @@ def send_file_to_ollama(file_path):
                         except Exception as e:
                             continue
         return "\n响应完成"
+    except requests.exceptions.ConnectionError as e:
+        return f"发生错误: 连接失败 - 请确保Ollama服务已启动 (运行 'ollama serve')"
+    except requests.exceptions.Timeout as e:
+        return f"发生错误: 请求超时 - 请检查网络连接和服务状态"
     except Exception as e:
-        return f"发生错误: {str(e)}"
+        error_msg = str(e)
+        if "Connection" in error_msg or "connect" in error_msg.lower():
+            return f"发生错误: 连接失败 - 请确保Ollama服务已启动并正在监听正确的端口"
+        elif "404" in error_msg:
+            return f"发生错误: 模型未找到 - 请运行 'ollama run qwen3:30b-a3b' 加载模型"
+        else:
+            return f"发生错误: {error_msg}"
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -201,6 +211,12 @@ class CAPLGenerator:
             # 使用现有的send_file_to_ollama函数
             result = send_file_to_ollama(tmp_file_path)
             
+            # 检查send_file_to_ollama的返回值
+            if result.startswith("发生错误") or result.startswith("错误:"):
+                # 提取错误信息
+                error_msg = result.replace("发生错误: ", "").replace("错误: ", "")
+                raise RuntimeError(f"AI模型调用失败: {error_msg}")
+            
             # 读取生成的CAPL代码
             import os
             script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -216,9 +232,15 @@ class CAPLGenerator:
             if capl_files:
                 latest_file = max(capl_files, key=os.path.getmtime)
                 with open(latest_file, 'r', encoding='utf-8') as f:
-                    return f.read()
+                    content = f.read()
+                    
+                # 检查生成内容是否有效
+                if not content.strip() or content.strip() == "// 生成的CAPL代码将在这里显示":
+                    raise RuntimeError("AI模型未返回有效内容，可能服务未启动或模型未加载")
+                    
+                return content
             else:
-                return "// 生成的CAPL代码将在这里显示\n"
+                raise RuntimeError("未找到生成的CAPL文件，AI模型可能未成功调用")
                 
         finally:
             # 清理临时文件

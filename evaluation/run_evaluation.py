@@ -132,6 +132,21 @@ def run_current_evaluation(single_file=None):
             generated_code = generator.generate_capl_code(case['requirement'])
             ai_generation_time = time.time() - start_generation_time
             
+            # 检查是否成功调用大模型（AI生成时间应该大于0，且生成代码不应为空或仅包含默认内容）
+            if ai_generation_time <= 0.01 or not generated_code.strip() or "// 生成的CAPL代码将在这里显示" in generated_code:
+                print(f"  ❌ 错误：大模型未成功调用！")
+                print(f"  AI生成时间: {ai_generation_time:.2f}秒（预期应大于0.01秒）")
+                print(f"  生成代码长度: {len(generated_code.strip())}字符")
+                print(f"  可能原因：")
+                print(f"    - Ollama服务未启动（运行 'ollama serve' 启动服务）")
+                print(f"    - 模型未正确加载（运行 'ollama run qwen3:30b-a3b' 加载模型）")
+                print(f"    - API连接失败（检查网络连接和服务状态）")
+                print(f"    - 环境变量配置错误（检查 .env 文件中的 API_TYPE 和 API_URL）")
+                
+                # 直接退出程序，避免继续执行无效的评估
+                print(f"\n⚠️  检测到AI模型调用失败，程序将退出。请检查上述问题后重试。")
+                sys.exit(1)
+            
             # 评估生成的代码（包括评估时间）
             result = evaluator.evaluate_single_case(
                 requirement=case['requirement'],
@@ -142,7 +157,7 @@ def run_current_evaluation(single_file=None):
             # 计算总时间 = AI生成时间 + 评估时间
             total_generation_time = ai_generation_time + result.generation_time
             
-            print(f"  AI模型生成时间: {ai_generation_time:.2f}秒")
+            print(f"  ✅ AI模型生成时间: {ai_generation_time:.2f}秒")
             print(f"  本地评估时间: {result.generation_time:.2f}秒")
             print(f"  总生成时间: {total_generation_time:.2f}秒")
             print(f"  语法分数: {result.syntax_score:.2f}")
@@ -166,11 +181,25 @@ def run_current_evaluation(single_file=None):
             })
             
         except Exception as e:
-            print(f"  评估失败: {str(e)}")
+            print(f"  ❌ 评估失败: {str(e)}")
+            print(f"  错误类型: {type(e).__name__}")
+            
+            # 如果是连接错误，提供具体的解决建议
+            if "Connection" in str(e) or "connect" in str(e).lower():
+                print(f"  可能原因：")
+                print(f"    - Ollama服务未启动")
+                print(f"    - 网络连接问题")
+                print(f"    - 防火墙阻止了连接")
+                print(f"  解决步骤：")
+                print(f"    1. 运行: ollama serve")
+                print(f"    2. 运行: ollama run qwen3:30b-a3b")
+                print(f"    3. 检查服务状态: curl http://localhost:11434/api/tags")
+            
             evaluation_data.append({
                 'test_id': case['test_id'],
                 'requirement': case['requirement'],
                 'error': str(e),
+                'error_type': type(e).__name__,
                 'syntax_score': 0.0,
                 'functional_score': 0.0,
                 'quality_score': 0.0,
@@ -180,6 +209,11 @@ def run_current_evaluation(single_file=None):
                 'evaluation_time': 0.0,
                 'total_generation_time': 0.0
             })
+            
+            # 对于关键错误，直接退出程序
+            if "Connection" in str(e) or "connect" in str(e).lower() or ai_generation_time <= 0.01:
+                print(f"\n⚠️  检测到AI模型调用失败，程序将退出。请检查上述问题后重试。")
+                sys.exit(1)
     
     # 生成总结报告
     if evaluation_data:
@@ -318,7 +352,6 @@ def main():
         create_benchmark_dataset()
         return
     
-    # 运行评估
     current_metrics = run_current_evaluation(single_file=args.file)
     
     if args.compare and current_metrics:
