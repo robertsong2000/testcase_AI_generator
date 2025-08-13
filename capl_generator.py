@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import ollama
 
 
-def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, context_length=None, max_tokens=None, temperature=None, top_p=None):
+def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, context_length=None, max_tokens=None, temperature=None, top_p=None, output_dir=None):
     try:
         # 加载 .env 文件
         load_dotenv()
@@ -110,8 +110,11 @@ def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, cont
 
         # 获取脚本所在目录
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        # 创建 capl 子目录在脚本所在目录下
-        capl_dir = os.path.join(script_dir, "capl")
+        # 创建输出目录，支持自定义目录
+        if output_dir:
+            capl_dir = os.path.abspath(output_dir)
+        else:
+            capl_dir = os.path.join(script_dir, "capl")
         os.makedirs(capl_dir, exist_ok=True)
         
         # 生成对应的 capl 文件名
@@ -180,6 +183,9 @@ def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, cont
             return f"发生错误: {error_msg}"
 
 def main():
+    import os
+    import sys
+    
     parser = argparse.ArgumentParser(description='CAPL代码生成器 - 基于测试需求生成CAPL代码')
     parser.add_argument('file_path', help='输入的测试需求文件路径')
     parser.add_argument('--api-type', choices=['ollama', 'openai'], 
@@ -196,6 +202,7 @@ def main():
                        help='top-p采样参数 (0.0-1.0)')
     parser.add_argument('--no-extract', action='store_true',
                        help='跳过CAPL代码提取步骤')
+    parser.add_argument('--output-dir', help='指定测试结果保存的目录')
     
     args = parser.parse_args()
     
@@ -215,6 +222,8 @@ def main():
         print(f"上下文长度: {args.context_length}")
     if args.max_tokens:
         print(f"最大输出tokens: {args.max_tokens}")
+    if args.output_dir:
+        print(f"输出目录: {args.output_dir}")
     
     result = send_file_to_ollama(
         args.file_path,
@@ -224,7 +233,8 @@ def main():
         context_length=args.context_length,
         max_tokens=args.max_tokens,
         temperature=args.temperature,
-        top_p=args.top_p
+        top_p=args.top_p,
+        output_dir=args.output_dir
     )
     
     if result.startswith("发生错误") or result.startswith("错误:"):
@@ -235,9 +245,13 @@ def main():
         
         if not args.no_extract:
             import subprocess
-            import os
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            capl_dir = os.path.join(script_dir, "capl")
+            
+            # 确定输出目录
+            if args.output_dir:
+                capl_dir = os.path.abspath(args.output_dir)
+            else:
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                capl_dir = os.path.join(script_dir, "capl")
             
             # 生成对应的文件名
             base_name = os.path.splitext(os.path.basename(args.file_path))[0]
@@ -245,7 +259,7 @@ def main():
             
             # 运行 CAPL 提取器 - 只提取当前生成的文件
             if os.path.exists(generated_md_file):
-                subprocess.run(["python", os.path.join(script_dir, "capl_extractor.py"), generated_md_file])
+                subprocess.run(["python", os.path.join(os.path.dirname(os.path.abspath(__file__)), "capl_extractor.py"), generated_md_file])
             else:
                 print(f"警告：未找到生成的文件 {generated_md_file}")
 
