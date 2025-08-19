@@ -148,6 +148,7 @@ python capl_checker/capl_checker.py --output report.txt capl/your_file.can
 ### 提示词文件
 - `prompt_template.txt`：标准提示词模板（默认）
 - `prompt_template_simple.txt`：简化版提示词模板
+- `example_code.txt`：示例代码文件，包含CAPL代码示例
 - 你可以创建自己的提示词模板文件
 
 ### 配置文件
@@ -199,6 +200,11 @@ python capl_workflow.py --skip-generation /path/to/existing/file.can
 2. 生成 CAPL 代码：
 ```bash
 python capl_generator.py /path/to/your/file
+```
+
+如果需要调试并查看完整的prompt信息，可以使用以下命令：
+```bash
+python capl_generator.py --debug-prompt /path/to/your/file
 ```
 
 3. 清理生成的代码（可选）：

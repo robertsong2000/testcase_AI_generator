@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import ollama
 
 
-def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, context_length=None, max_tokens=None, temperature=None, top_p=None, output_dir=None):
+def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, context_length=None, max_tokens=None, temperature=0.7, top_p=0.9, output_dir=None, debug_prompt=False):
     try:
         # 加载 .env 文件
         load_dotenv()
@@ -52,10 +52,30 @@ def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, cont
         try:
             with open(prompt_template_path, "r", encoding="utf-8") as prompt_file:
                 prompt_template = prompt_file.read()
+                
+            # 检查是否存在示例代码文件，如果存在则读取并合并
+            example_code_file = "example_code.txt"
+            example_code_path = os.path.join(script_dir, example_code_file)
+            if os.path.exists(example_code_path):
+                with open(example_code_path, "r", encoding="utf-8") as example_file:
+                    example_code_content = example_file.read()
+                    # 将示例代码内容合并到提示词模板中
+                    prompt_template = prompt_template.replace("示例代码已移至单独的文件 example_code.txt 中，以保护敏感代码内容。", example_code_content)
         except FileNotFoundError:
             return f"错误: 找不到提示词模板文件 {prompt_template_path}"
         except Exception as e:
             return f"错误: 读取提示词模板文件失败: {str(e)}"
+
+        # 如果启用调试模式，打印完整的prompt信息
+        if debug_prompt:
+            print("=" * 50)
+            print("完整的Prompt信息:")
+            print("=" * 50)
+            print(f"System Prompt:\n{prompt_template}\n")
+            print(f"User Content:\n{file_content}\n")
+            print("=" * 50)
+            print("Prompt信息打印完成")
+            print("=" * 50)
 
         if api_type == 'ollama':
             # 使用官方 ollama 库
@@ -203,6 +223,8 @@ def main():
     parser.add_argument('--no-extract', action='store_true',
                        help='跳过CAPL代码提取步骤')
     parser.add_argument('--output-dir', help='指定测试结果保存的目录')
+    parser.add_argument('--debug-prompt', action='store_true',
+                       help='启用调试模式，打印完整的prompt信息')
     
     args = parser.parse_args()
     
@@ -234,7 +256,8 @@ def main():
         max_tokens=args.max_tokens,
         temperature=args.temperature,
         top_p=args.top_p,
-        output_dir=args.output_dir
+        output_dir=args.output_dir,
+        debug_prompt=args.debug_prompt
     )
     
     if result.startswith("发生错误") or result.startswith("错误:"):
