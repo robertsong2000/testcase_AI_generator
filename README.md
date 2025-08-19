@@ -122,10 +122,18 @@ python capl_checker/capl_checker.py --output report.txt capl/your_file.can
    - 复制配置文件：`cp .env.ollama.sample .env`
    - 配置项说明：
      - `API_TYPE=ollama`：使用 Ollama API
-     - `API_URL`：Ollama 服务器地址，默认为 `http://localhost:11434`
+     - `API_URL`：Ollama 服务器地址，默认为 `http://localhost:11434`，如果Ollama运行在远程服务器上，需要修改为相应的地址，例如 `http://192.168.1.2:11434`
      - `OLLAMA_MODEL`：使用的模型名称，默认为 `qwen3:30b-a3b`
      - `OLLAMA_CONTEXT_LENGTH`：上下文长度，默认为 8192
      - `OLLAMA_MAX_TOKENS`：最大输出长度，默认为 4096（防止循环）
+
+### 特殊模型说明
+
+**qwen3-coder 模型**：
+- 该模型采用非思考模式（Non-Thinking）架构设计，仅支持非思考模式
+- 输出不包含 `<think>` 标记
+- 无需手动指定 `enable_thinking=False`
+- 在测试中不会生成推理过程内容
 
 2. OpenAI 兼容 API（如 LM Studio）：
    - 复制配置文件：`cp .env.openai.sample .env`
