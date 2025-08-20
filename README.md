@@ -8,6 +8,8 @@
 - **循环检测器**：检测和清理生成代码中的重复循环
 - **代码清理器**：移除重复的变量定义
 - **CAPL 语法检查器**：集成的 capl_checker 子模块，提供静态语法检查功能
+- **VERSION**：项目版本文件
+- **CHANGELOG.md**：项目变更日志文件
 
 ## 环境准备
 确保你已经安装了 Python 3.x，并且本地运行着 Ollama 或 LM Studio 服务器。
@@ -221,3 +223,14 @@ python capl_checker/capl_checker.py capl/generated_file.can
 ## 输出说明
 - 程序会在当前目录下创建 `capl` 文件夹
 - 生成的 CAPL 代码将保存在 `capl` 文件夹中，文件名与输入文件同名，扩展名为 `.md`
+
+## 版本和变更日志
+
+本项目使用 [VERSION](VERSION) 文件来跟踪当前版本号，使用 [CHANGELOG.md](CHANGELOG.md) 文件来记录所有重要的变更历史。
+
+- VERSION: 包含当前项目的版本号
+- CHANGELOG.md: 详细记录每个版本的新增功能、变更和修复内容
+
+请定期查看 CHANGELOG.md 以了解项目的最新更新。
+
+```
