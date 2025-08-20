@@ -202,10 +202,16 @@ def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, cont
         generation_time = time.time() - start_time
         code_length = len(generated_content)
         
-        # 显示类似 test_ai_connection.py 的输出
+        # 估算token数量（1个token大约等于4个字符，中文按2-3字符/token）
+        estimated_tokens = max(1, code_length // 4)  # 保守估计
+        token_rate = estimated_tokens / generation_time
+        
+        # 显示类似 test_ai_connection.py 的输出，包含token速率
         print("\n✅ AI模型调用成功")
         print(f"   生成时间: {generation_time:.2f}秒")
         print(f"   代码长度: {code_length}字符")
+        print(f"   估算token: {estimated_tokens} tokens")
+        print(f"   输出速率: {token_rate:.2f} tokens/秒")
         
         return "\n响应完成"
     except requests.exceptions.ConnectionError as e:
