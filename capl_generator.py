@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import ollama
 
 
-def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, context_length=None, max_tokens=None, temperature=0.7, top_p=0.9, output_dir=None, debug_prompt=False):
+def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, context_length=None, max_tokens=None, temperature=None, top_p=None, output_dir=None, debug_prompt=False):
     try:
         # 加载 .env 文件
         load_dotenv()
