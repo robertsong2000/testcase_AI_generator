@@ -4,12 +4,16 @@ import sys
 import json
 import os
 import argparse
+import time
 from dotenv import load_dotenv
 import ollama
 
 
 def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, context_length=None, max_tokens=None, temperature=None, top_p=None, output_dir=None, debug_prompt=False):
     try:
+        # 记录开始时间
+        start_time = time.time()
+        
         # 加载 .env 文件
         load_dotenv()
         
@@ -141,6 +145,9 @@ def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, cont
         base_name = os.path.splitext(os.path.basename(file_path))[0]
         capl_file_path = os.path.join(capl_dir, f"{base_name}.md")
         
+        # 用于收集生成的代码内容
+        generated_content = ""
+        
         with open(capl_file_path, "w", encoding="utf-8") as capl_file:
             if api_type == 'ollama':
                 # 处理 ollama 库的流式响应
@@ -173,6 +180,7 @@ def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, cont
                                 think_ended = True
                             print(content, end='', flush=True)
                             capl_file.write(content)
+                            generated_content += content
             else:
                 # 处理 openai 兼容 API 的流式响应
                 for line in response.iter_lines():
@@ -186,8 +194,19 @@ def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, cont
                                         response_text = json_data['choices'][0]['delta']['content']
                                         print(response_text, end='', flush=True)
                                         capl_file.write(response_text)
+                                        generated_content += response_text
                         except Exception as e:
                             continue
+        
+        # 计算生成时间和代码长度
+        generation_time = time.time() - start_time
+        code_length = len(generated_content)
+        
+        # 显示类似 test_ai_connection.py 的输出
+        print("\n✅ AI模型调用成功")
+        print(f"   生成时间: {generation_time:.2f}秒")
+        print(f"   代码长度: {code_length}字符")
+        
         return "\n响应完成"
     except requests.exceptions.ConnectionError as e:
         return f"发生错误: 连接失败 - 请确保Ollama服务已启动 (运行 'ollama serve')"
