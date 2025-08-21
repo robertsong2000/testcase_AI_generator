@@ -138,42 +138,117 @@ class CAPLAIEvaluator:
             print(f"读取文件失败 {file_path}: {e}")
             return ""
     
-    def extract_requirements_from_md(self, md_content: str) -> List[str]:
-        """从需求文档提取功能需求"""
+    def extract_requirements_from_md(self, md_content: str) -> List[Dict[str, str]]:
+        """从测试用例文档提取功能需求
+        
+        针对测试用例文档的特点：
+        1. 包含测试步骤和执行说明
+        2. 没有明确的预期结果列
+        3. 通过操作描述和验证点体现需求
+        """
+        import re
         requirements = []
         
-        # 提取测试步骤中的功能描述
+        # 提取测试步骤表中的功能描述
+        in_test_steps = False
         lines = md_content.split('\n')
+        
         for line in lines:
-            if '|' in line and '测试步骤' not in line and '预期结果' not in line:
-                parts = [part.strip() for part in line.split('|')]
-                if len(parts) >= 4:
-                    test_step = parts[2] if len(parts) > 2 else ""
-                    expected_result = parts[3] if len(parts) > 3 else ""
-                    if test_step and test_step != '测试步骤':
+            line = line.strip()
+            
+            # 检测测试步骤表的开始
+            if '|' in line and ('测试步骤' in line or 'Test Step' in line or 'Description' in line):
+                in_test_steps = True
+                continue
+                
+            # 处理测试步骤表中的行
+            if in_test_steps and '|' in line and '---' not in line:
+                parts = [part.strip() for part in line.split('|') if part.strip()]
+                if len(parts) >= 3:
+                    timestamp = parts[0] if len(parts) >= 1 else ""
+                    test_step = parts[1] if len(parts) >= 2 else ""
+                    description = parts[2] if len(parts) >= 3 else ""
+                    
+                    # 过滤无效行
+                    if (test_step and 
+                        test_step not in ['测试步骤', 'Test Step', 'Description'] and
+                        '---' not in test_step and
+                        not re.match(r'^\d+\.?\d*$', test_step) and
+                        not test_step.startswith('[')):
+                        
+                        # 构建功能需求描述
+                        functional_desc = self._build_functional_requirement(test_step, description)
+                        
                         requirements.append({
                             'step': test_step,
-                            'expected': expected_result,
-                            'functional_requirement': self._extract_functional_requirement(test_step)
+                            'expected': description,
+                            'functional_requirement': functional_desc
                         })
+            
+            # 提取独立的测试操作
+            elif re.search(r'(TS_|Set|Check|Wait)[A-Z]', line) and '|' not in line:
+                # 提取操作描述
+                match = re.search(r'([A-Z][a-zA-Z0-9_]+)\s*[:：]?\s*(.+)', line)
+                if match:
+                    operation = match.group(1)
+                    description = match.group(2)
+                    
+                    functional_desc = self._build_functional_requirement(operation, description)
+                    
+                    requirements.append({
+                        'step': operation,
+                        'expected': description,
+                        'functional_requirement': functional_desc
+                    })
         
         return requirements
     
-    def _extract_functional_requirement(self, test_step: str) -> str:
-        """提取功能需求"""
-        # 简化版本，实际可更复杂
-        keywords = [
-            '雨刷', 'wiper', '速度', 'speed', '位置', 'position',
-            '间歇', 'intermittent', '低速', 'low speed', '高速', 'high speed',
-            '停止', 'stop', '启动', 'start', '故障', 'fault'
-        ]
+    def _build_functional_requirement(self, test_step: str, description: str = "") -> str:
+        """构建功能需求描述
         
-        functional_req = []
-        for keyword in keywords:
-            if keyword.lower() in test_step.lower():
-                functional_req.append(keyword)
+        从测试步骤和操作描述中提取核心功能需求
+        """
+        import re
         
-        return " ".join(functional_req) if functional_req else test_step
+        # 合并测试步骤和描述进行统一分析
+        combined_text = f"{test_step} {description}".strip()
+        
+        # 定义功能关键词映射
+        feature_keywords = {
+            'wiper_control': ['wiper', '雨刷', 'Wiper'],
+            'speed_control': ['speed', '速度', 'Speed'],
+            'position_control': ['position', '位置', 'Position', 'stop'],
+            'mode_control': ['intermittent', '间歇', 'low', 'high', '低速', '高速'],
+            'fault_handling': ['fault', 'failure', '故障', '错误', 'blocked'],
+            'timing_control': ['wait', '等待', 'delay', '延时']
+        }
+        
+        # 提取核心功能
+        features = []
+        for feature, keywords in feature_keywords.items():
+            for keyword in keywords:
+                if keyword.lower() in combined_text.lower():
+                    features.append(feature)
+                    break
+        
+        # 如果没有匹配到功能关键词，使用简化描述
+        if not features:
+            # 清理测试步骤，移除TS_前缀等
+            clean_step = re.sub(r'^TS_', '', test_step)
+            clean_step = re.sub(r'([A-Z])', r' \1', clean_step).strip()
+            return clean_step
+        
+        # 构建功能需求描述
+        feature_map = {
+            'wiper_control': '雨刷控制',
+            'speed_control': '速度控制',
+            'position_control': '位置控制',
+            'mode_control': '模式控制',
+            'fault_handling': '故障处理',
+            'timing_control': '时序控制'
+        }
+        
+        return " + ".join([feature_map.get(f, f) for f in features])
     
     def create_evaluation_prompt(self, handwritten_content: str, generated_content: str, requirements: List[str]) -> str:
         """创建AI评估提示"""
@@ -491,6 +566,26 @@ class CAPLAIEvaluator:
         print("🔍 分析需求文档...")
         requirements = self.extract_requirements_from_md(requirement_content)
         print(f"   ✅ 提取到 {len(requirements)} 个功能需求")
+        
+        # 详细打印每个提取到的需求
+        if requirements:
+            print("   📋 需求详情:")
+            for i, req in enumerate(requirements, 1):
+                print(f"   {i:2d}. 测试步骤: {req['step']}")
+                print(f"      预期结果: {req['expected']}")
+                print(f"      功能需求: {req['functional_requirement']}")
+                if i < len(requirements):
+                    print()
+        
+        # 详细打印每个提取到的需求
+        if requirements:
+            print("   📋 需求详情:")
+            for i, req in enumerate(requirements, 1):
+                print(f"   {i:2d}. 测试步骤: {req['step']}")
+                print(f"      预期结果: {req['expected']}")
+                print(f"      功能需求: {req['functional_requirement']}")
+                if i < len(requirements):
+                    print()
         
         # 创建评估提示
         print("📝 生成AI评估提示...")
