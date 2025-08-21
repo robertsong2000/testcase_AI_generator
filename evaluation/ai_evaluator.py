@@ -254,7 +254,7 @@ class CAPLAIEvaluator:
         """创建AI评估提示"""
         
         requirements_text = "\n".join([
-            f"{i+1}. {req['step']} -> 预期: {req['expected']}"
+            f"{i+1}. 步骤: {req['step']} -> 详细步骤: {req['expected']}"
             for i, req in enumerate(requirements)
         ])
         
@@ -328,6 +328,15 @@ class CAPLAIEvaluator:
             print(f"   📡 调用AI模型: {self.model_type}")
             print(f"   🎯 目标模型: {self.model_name}")
             print(f"   🌡️  温度参数: {self.temperature}")
+            
+            # 打印完整的prompt内容
+            print("=" * 80)
+            print("📋 发送给大模型的完整PROMPT内容:")
+            print("=" * 80)
+            print(prompt)
+            print("=" * 80)
+            print("📋 PROMPT内容结束")
+            print("=" * 80)
             
             # 使用一致性种子
             import hashlib
