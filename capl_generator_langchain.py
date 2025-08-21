@@ -368,7 +368,7 @@ class CAPLGeneratorService:
         self.generator = CAPLGenerator(self.config)
         self.start_time = None
         
-    def process_file(self, file_path: str, **kwargs) -> Dict[str, Any]:
+    def process_file(self, file_path: str, debug_prompt: bool = False, **kwargs) -> Dict[str, Any]:
         """处理单个文件"""
         self.start_time = time.time()
         
@@ -381,6 +381,18 @@ class CAPLGeneratorService:
             
             # 读取需求文件
             requirement = self._read_file(file_path)
+            
+            # 调试模式：打印完整的prompt
+            if debug_prompt:
+                print("\n🔍 调试模式：完整Prompt内容")
+                print("=" * 60)
+                print("系统提示词:")
+                print(self.generator.prompt_manager.system_prompt)
+                print("\n" + "=" * 60)
+                print("用户输入:")
+                print(requirement)
+                print("=" * 60)
+                print("\n")
             
             # 生成CAPL代码
             capl_code = self.generator.generate_capl_code(requirement)
@@ -452,6 +464,7 @@ def main():
     parser.add_argument('--max-tokens', type=int, help='最大输出tokens')
     parser.add_argument('--temperature', type=float, help='生成温度')
     parser.add_argument('--top-p', type=float, help='top-p采样参数')
+    parser.add_argument('--debug-prompt', action='store_true', help='调试模式：打印完整的prompt信息')
     
     args = parser.parse_args()
     
@@ -495,7 +508,7 @@ def main():
     
     # 创建服务并处理文件
     service = CAPLGeneratorService(config)
-    result = service.process_file(args.file_path)
+    result = service.process_file(args.file_path, debug_prompt=args.debug_prompt)
     
     if result["status"] == "success":
         print("\n✅ CAPL代码生成成功")
