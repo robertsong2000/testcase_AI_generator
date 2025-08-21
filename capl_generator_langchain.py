@@ -140,11 +140,53 @@ class PromptTemplateManager:
                 with open(self.config.example_code_file, 'r', encoding='utf-8') as f:
                     example_code = f.read()
                     prompt = prompt.replace("示例代码已移至单独的文件 example_code.txt 中，以保护敏感代码内容。", example_code)
+            
+            # 转义非变量占位符的花括号
+            prompt = self._escape_brackets(prompt)
                     
             return prompt
         except Exception as e:
             print(f"警告: 加载提示模板失败，使用默认模板: {e}")
             return self._get_default_prompt()
+    
+    def _escape_brackets(self, text: str) -> str:
+        """转义非变量占位符的花括号
+        
+        LangChain使用Jinja2模板引擎，会将单花括号识别为变量占位符。
+        此方法会转义所有非变量占位符的花括号，避免解析错误。
+        """
+        import re
+        
+        # 定义需要保留的变量占位符模式
+        variable_patterns = [
+            r'\{requirement\}',
+            r'\{context\}',
+        ]
+        
+        # 创建一个临时占位符映射
+        temp_placeholders = {}
+        placeholder_counter = 0
+        
+        # 首先保护已知的变量占位符
+        protected_text = text
+        for pattern in variable_patterns:
+            matches = re.finditer(pattern, protected_text)
+            for match in matches:
+                placeholder = f"___VAR_PLACEHOLDER_{placeholder_counter}___"
+                temp_placeholders[placeholder] = match.group()
+                protected_text = protected_text.replace(match.group(), placeholder)
+                placeholder_counter += 1
+        
+        # 转义所有剩余的单花括号
+        # 将 { 替换为 {{，} 替换为 }}
+        protected_text = re.sub(r'(?<!\{)\{(?!\{)', '{{', protected_text)
+        protected_text = re.sub(r'(?<!\})\}(?!\})', '}}', protected_text)
+        
+        # 恢复被保护的变量占位符
+        for placeholder, original in temp_placeholders.items():
+            protected_text = protected_text.replace(placeholder, original)
+        
+        return protected_text
     
     def _get_default_prompt(self) -> str:
         """获取默认提示模板"""
