@@ -576,25 +576,9 @@ class CAPLAIEvaluator:
         requirements = self.extract_requirements_from_md(requirement_content)
         print(f"   ✅ 提取到 {len(requirements)} 个功能需求")
         
-        # 详细打印每个提取到的需求
-        if requirements:
-            print("   📋 需求详情:")
-            for i, req in enumerate(requirements, 1):
-                print(f"   {i:2d}. 测试步骤: {req['step']}")
-                print(f"      预期结果: {req['expected']}")
-                print(f"      功能需求: {req['functional_requirement']}")
-                if i < len(requirements):
-                    print()
+
         
-        # 详细打印每个提取到的需求
-        if requirements:
-            print("   📋 需求详情:")
-            for i, req in enumerate(requirements, 1):
-                print(f"   {i:2d}. 测试步骤: {req['step']}")
-                print(f"      预期结果: {req['expected']}")
-                print(f"      功能需求: {req['functional_requirement']}")
-                if i < len(requirements):
-                    print()
+
         
         # 创建评估提示
         print("📝 生成AI评估提示...")
