@@ -340,6 +340,10 @@ class CAPLAIEvaluator:
             data = response.json()
             content = data['choices'][0]['message']['content']
             
+            # 显示AI的部分分析内容（前500字符）
+            preview = content[:500] + "..." if len(content) > 500 else content
+            print(f"   🧠 AI分析预览: {preview}")
+            
             # 清理可能的markdown代码块标记
             content = content.strip()
             if content.startswith('```json'):
@@ -348,6 +352,18 @@ class CAPLAIEvaluator:
                 content = content[:-3]
             
             result = json.loads(content.strip())
+            
+            # 显示关键分析结果
+            if isinstance(result, dict):
+                print(f"   📊 功能完整性评分: {result.get('functional_completeness', 'N/A')}")
+                print(f"   📊 需求覆盖率评分: {result.get('requirement_coverage', 'N/A')}")
+                print(f"   📊 测试逻辑正确性: {result.get('test_logic_correctness', 'N/A')}")
+                
+                missing_count = len(result.get('missing_functionalities', []))
+                suggestions_count = len(result.get('improvement_suggestions', []))
+                print(f"   📋 发现缺失功能: {missing_count} 项")
+                print(f"   💡 提供改进建议: {suggestions_count} 条")
+            
             print("   ✅ JSON解析成功")
             return result
         except requests.exceptions.ConnectionError as e:
@@ -390,6 +406,10 @@ class CAPLAIEvaluator:
             print("   ✅ 收到AI响应")
             content = response['message']['content']
             
+            # 显示AI的部分分析内容（前500字符）
+            preview = content[:500] + "..." if len(content) > 500 else content
+            print(f"   🧠 AI分析预览: {preview}")
+            
             # 清理可能的markdown代码块标记
             content = content.strip()
             if content.startswith('```json'):
@@ -398,6 +418,18 @@ class CAPLAIEvaluator:
                 content = content[:-3]
             
             result = json.loads(content.strip())
+            
+            # 显示关键分析结果
+            if isinstance(result, dict):
+                print(f"   📊 功能完整性评分: {result.get('functional_completeness', 'N/A')}")
+                print(f"   📊 需求覆盖率评分: {result.get('requirement_coverage', 'N/A')}")
+                print(f"   📊 测试逻辑正确性: {result.get('test_logic_correctness', 'N/A')}")
+                
+                missing_count = len(result.get('missing_functionalities', []))
+                suggestions_count = len(result.get('improvement_suggestions', []))
+                print(f"   📋 发现缺失功能: {missing_count} 项")
+                print(f"   💡 提供改进建议: {suggestions_count} 条")
+            
             print("   ✅ JSON解析成功")
             return result
         except Exception as e:
