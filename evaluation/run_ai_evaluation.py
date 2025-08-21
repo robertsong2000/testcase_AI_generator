@@ -89,6 +89,14 @@ def main():
     # 保存并显示结果
     evaluator.save_evaluation_result(result, args.testcase_id)
     
+    # 计算加权综合评分
+    weighted_score = (result.functional_completeness * 0.25 + 
+                     result.requirement_coverage * 0.25 + 
+                     result.test_logic_correctness * 0.20 + 
+                     result.edge_case_handling * 0.15 + 
+                     result.error_handling * 0.10 + 
+                     result.code_quality * 0.05)
+    
     # 简要结果
     print(f"\n📊 AI评估完成!")
     print(f"=" * 40)
@@ -98,6 +106,7 @@ def main():
     print(f"边界条件处理: {result.edge_case_handling:.1f}/100")
     print(f"错误处理: {result.error_handling:.1f}/100")
     print(f"代码质量: {result.code_quality:.1f}/100")
+    print(f"综合评分: {weighted_score:.1f}/100")
     print(f"=" * 40)
     
     if result.missing_functionalities:

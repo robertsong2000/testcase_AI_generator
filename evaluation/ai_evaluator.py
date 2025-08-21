@@ -11,6 +11,7 @@ import time
 import requests
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+from datetime import datetime
 import ollama
 from dotenv import load_dotenv
 from dataclasses import dataclass, asdict
@@ -334,7 +335,7 @@ class CAPLAIEvaluator:
 | 错误处理 | {result.error_handling:.1f}/100 | {self._get_rating(result.error_handling)} |
 | 代码质量 | {result.code_quality:.1f}/100 | {self._get_rating(result.code_quality)} |
 
-## 综合评分: {(result.functional_completeness + result.requirement_coverage + result.test_logic_correctness) / 3:.1f}/100
+## 综合评分: {(result.functional_completeness * 0.25 + result.requirement_coverage * 0.25 + result.test_logic_correctness * 0.20 + result.edge_case_handling * 0.15 + result.error_handling * 0.10 + result.code_quality * 0.05):.1f}/100
 
 ## 详细分析
 {result.detailed_analysis}
@@ -379,13 +380,16 @@ class CAPLAIEvaluator:
         output_path = Path(output_dir)
         output_path.mkdir(exist_ok=True)
         
+        # 生成年月日时分秒格式的时间戳
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        
         # 保存JSON结果
-        json_file = output_path / f"ai_evaluation_{testcase_id}_{int(time.time())}.json"
+        json_file = output_path / f"ai_evaluation_{testcase_id}_{timestamp}.json"
         with open(json_file, 'w', encoding='utf-8') as f:
             json.dump(asdict(result), f, ensure_ascii=False, indent=2)
         
         # 保存详细报告
-        report_file = output_path / f"ai_report_{testcase_id}_{int(time.time())}.md"
+        report_file = output_path / f"ai_report_{testcase_id}_{timestamp}.md"
         report = self.generate_detailed_report(result, testcase_id)
         with open(report_file, 'w', encoding='utf-8') as f:
             f.write(report)
