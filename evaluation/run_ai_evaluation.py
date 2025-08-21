@@ -102,6 +102,7 @@ def main():
     print(f"\n🤖 调用AI模型进行分析...")
     print(f"   模型: {evaluator.model_name}")
     print(f"   温度: {evaluator.temperature}")
+    print(f"   Top-P: {evaluator.top_p}")
     
     result = evaluator.evaluate_testcase(
         args.testcase_id,
