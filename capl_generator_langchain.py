@@ -45,7 +45,9 @@ class CAPLGeneratorConfig:
         # 路径配置
         self.project_root = Path(__file__).parent
         self.output_dir = self.project_root / "capl"
-        self.prompt_template_file = self.project_root / "prompt_template_simple.txt"
+        
+        # 从配置文件读取提示词模板路径
+        self.prompt_template_file = self._get_prompt_template_path()
         self.example_code_file = self.project_root / "example_code.txt"
         
         # RAG配置
@@ -53,6 +55,24 @@ class CAPLGeneratorConfig:
         self.knowledge_base_dir = self.project_root / "knowledge_base"
         self.vector_db_dir = self.project_root / "vector_db"
         self.embedding_model = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
+    
+    def _get_prompt_template_path(self) -> Path:
+        """从配置文件读取提示词模板路径"""
+        config_path = self.project_root / "prompt_config.ini"
+        default_template = "prompt_template_simple.txt"
+        
+        if config_path.exists():
+            try:
+                import configparser
+                config = configparser.ConfigParser()
+                config.read(config_path, encoding='utf-8')
+                if 'DEFAULT' in config and 'PROMPT_TEMPLATE_FILE' in config['DEFAULT']:
+                    template_file = config['DEFAULT']['PROMPT_TEMPLATE_FILE']
+                    return self.project_root / template_file
+            except Exception as e:
+                print(f"警告: 读取配置文件失败，使用默认提示词模板: {e}")
+        
+        return self.project_root / default_template
 
 class LLMFactory:
     """LLM工厂类，统一管理不同提供商的LLM"""
