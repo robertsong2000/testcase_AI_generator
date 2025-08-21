@@ -23,14 +23,14 @@ def find_testcase_files(testcase_id: str) -> dict:
     generated_files = list(base_dir.glob(f"test_output/qualification*{testcase_id}*.can"))
     generated = generated_files[0] if generated_files else None
     
-    # 需求文档
-    requirement_files = list(base_dir.glob(f"pdf_converter/testcases/qualification*{testcase_id}*.md"))
-    requirement = requirement_files[0] if requirement_files else None
+    # 测试文档
+    testspec_files = list(base_dir.glob(f"pdf_converter/testcases/qualification*{testcase_id}*.md"))
+    testspec = testspec_files[0] if testspec_files else None
     
     return {
         'refwritten': refwritten,
         'generated': generated,
-        'requirement': requirement
+        'testspec': testspec
     }
 
 def main():
@@ -90,7 +90,7 @@ def main():
     print(f"🤖 开始AI评估测试用例 {args.testcase_id}...")
     print(f"参考文件: {files['refwritten'].name}")
     print(f"生成文件: {files['generated'].name}")
-    print(f"需求文件: {files['requirement'].name}")
+    print(f"测试文件: {files['testspec'].name}")
     print(f"AI配置: 使用{evaluator.model_type}模型 ({evaluator.model_name})")
     
     # 执行评估（带详细过程输出）
@@ -108,7 +108,7 @@ def main():
         args.testcase_id,
         str(files['refwritten']),
         str(files['generated']),
-        str(files['requirement'])
+        str(files['testspec'])
     )
     
     end_time = time.time()
@@ -122,7 +122,7 @@ def main():
     
     # 计算加权综合评分
     weighted_score = (result.functional_completeness * 0.25 + 
-                     result.requirement_coverage * 0.25 + 
+                     result.testspec_coverage * 0.25 + 
                      result.test_logic_correctness * 0.20 + 
                      result.edge_case_handling * 0.15 + 
                      result.error_handling * 0.10 + 
@@ -144,7 +144,7 @@ def main():
     print(f"\n📊 AI评估完成!")
     print(f"=" * 50)
     print(f"功能完整性: {result.functional_completeness:.1f}/100")
-    print(f"需求覆盖率: {result.requirement_coverage:.1f}/100")
+    print(f"测试覆盖率: {result.testspec_coverage:.1f}/100")
     print(f"测试逻辑正确性: {result.test_logic_correctness:.1f}/100")
     print(f"边界条件处理: {result.edge_case_handling:.1f}/100")
     print(f"错误处理: {result.error_handling:.1f}/100")

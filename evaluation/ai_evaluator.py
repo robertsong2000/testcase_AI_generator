@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 class AIEvaluationResult:
     """AI评估结果"""
     functional_completeness: float  # 功能完整性评分 (0-100)
-    requirement_coverage: float     # 需求覆盖率 (0-100)
+    testspec_coverage: float     # 测试覆盖率 (0-100)
     test_logic_correctness: float   # 测试逻辑正确性 (0-100)
     edge_case_handling: float       # 边界条件处理 (0-100)
     error_handling: float           # 错误处理评估 (0-100)
@@ -73,20 +73,20 @@ class CAPLAIEvaluator:
         ## 评分标准（严格按照以下标准评分）
 
         ### 功能完整性评分标准：
-        - 100分：完全覆盖所有功能需求，包括主要功能、次要功能、边缘功能
+        - 100分：完全覆盖所有功能测试，包括主要功能、次要功能、边缘功能
         - 90-99分：基本覆盖所有主要功能，少量次要功能缺失
         - 80-89分：覆盖主要功能，但有明显功能缺失
         - 70-79分：部分主要功能未覆盖
-        - 60-69分：大量功能需求缺失
+        - 60-69分：大量功能测试缺失
         - <60分：功能覆盖严重不足
 
-        ### 需求覆盖率评分标准：
-        - 100分：需求文档中100%功能点都有对应测试
-        - 95-99分：需求文档中95-99%功能点有对应测试
-        - 90-94分：需求文档中90-94%功能点有对应测试
-        - 85-89分：需求文档中85-89%功能点有对应测试
-        - 80-84分：需求文档中80-84%功能点有对应测试
-        - <80分：需求覆盖率低于80%
+        ### 测试覆盖率评分标准：
+        - 100分：测试文档中100%功能点都有对应测试
+        - 95-99分：测试文档中95-99%功能点有对应测试
+        - 90-94分：测试文档中90-94%功能点有对应测试
+        - 85-89分：测试文档中85-89%功能点有对应测试
+        - 80-84分：测试文档中80-84%功能点有对应测试
+        - <80分：测试覆盖率低于80%
 
         ### 测试逻辑正确性评分标准：
         - 100分：测试逻辑完全符合业务规则，无任何逻辑错误
@@ -152,16 +152,16 @@ class CAPLAIEvaluator:
             print(f"读取文件失败 {file_path}: {e}")
             return ""
     
-    def extract_requirements_from_md(self, md_content: str) -> List[Dict[str, str]]:
-        """从测试用例文档提取功能需求
+    def extract_testspecs_from_md(self, md_content: str) -> List[Dict[str, str]]:
+        """从测试用例文档提取功能测试
         
         针对测试用例文档的特点：
         1. 包含测试步骤和执行说明
         2. 没有明确的预期结果列
-        3. 通过操作描述和验证点体现需求
+        3. 通过操作描述和验证点体现测试
         """
         import re
-        requirements = []
+        testspecs = []
         
         # 提取测试步骤表中的功能描述
         in_test_steps = False
@@ -190,13 +190,13 @@ class CAPLAIEvaluator:
                         not re.match(r'^\d+\.?\d*$', test_step) and
                         not test_step.startswith('[')):
                         
-                        # 构建功能需求描述
-                        functional_desc = self._build_functional_requirement(test_step, description)
+                        # 构建功能测试描述
+                        functional_desc = self._build_functional_testspec(test_step, description)
                         
-                        requirements.append({
+                        testspecs.append({
                             'step': test_step,
                             'expected': description,
-                            'functional_requirement': functional_desc
+                            'functional_testspec': functional_desc
                         })
             
             # 提取独立的测试操作
@@ -207,20 +207,20 @@ class CAPLAIEvaluator:
                     operation = match.group(1)
                     description = match.group(2)
                     
-                    functional_desc = self._build_functional_requirement(operation, description)
+                    functional_desc = self._build_functional_testspec(operation, description)
                     
-                    requirements.append({
+                    testspecs.append({
                         'step': operation,
                         'expected': description,
-                        'functional_requirement': functional_desc
+                        'functional_testspec': functional_desc
                     })
         
-        return requirements
+        return testspecs
     
-    def _build_functional_requirement(self, test_step: str, description: str = "") -> str:
-        """构建功能需求描述
+    def _build_functional_testspec(self, test_step: str, description: str = "") -> str:
+        """构建功能测试描述
         
-        从测试步骤和操作描述中提取核心功能需求
+        从测试步骤和操作描述中提取核心功能测试
         """
         import re
         
@@ -252,7 +252,7 @@ class CAPLAIEvaluator:
             clean_step = re.sub(r'([A-Z])', r' \1', clean_step).strip()
             return clean_step
         
-        # 构建功能需求描述
+        # 构建功能测试描述
         feature_map = {
             'wiper_control': '雨刷控制',
             'speed_control': '速度控制',
@@ -264,19 +264,19 @@ class CAPLAIEvaluator:
         
         return " + ".join([feature_map.get(f, f) for f in features])
     
-    def create_evaluation_prompt(self, refwritten_content: str, generated_content: str, requirements: List[str]) -> str:
+    def create_evaluation_prompt(self, refwritten_content: str, generated_content: str, testspecs: List[str]) -> str:
         """创建AI评估提示"""
         
-        requirements_text = "\n".join([
+        testspecs_text = "\n".join([
             f"{i+1}. 步骤: {req['step']} -> 详细步骤: {req['expected']}"
-            for i, req in enumerate(requirements)
+            for i, req in enumerate(testspecs)
         ])
         
         prompt = f"""
         请作为CAPL测试专家，严格按照评分标准评估以下测试用例。请逐项分析后再给出准确评分。
 
-        ## 需求文档（共{len(requirements)}项需求）
-        {requirements_text}
+        ## 测试文档（共{len(testspecs)}项测试）
+        {testspecs_text}
 
         ## 参考测试用例
         ```capl
@@ -292,8 +292,8 @@ class CAPLAIEvaluator:
         请严格按照之前定义的评分标准，从以下6个维度进行评估：
 
         ### 评估步骤：
-        1. **功能完整性分析**：对照需求文档，逐一检查每个需求是否被测试
-        2. **需求覆盖率统计**：计算被测试需求占总需求的比例
+        1. **功能完整性分析**：对照测试文档，逐一检查每个测试项目是否被测试
+        2. **测试覆盖率统计**：计算被测试项目占总测试的比例
         3. **测试逻辑验证**：验证测试步骤是否符合业务逻辑
         4. **边界条件检查**：检查是否包含边界值测试（如极值、临界值）
         5. **错误处理评估**：检查异常情况的测试覆盖
@@ -308,7 +308,7 @@ class CAPLAIEvaluator:
         请以以下JSON格式返回评估结果：
         {{
             "functional_completeness": 整数分数,
-            "requirement_coverage": 整数分数,
+            "testspec_coverage": 整数分数,
             "test_logic_correctness": 整数分数,
             "edge_case_handling": 整数分数,
             "error_handling": 整数分数,
@@ -319,7 +319,7 @@ class CAPLAIEvaluator:
             "detailed_analysis": "详细分析文本，包含评分依据",
             "scoring_basis": {{
                 "functional_completeness": "评分具体依据",
-                "requirement_coverage": "评分具体依据",
+                "testspec_coverage": "评分具体依据",
                 "test_logic_correctness": "评分具体依据",
                 "edge_case_handling": "评分具体依据",
                 "error_handling": "评分具体依据",
@@ -328,8 +328,8 @@ class CAPLAIEvaluator:
         }}
 
         ## 注意事项
-        1. 先分析每个需求是否被测试，再给出功能完整性评分
-        2. 计算实际覆盖率百分比，再给出需求覆盖率评分
+        1. 先分析每个测试项目是否被测试，再给出功能完整性评分
+        2. 计算实际覆盖率百分比，再给出测试覆盖率评分
         3. 每项评分必须基于具体事实，不能主观判断
         4. 确保评分的一致性，同样的情况必须给同样的分数
         """
@@ -377,7 +377,7 @@ class CAPLAIEvaluator:
         """标准化评分结果，确保一致性"""
         # 确保所有评分都是有效的数值
         score_fields = [
-            'functional_completeness', 'requirement_coverage', 
+            'functional_completeness', 'testspec_coverage', 
             'test_logic_correctness', 'edge_case_handling',
             'error_handling', 'code_quality'
         ]
@@ -455,7 +455,7 @@ class CAPLAIEvaluator:
             # 显示关键分析结果
             if isinstance(result, dict):
                 print(f"   📊 功能完整性评分: {result.get('functional_completeness', 'N/A')}")
-                print(f"   📊 需求覆盖率评分: {result.get('requirement_coverage', 'N/A')}")
+                print(f"   📊 测试覆盖率评分: {result.get('testspec_coverage', 'N/A')}")
                 print(f"   📊 测试逻辑正确性: {result.get('test_logic_correctness', 'N/A')}")
                 
                 missing_count = len(result.get('missing_functionalities', []))
@@ -521,7 +521,7 @@ class CAPLAIEvaluator:
             # 显示关键分析结果
             if isinstance(result, dict):
                 print(f"   📊 功能完整性评分: {result.get('functional_completeness', 'N/A')}")
-                print(f"   📊 需求覆盖率评分: {result.get('requirement_coverage', 'N/A')}")
+                print(f"   📊 测试覆盖率评分: {result.get('testspec_coverage', 'N/A')}")
                 print(f"   📊 测试逻辑正确性: {result.get('test_logic_correctness', 'N/A')}")
                 
                 missing_count = len(result.get('missing_functionalities', []))
@@ -544,7 +544,7 @@ class CAPLAIEvaluator:
         """获取默认评估结果"""
         return {
             "functional_completeness": 75.0,
-            "requirement_coverage": 75.0,
+            "testspec_coverage": 75.0,
             "test_logic_correctness": 75.0,
             "edge_case_handling": 70.0,
             "error_handling": 70.0,
@@ -559,7 +559,7 @@ class CAPLAIEvaluator:
             "detailed_analysis": "由于AI模型调用失败，使用默认评估结果。建议检查网络连接和API配置后重新评估。",
             "scoring_basis": {
                 "functional_completeness": "默认中等评分",
-                "requirement_coverage": "默认中等评分", 
+                "testspec_coverage": "默认中等评分", 
                 "test_logic_correctness": "默认中等评分",
                 "edge_case_handling": "默认中等评分",
                 "error_handling": "默认中等评分",
@@ -567,7 +567,7 @@ class CAPLAIEvaluator:
             }
         }
     
-    def evaluate_testcase(self, testcase_id: str, refwritten_path: str, generated_path: str, requirement_path: str) -> AIEvaluationResult:
+    def evaluate_testcase(self, testcase_id: str, refwritten_path: str, generated_path: str, testspec_path: str) -> AIEvaluationResult:
         """评估单个测试用例"""
         
         print(f"\n📋 开始评估测试用例 {testcase_id}")
@@ -576,24 +576,24 @@ class CAPLAIEvaluator:
         print("📖 读取测试文件...")
         refwritten_content = self.read_file_content(refwritten_path)
         generated_content = self.read_file_content(generated_path)
-        requirement_content = self.read_file_content(requirement_path)
+        testspec_content = self.read_file_content(testspec_path)
         
-        if not all([refwritten_content, generated_content, requirement_content]):
+        if not all([refwritten_content, generated_content, testspec_content]):
             print("❌ 部分文件内容为空或无法读取")
             return AIEvaluationResult(**self._get_default_result())
         
         print(f"   ✅ 参考测试用例: {len(refwritten_content)} 字符")
         print(f"   ✅ 生成测试用例: {len(generated_content)} 字符")
-        print(f"   ✅ 需求文档: {len(requirement_content)} 字符")
+        print(f"   ✅ 测试文档: {len(testspec_content)} 字符")
         
-        # 提取需求
-        print("🔍 分析需求文档...")
-        requirements = self.extract_requirements_from_md(requirement_content)
-        print(f"   ✅ 提取到 {len(requirements)} 个功能需求")
+        # 提取测试
+        print("🔍 分析测试文档...")
+        testspecs = self.extract_testspecs_from_md(testspec_content)
+        print(f"   ✅ 提取到 {len(testspecs)} 个功能测试")
 
         # 创建评估提示
         print("📝 生成AI评估提示...")
-        prompt = self.create_evaluation_prompt(refwritten_content, generated_content, requirements)
+        prompt = self.create_evaluation_prompt(refwritten_content, generated_content, testspecs)
         prompt_size = len(prompt)
         print(f"   ✅ 提示词长度: {prompt_size} 字符")
         
@@ -614,7 +614,7 @@ class CAPLAIEvaluator:
         
         # 计算加权综合评分
         weighted_score = (result.functional_completeness * 0.25 + 
-                         result.requirement_coverage * 0.25 + 
+                         result.testspec_coverage * 0.25 + 
                          result.test_logic_correctness * 0.20 + 
                          result.edge_case_handling * 0.15 + 
                          result.error_handling * 0.10 + 
@@ -627,7 +627,7 @@ class CAPLAIEvaluator:
 | 评估维度 | 得分 | 评级 |
 |----------|------|------|
 | 功能完整性 | {result.functional_completeness:.1f}/100 | {self._get_rating(result.functional_completeness)} |
-| 需求覆盖率 | {result.requirement_coverage:.1f}/100 | {self._get_rating(result.requirement_coverage)} |
+| 测试覆盖率 | {result.testspec_coverage:.1f}/100 | {self._get_rating(result.testspec_coverage)} |
 | 测试逻辑正确性 | {result.test_logic_correctness:.1f}/100 | {self._get_rating(result.test_logic_correctness)} |
 | 边界条件处理 | {result.edge_case_handling:.1f}/100 | {self._get_rating(result.edge_case_handling)} |
 | 错误处理 | {result.error_handling:.1f}/100 | {self._get_rating(result.error_handling)} |
@@ -664,7 +664,7 @@ class CAPLAIEvaluator:
         """过滤AI响应，只保留AIEvaluationResult所需的字段"""
         # 定义AIEvaluationResult所需的字段
         required_fields = {
-            'functional_completeness', 'requirement_coverage', 'test_logic_correctness',
+            'functional_completeness', 'testspec_coverage', 'test_logic_correctness',
             'edge_case_handling', 'error_handling', 'code_quality',
             'missing_functionalities', 'redundant_tests', 'improvement_suggestions',
             'detailed_analysis', 'scoring_basis'
@@ -751,22 +751,22 @@ def main():
     
     refwritten_path = base_dir / "test_output" / f"testcase_id_{args.testcase_id}.can"
     generated_path = base_dir / "test_output" / f"qualification_*{args.testcase_id}*.can"
-    requirement_path = base_dir / "pdf_converter" / "testcases" / f"qualification_*{args.testcase_id}*.md"
+    testspec_path = base_dir / "pdf_converter" / "testcases" / f"qualification_*{args.testcase_id}*.md"
     
     # 查找生成的测试用例文件
     generated_files = list(base_dir.glob(f"test_output/qualification*{args.testcase_id}*.can"))
-    requirement_files = list(base_dir.glob(f"pdf_converter/testcases/qualification*{args.testcase_id}*.md"))
+    testspec_files = list(base_dir.glob(f"pdf_converter/testcases/qualification*{args.testcase_id}*.md"))
     
     if not generated_files:
         print(f"❌ 未找到生成的测试用例文件")
         return
     
-    if not requirement_files:
-        print(f"❌ 未找到需求文档")
+    if not testspec_files:
+        print(f"❌ 未找到测试文档")
         return
     
     generated_path = generated_files[0]
-    requirement_path = requirement_files[0]
+    testspec_path = testspec_files[0]
     
     if not refwritten_path.exists():
         print(f"❌ 未找到参考测试用例: {refwritten_path}")
@@ -785,7 +785,7 @@ def main():
         args.testcase_id,
         str(refwritten_path),
         str(generated_path),
-        str(requirement_path)
+        str(testspec_path)
     )
     
     # 保存结果
@@ -794,7 +794,7 @@ def main():
     # 打印简要结果
     print(f"\n📊 AI评估完成!")
     print(f"功能完整性: {result.functional_completeness:.1f}/100")
-    print(f"需求覆盖率: {result.requirement_coverage:.1f}/100")
+    print(f"测试覆盖率: {result.testspec_coverage:.1f}/100")
     print(f"测试逻辑正确性: {result.test_logic_correctness:.1f}/100")
 
 if __name__ == "__main__":
