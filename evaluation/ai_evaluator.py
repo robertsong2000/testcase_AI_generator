@@ -37,7 +37,7 @@ class AIEvaluationResult:
 class CAPLAIEvaluator:
     """CAPL测试用例AI评估器"""
     
-    def __init__(self, model_type: str = None, api_url: str = None, model_name: str = None, api_key: str = None):
+    def __init__(self, model_type: str = None, api_url: str = None, model_name: str = None, api_key: str = None, verbose: bool = False):
         # 加载环境变量
         load_dotenv()
         
@@ -46,6 +46,7 @@ class CAPLAIEvaluator:
         self.api_url = api_url or self._get_default_api_url()
         self.model_name = model_name or self._get_default_model()
         self.api_key = api_key or os.getenv('API_KEY')
+        self.verbose = verbose
         
         # 优化参数以提高一致性
         self.context_length = int(os.getenv('OLLAMA_CONTEXT_LENGTH', '8192'))
@@ -329,14 +330,15 @@ class CAPLAIEvaluator:
             print(f"   🎯 目标模型: {self.model_name}")
             print(f"   🌡️  温度参数: {self.temperature}")
             
-            # 打印完整的prompt内容
-            print("=" * 80)
-            print("📋 发送给大模型的完整PROMPT内容:")
-            print("=" * 80)
-            print(prompt)
-            print("=" * 80)
-            print("📋 PROMPT内容结束")
-            print("=" * 80)
+            # 根据verbose参数决定是否打印完整的prompt内容
+            if self.verbose:
+                print("=" * 80)
+                print("📋 发送给大模型的完整PROMPT内容:")
+                print("=" * 80)
+                print(prompt)
+                print("=" * 80)
+                print("📋 PROMPT内容结束")
+                print("=" * 80)
             
             # 使用一致性种子
             import hashlib
