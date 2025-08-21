@@ -37,3 +37,7 @@ test_output/
 
 # 评估日志目录
 evaluation/logs/
+
+# AI评估结果目录（临时文件）
+evaluation/results/
+results/
