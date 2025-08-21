@@ -145,6 +145,9 @@ class CAPLAIEvaluator:
     
     def read_file_content(self, file_path: str) -> str:
         """读取文件内容"""
+        if not file_path or not file_path.strip():
+            return ""  # 空路径返回空字符串
+        
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 return f.read()
