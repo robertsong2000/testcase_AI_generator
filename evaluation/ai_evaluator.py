@@ -251,7 +251,7 @@ class CAPLAIEvaluator:
         
         return " + ".join([feature_map.get(f, f) for f in features])
     
-    def create_evaluation_prompt(self, handwritten_content: str, generated_content: str, requirements: List[str]) -> str:
+    def create_evaluation_prompt(self, refwritten_content: str, generated_content: str, requirements: List[str]) -> str:
         """创建AI评估提示"""
         
         requirements_text = "\n".join([
@@ -265,9 +265,9 @@ class CAPLAIEvaluator:
         ## 需求文档（共{len(requirements)}项需求）
         {requirements_text}
 
-        ## 手写测试用例
+        ## 参考测试用例
         ```capl
-        {handwritten_content}
+        {refwritten_content}
         ```
 
         ## 生成测试用例
@@ -554,22 +554,22 @@ class CAPLAIEvaluator:
             }
         }
     
-    def evaluate_testcase(self, testcase_id: str, handwritten_path: str, generated_path: str, requirement_path: str) -> AIEvaluationResult:
+    def evaluate_testcase(self, testcase_id: str, refwritten_path: str, generated_path: str, requirement_path: str) -> AIEvaluationResult:
         """评估单个测试用例"""
         
         print(f"\n📋 开始评估测试用例 {testcase_id}")
         
         # 读取文件内容
         print("📖 读取测试文件...")
-        handwritten_content = self.read_file_content(handwritten_path)
+        refwritten_content = self.read_file_content(refwritten_path)
         generated_content = self.read_file_content(generated_path)
         requirement_content = self.read_file_content(requirement_path)
         
-        if not all([handwritten_content, generated_content, requirement_content]):
+        if not all([refwritten_content, generated_content, requirement_content]):
             print("❌ 部分文件内容为空或无法读取")
             return AIEvaluationResult(**self._get_default_result())
         
-        print(f"   ✅ 手写测试用例: {len(handwritten_content)} 字符")
+        print(f"   ✅ 参考测试用例: {len(refwritten_content)} 字符")
         print(f"   ✅ 生成测试用例: {len(generated_content)} 字符")
         print(f"   ✅ 需求文档: {len(requirement_content)} 字符")
         
@@ -577,14 +577,10 @@ class CAPLAIEvaluator:
         print("🔍 分析需求文档...")
         requirements = self.extract_requirements_from_md(requirement_content)
         print(f"   ✅ 提取到 {len(requirements)} 个功能需求")
-        
 
-        
-
-        
         # 创建评估提示
         print("📝 生成AI评估提示...")
-        prompt = self.create_evaluation_prompt(handwritten_content, generated_content, requirements)
+        prompt = self.create_evaluation_prompt(refwritten_content, generated_content, requirements)
         prompt_size = len(prompt)
         print(f"   ✅ 提示词长度: {prompt_size} 字符")
         
@@ -740,7 +736,7 @@ def main():
     # 查找测试用例文件
     base_dir = Path("/Users/robertsong/Downloads/code/testcase_AI_generator")
     
-    handwritten_path = base_dir / "test_output" / f"testcase_id_{args.testcase_id}.can"
+    refwritten_path = base_dir / "test_output" / f"testcase_id_{args.testcase_id}.can"
     generated_path = base_dir / "test_output" / f"qualification_*{args.testcase_id}*.can"
     requirement_path = base_dir / "pdf_converter" / "testcases" / f"qualification_*{args.testcase_id}*.md"
     
@@ -759,8 +755,8 @@ def main():
     generated_path = generated_files[0]
     requirement_path = requirement_files[0]
     
-    if not handwritten_path.exists():
-        print(f"❌ 未找到手写测试用例: {handwritten_path}")
+    if not refwritten_path.exists():
+        print(f"❌ 未找到参考测试用例: {refwritten_path}")
         return
     
     # 初始化评估器
@@ -774,7 +770,7 @@ def main():
     print(f"🤖 开始AI评估测试用例 {args.testcase_id}...")
     result = evaluator.evaluate_testcase(
         args.testcase_id,
-        str(handwritten_path),
+        str(refwritten_path),
         str(generated_path),
         str(requirement_path)
     )

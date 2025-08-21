@@ -16,8 +16,8 @@ def find_testcase_files(testcase_id: str) -> dict:
     """查找测试用例文件"""
     base_dir = Path(__file__).parent.parent
     
-    # 手写测试用例
-    handwritten = base_dir / "test_output" / f"testcase_id_{testcase_id}.can"
+    # 参考测试用例
+    refwritten = base_dir / "test_output" / f"testcase_id_{testcase_id}.can"
     
     # 生成的测试用例
     generated_files = list(base_dir.glob(f"test_output/qualification*{testcase_id}*.can"))
@@ -28,7 +28,7 @@ def find_testcase_files(testcase_id: str) -> dict:
     requirement = requirement_files[0] if requirement_files else None
     
     return {
-        'handwritten': handwritten,
+        'refwritten': refwritten,
         'generated': generated,
         'requirement': requirement
     }
@@ -88,7 +88,7 @@ def main():
     
     # 显示配置信息
     print(f"🤖 开始AI评估测试用例 {args.testcase_id}...")
-    print(f"手写文件: {files['handwritten'].name}")
+    print(f"参考文件: {files['refwritten'].name}")
     print(f"生成文件: {files['generated'].name}")
     print(f"需求文件: {files['requirement'].name}")
     print(f"AI配置: 使用{evaluator.model_type}模型 ({evaluator.model_name})")
@@ -105,7 +105,7 @@ def main():
     
     result = evaluator.evaluate_testcase(
         args.testcase_id,
-        str(files['handwritten']),
+        str(files['refwritten']),
         str(files['generated']),
         str(files['requirement'])
     )
