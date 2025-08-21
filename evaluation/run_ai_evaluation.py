@@ -124,12 +124,12 @@ def main():
     
     if result.missing_functionalities:
         print(f"\n⚠️ 缺失功能点 ({len(result.missing_functionalities)}):")
-        for func in result.missing_functionalities[:3]:
+        for func in result.missing_functionalities:
             print(f"  - {func}")
     
     if result.improvement_suggestions:
-        print(f"\n💡 主要改进建议 ({len(result.improvement_suggestions)}):")
-        for suggestion in result.improvement_suggestions[:3]:
+        print(f"\n💡 改进建议 ({len(result.improvement_suggestions)}):")
+        for suggestion in result.improvement_suggestions:
             print(f"  - {suggestion}")
 
 if __name__ == "__main__":
