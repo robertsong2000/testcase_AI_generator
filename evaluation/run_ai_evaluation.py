@@ -19,7 +19,7 @@ def find_testcase_files(testcase_id: str) -> dict:
     # 参考测试用例
     refwritten = base_dir / "test_output" / f"testcase_id_{testcase_id}.can"
     
-    # 生成的测试用例
+    # 大模型生成的测试用例
     generated_files = list(base_dir.glob(f"test_output/qualification*{testcase_id}*.can"))
     generated = generated_files[0] if generated_files else None
     

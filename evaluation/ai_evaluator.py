@@ -747,18 +747,18 @@ def main():
     args = parser.parse_args()
     
     # 查找测试用例文件
-    base_dir = Path("/Users/robertsong/Downloads/code/testcase_AI_generator")
+    base_dir = Path(__file__).parent.parent
     
     refwritten_path = base_dir / "test_output" / f"testcase_id_{args.testcase_id}.can"
     generated_path = base_dir / "test_output" / f"qualification_*{args.testcase_id}*.can"
     testspec_path = base_dir / "pdf_converter" / "testcases" / f"qualification_*{args.testcase_id}*.md"
     
-    # 查找生成的测试用例文件
+    # 查找大模型生成的测试用例文件
     generated_files = list(base_dir.glob(f"test_output/qualification*{args.testcase_id}*.can"))
     testspec_files = list(base_dir.glob(f"pdf_converter/testcases/qualification*{args.testcase_id}*.md"))
     
     if not generated_files:
-        print(f"❌ 未找到生成的测试用例文件")
+        print(f"❌ 未找到大模型生成的测试用例文件")
         return
     
     if not testspec_files:
