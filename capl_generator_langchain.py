@@ -478,6 +478,21 @@ def main():
     if args.top_p is not None:
         config.top_p = args.top_p
     
+    # 打印配置信息
+    print("=" * 50)
+    print("CAPL生成器配置信息")
+    print("=" * 50)
+    print(f"📊 API类型: {config.api_type}")
+    print(f"🔗 API地址: {config.api_url}")
+    print(f"🤖 模型名称: {config.model}")
+    print(f"📁 输出目录: {config.output_dir}")
+    print(f"📚 RAG功能: {'启用' if config.enable_rag else '禁用'}")
+    print(f"📏 上下文长度: {config.context_length} tokens")
+    print(f"📝 最大输出: {config.max_tokens} tokens")
+    print(f"🌡️  生成温度: {config.temperature}")
+    print(f"🎯 Top-P参数: {config.top_p}")
+    print("=" * 50)
+    
     # 创建服务并处理文件
     service = CAPLGeneratorService(config)
     result = service.process_file(args.file_path)
