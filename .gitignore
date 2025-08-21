@@ -32,7 +32,6 @@ capl/
 sample/
 
 # 临时测试目录
-test/
 test_output/
 
 # 评估日志目录
