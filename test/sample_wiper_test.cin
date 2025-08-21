@@ -1,0 +1,23 @@
+// 测试雨刷速度控制功能
+// 验证不同速度档位下的信号发送
+// 测试场景：低速、中速、高速切换
+
+variables
+{
+  int wiperSpeed;
+  int targetSpeed;
+  msTimer speedTimer;
+}
+
+testcase TC_Wiper_Speed_Control()
+{
+  // 测试低速档
+  targetSpeed = 1;
+  setTimer(speedTimer, 1000);
+}
+
+on timer speedTimer
+{
+  wiperSpeed = targetSpeed;
+  output("Wiper speed set to: %d", wiperSpeed);
+}
