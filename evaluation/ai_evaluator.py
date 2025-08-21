@@ -54,6 +54,19 @@ class CAPLAIEvaluator:
         self.temperature = float(os.getenv('TEMPERATURE', '0.05'))  # 极低温度确保一致性
         self.top_p = float(os.getenv('TOP_P', '0.95'))
         
+        # 打印所有参数值用于调试
+        print("📊 AI评估器配置参数:")
+        print(f"   模型类型: {self.model_type}")
+        print(f"   API地址: {self.api_url}")
+        print(f"   模型名称: {self.model_name}")
+        print(f"   API密钥: {'已配置' if self.api_key else '未配置'}")
+        print(f"   上下文长度: {self.context_length}")
+        print(f"   最大token数: {self.max_tokens}")
+        print(f"   温度参数: {self.temperature}")
+        print(f"   Top-P参数: {self.top_p}")
+        print(f"   详细模式: {self.verbose}")
+        print("-" * 50)
+        
         self.system_prompt = """
         你是一个严格的汽车电子测试专家，专门评估CAPL测试用例的质量。请严格按照以下标准进行评分，确保每次评估的一致性。
 
