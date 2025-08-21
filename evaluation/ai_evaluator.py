@@ -272,18 +272,32 @@ class CAPLAIEvaluator:
             for i, req in enumerate(testspecs)
         ])
         
-        prompt = f"""
-        请作为CAPL测试专家，严格按照评分标准评估以下测试用例。请逐项分析后再给出准确评分。
-
-        ## 测试文档（共{len(testspecs)}项测试）
-        {testspecs_text}
-
+        # 根据是否有参考测试用例动态调整提示词
+        has_reference = refwritten_content and refwritten_content.strip()
+        
+        if has_reference:
+            reference_section = f"""
         ## 参考测试用例（已验证的标准用例）
         ```capl
         {refwritten_content}
         ```
         
-        **说明**：上述参考测试用例是经过实际验证的标准测试用例，可作为判断生成测试用例质量的权威参考标准。该用例已经过功能验证和需求覆盖确认，代表了正确的测试逻辑和实现方式。在评估过程中，请以此用例为基准，对比分析生成测试用例在功能覆盖、测试逻辑、边界条件处理等方面的差异和优劣。
+        **说明**：上述参考测试用例是经过实际验证的标准测试用例，可作为判断生成测试用例质量的权威参考标准。该用例已经过功能验证和需求覆盖确认，代表了正确的测试逻辑和实现方式。在评估过程中，请以此用例为基准，对比分析生成测试用例在功能覆盖、测试逻辑、边界条件处理等方面的差异和优劣。"""
+            evaluation_method = "请以参考测试用例为基准，进行详细对比分析，重点关注与标准用例的差异"
+        else:
+            reference_section = """
+        ## 参考测试用例
+        无参考测试用例，将基于测试文档直接进行评估。
+        
+        **说明**：由于缺少参考测试用例，请基于测试文档的要求，独立评估生成测试用例的质量。重点关注测试用例是否完整覆盖了测试文档中的所有功能点，测试逻辑是否正确，以及代码质量是否达标。"""
+            evaluation_method = "请基于测试文档的独立要求，进行全面的质量评估"
+        
+        prompt = f"""
+        请作为CAPL测试专家，严格按照评分标准评估以下测试用例。请逐项分析后再给出准确评分。
+
+        ## 测试文档（共{len(testspecs)}项测试）
+        {testspecs_text}
+{reference_section}
 
         ## 生成测试用例
         ```capl
@@ -300,6 +314,9 @@ class CAPLAIEvaluator:
         4. **边界条件检查**：检查是否包含边界值测试（如极值、临界值）
         5. **错误处理评估**：检查异常情况的测试覆盖
         6. **代码质量评估**：评估代码可读性、结构清晰度
+
+        ### 评估方法：
+        {evaluation_method}
 
         ### 评分要求：
         - 每项评分必须有明确依据
@@ -580,12 +597,18 @@ class CAPLAIEvaluator:
         generated_content = self.read_file_content(generated_path)
         testspec_content = self.read_file_content(testspec_path)
         
-        if not all([refwritten_content, generated_content, testspec_content]):
-            print("❌ 部分文件内容为空或无法读取")
+        if not testspec_content or not generated_content:
+            print("❌ 测试文档或大模型生成测试用例为空或无法读取")
             return AIEvaluationResult(**self._get_default_result())
         
-        print(f"   ✅ 参考测试用例: {len(refwritten_content)} 字符")
-        print(f"   ✅ 生成测试用例: {len(generated_content)} 字符")
+        # 参考测试用例可选，不影响评估
+        has_refwritten = bool(refwritten_content)
+        if has_refwritten:
+            print(f"   ✅ 参考测试用例: {len(refwritten_content)} 字符")
+        else:
+            print("   ℹ️  无参考测试用例，将基于测试文档直接评估")
+        
+        print(f"   ✅ 大模型生成测试用例: {len(generated_content)} 字符")
         print(f"   ✅ 测试文档: {len(testspec_content)} 字符")
         
         # 提取测试

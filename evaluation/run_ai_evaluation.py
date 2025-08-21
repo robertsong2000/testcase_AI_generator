@@ -54,14 +54,17 @@ def main():
     # 查找文件
     files = find_testcase_files(args.testcase_id)
     
-    # 检查文件
+    # 检查必需文件（测试文档和大模型生成测试用例）
+    required_files = ['generated', 'testspec']
     missing = []
-    for key, file in files.items():
+    
+    for key in required_files:
+        file = files[key]
         if not file or not file.exists():
             missing.append(key)
     
     if missing:
-        print(f"❌ 缺少文件: {', '.join(missing)}")
+        print(f"❌ 缺少必需文件: {', '.join(missing)}")
         print("找到的文件:")
         for key, file in files.items():
             if file and file.exists():
@@ -69,6 +72,11 @@ def main():
             else:
                 print(f"  ❌ {key}: 未找到")
         return
+    
+    # 参考测试用例可选，不影响评估
+    has_refwritten = files['refwritten'] and files['refwritten'].exists()
+    if not has_refwritten:
+        print("ℹ️  无参考测试用例，将基于测试文档直接评估")
     
     # 初始化评估器
     evaluator = CAPLAIEvaluator(
@@ -88,7 +96,10 @@ def main():
     
     # 显示配置信息
     print(f"🤖 开始AI评估测试用例 {args.testcase_id}...")
-    print(f"参考文件: {files['refwritten'].name}")
+    if has_refwritten:
+        print(f"参考文件: {files['refwritten'].name}")
+    else:
+        print("参考文件: 无 (基于测试文档直接评估)")
     print(f"生成文件: {files['generated'].name}")
     print(f"测试文件: {files['testspec'].name}")
     print(f"AI配置: 使用{evaluator.model_type}模型 ({evaluator.model_name})")
@@ -104,9 +115,10 @@ def main():
     print(f"   温度: {evaluator.temperature}")
     print(f"   Top-P: {evaluator.top_p}")
     
+    refwritten_path = str(files['refwritten']) if has_refwritten else ""
     result = evaluator.evaluate_testcase(
         args.testcase_id,
-        str(files['refwritten']),
+        refwritten_path,
         str(files['generated']),
         str(files['testspec'])
     )
