@@ -30,6 +30,7 @@ capl/
 
 # 已有的测试用例
 sample/
+example_code.txt
 
 # 临时测试目录
 test_output/
