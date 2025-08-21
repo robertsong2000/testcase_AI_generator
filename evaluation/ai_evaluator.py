@@ -52,7 +52,7 @@ class CAPLAIEvaluator:
         self.context_length = int(os.getenv('OLLAMA_CONTEXT_LENGTH', '8192'))
         self.max_tokens = int(os.getenv('OLLAMA_MAX_TOKENS', '4096'))
         self.temperature = float(os.getenv('EVALUATOR_TEMPERATURE', '0.05'))  # 极低温度确保一致性
-        self.top_p = float(os.getenv('EVALUATOR_TOP_P', '0.95'))
+        self.top_p = float(os.getenv('EVALUATOR_TOP_P', '0.8'))
         
         # 打印所有参数值用于调试
         print("📊 AI评估器配置参数:")
