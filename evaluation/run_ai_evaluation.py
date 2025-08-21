@@ -46,6 +46,8 @@ def main():
                        help='模型温度参数，越低越一致 (默认: 0.05)')
     parser.add_argument('--consistent-mode', action='store_true',
                        help='启用一致性模式，确保评分稳定')
+    parser.add_argument('--verbose', '-v', action='store_true',
+                       help='详细模式，打印发送给AI的完整prompt内容')
     
     args = parser.parse_args()
     
@@ -73,7 +75,8 @@ def main():
         model_type=args.model_type,
         api_url=args.api_url,
         model_name=args.model,
-        api_key=args.api_key
+        api_key=args.api_key,
+        verbose=args.verbose
     )
     
     # 设置温度参数以提高一致性
@@ -96,24 +99,6 @@ def main():
     
     start_time = time.time()
     
-    # 读取和分析文件
-    print("📂 读取测试文件...")
-    with open(files['handwritten'], 'r', encoding='utf-8') as f:
-        handwritten_content = f.read()
-    with open(files['generated'], 'r', encoding='utf-8') as f:
-        generated_content = f.read()
-    with open(files['requirement'], 'r', encoding='utf-8') as f:
-        requirement_content = f.read()
-    print(f"   ✅ 手写测试用例: {len(handwritten_content)} 字符")
-    print(f"   ✅ 生成测试用例: {len(generated_content)} 字符")
-    print(f"   ✅ 需求文档: {len(requirement_content)} 字符")
-    
-    # 提取需求
-    print("\n🔍 提取功能需求...")
-    requirements = evaluator.extract_requirements_from_md(str(files['requirement']))
-    print(f"   ✅ 提取到 {len(requirements)} 个功能需求")
-    
-    # 执行AI评估
     print(f"\n🤖 调用AI模型进行分析...")
     print(f"   模型: {evaluator.model_name}")
     print(f"   温度: {evaluator.temperature}")
