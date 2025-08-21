@@ -6,6 +6,7 @@ AI评估系统运行器
 
 import os
 import sys
+import time
 from pathlib import Path
 import argparse
 import json
@@ -41,6 +42,10 @@ def main():
     parser.add_argument('--api-url', help='API服务地址')
     parser.add_argument('--model', help='使用的模型名称')
     parser.add_argument('--api-key', help='API密钥 (可选)')
+    parser.add_argument('--temperature', type=float, default=0.05, 
+                       help='模型温度参数，越低越一致 (默认: 0.05)')
+    parser.add_argument('--consistent-mode', action='store_true',
+                       help='启用一致性模式，确保评分稳定')
     
     args = parser.parse_args()
     
@@ -71,6 +76,13 @@ def main():
         api_key=args.api_key
     )
     
+    # 设置温度参数以提高一致性
+    if args.temperature is not None:
+        evaluator.temperature = args.temperature
+    
+    if args.consistent_mode:
+        evaluator.temperature = 0.01  # 极低温度确保最大一致性
+    
     # 显示配置信息
     print(f"🤖 开始AI评估测试用例 {args.testcase_id}...")
     print(f"手写文件: {files['handwritten'].name}")
@@ -78,7 +90,34 @@ def main():
     print(f"需求文件: {files['requirement'].name}")
     print(f"AI配置: 使用{evaluator.model_type}模型 ({evaluator.model_name})")
     
-    # 执行评估
+    # 执行评估（带详细过程输出）
+    print(f"\n🔄 开始AI分析过程...")
+    print("-" * 50)
+    
+    start_time = time.time()
+    
+    # 读取和分析文件
+    print("📂 读取测试文件...")
+    with open(files['handwritten'], 'r', encoding='utf-8') as f:
+        handwritten_content = f.read()
+    with open(files['generated'], 'r', encoding='utf-8') as f:
+        generated_content = f.read()
+    with open(files['requirement'], 'r', encoding='utf-8') as f:
+        requirement_content = f.read()
+    print(f"   ✅ 手写测试用例: {len(handwritten_content)} 字符")
+    print(f"   ✅ 生成测试用例: {len(generated_content)} 字符")
+    print(f"   ✅ 需求文档: {len(requirement_content)} 字符")
+    
+    # 提取需求
+    print("\n🔍 提取功能需求...")
+    requirements = evaluator.extract_requirements_from_md(str(files['requirement']))
+    print(f"   ✅ 提取到 {len(requirements)} 个功能需求")
+    
+    # 执行AI评估
+    print(f"\n🤖 调用AI模型进行分析...")
+    print(f"   模型: {evaluator.model_name}")
+    print(f"   温度: {evaluator.temperature}")
+    
     result = evaluator.evaluate_testcase(
         args.testcase_id,
         str(files['handwritten']),
@@ -86,8 +125,14 @@ def main():
         str(files['requirement'])
     )
     
-    # 保存并显示结果
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    
+    # 保存结果
+    print(f"\n💾 保存评估结果...")
     evaluator.save_evaluation_result(result, args.testcase_id)
+    print(f"   ✅ 结果已保存到 evaluation/results/ 目录")
+    print(f"   ⏱️  总耗时: {elapsed_time:.1f}秒")
     
     # 计算加权综合评分
     weighted_score = (result.functional_completeness * 0.25 + 
