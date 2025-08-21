@@ -97,17 +97,30 @@ def main():
                      result.error_handling * 0.10 + 
                      result.code_quality * 0.05)
     
+    # 获取评级
+    def get_rating(score):
+        if score >= 90:
+            return "优秀"
+        elif score >= 80:
+            return "良好"
+        elif score >= 70:
+            return "一般"
+        else:
+            return "需改进"
+    
     # 简要结果
+    rating = get_rating(weighted_score)
     print(f"\n📊 AI评估完成!")
-    print(f"=" * 40)
+    print(f"=" * 50)
     print(f"功能完整性: {result.functional_completeness:.1f}/100")
     print(f"需求覆盖率: {result.requirement_coverage:.1f}/100")
     print(f"测试逻辑正确性: {result.test_logic_correctness:.1f}/100")
     print(f"边界条件处理: {result.edge_case_handling:.1f}/100")
     print(f"错误处理: {result.error_handling:.1f}/100")
     print(f"代码质量: {result.code_quality:.1f}/100")
-    print(f"综合评分: {weighted_score:.1f}/100")
-    print(f"=" * 40)
+    print(f"-" * 50)
+    print(f"综合评分: {weighted_score:.1f}/100 ({rating})")
+    print(f"=" * 50)
     
     if result.missing_functionalities:
         print(f"\n⚠️ 缺失功能点 ({len(result.missing_functionalities)}):")

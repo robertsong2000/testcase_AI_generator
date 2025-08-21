@@ -322,8 +322,16 @@ class CAPLAIEvaluator:
     def generate_detailed_report(self, result: AIEvaluationResult, testcase_id: str) -> str:
         """生成详细评估报告"""
         
-        report = f"""
-# CAPL测试用例AI评估报告 - 测试用例 {testcase_id}
+        # 计算加权综合评分
+        weighted_score = (result.functional_completeness * 0.25 + 
+                         result.requirement_coverage * 0.25 + 
+                         result.test_logic_correctness * 0.20 + 
+                         result.edge_case_handling * 0.15 + 
+                         result.error_handling * 0.10 + 
+                         result.code_quality * 0.05)
+        rating = self._get_rating(weighted_score)
+        
+        report = f"""\# CAPL测试用例AI评估报告 - 测试用例 {testcase_id}
 
 ## 综合评分
 | 评估维度 | 得分 | 评级 |
@@ -335,7 +343,7 @@ class CAPLAIEvaluator:
 | 错误处理 | {result.error_handling:.1f}/100 | {self._get_rating(result.error_handling)} |
 | 代码质量 | {result.code_quality:.1f}/100 | {self._get_rating(result.code_quality)} |
 
-## 综合评分: {(result.functional_completeness * 0.25 + result.requirement_coverage * 0.25 + result.test_logic_correctness * 0.20 + result.edge_case_handling * 0.15 + result.error_handling * 0.10 + result.code_quality * 0.05):.1f}/100
+## 综合评分: {weighted_score:.1f}/100 ({rating})
 
 ## 详细分析
 {result.detailed_analysis}
