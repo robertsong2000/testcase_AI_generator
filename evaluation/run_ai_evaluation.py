@@ -96,12 +96,21 @@ def main():
     
     # 显示配置信息
     print(f"🤖 开始AI评估测试用例 {args.testcase_id}...")
+    
+    # 获取工程根目录
+    project_root = Path(__file__).parent.parent
+    
     if has_refwritten:
-        print(f"参考文件: {files['refwritten'].name}")
+        ref_rel_path = files['refwritten'].relative_to(project_root)
+        print(f"参考文件: ./{ref_rel_path}")
     else:
         print("参考文件: 无 (基于测试文档直接评估)")
-    print(f"生成文件: {files['generated'].name}")
-    print(f"测试文件: {files['testspec'].name}")
+    
+    # 显示相对于工程的完整路径
+    gen_rel_path = files['generated'].relative_to(project_root)
+    test_rel_path = files['testspec'].relative_to(project_root)
+    print(f"生成文件: ./{gen_rel_path}")
+    print(f"测试文件: ./{test_rel_path}")
     print(f"AI配置: 使用{evaluator.model_type}模型 ({evaluator.model_name})")
     
     # 执行评估（带详细过程输出）
