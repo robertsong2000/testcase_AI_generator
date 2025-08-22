@@ -236,6 +236,18 @@ class KnowledgeBaseManager:
             
             # 创建向量存储
             embeddings = EmbeddingFactory.create_embeddings(self.config)
+            
+            # 修复Ollama嵌入模型输入格式问题
+            # 确保文档内容都是字符串格式
+            for doc in splits:
+                if hasattr(doc, 'page_content'):
+                    # 确保内容不是列表或字典
+                    if isinstance(doc.page_content, (list, dict)):
+                        doc.page_content = str(doc.page_content)
+                    # 确保内容是字符串
+                    doc.page_content = str(doc.page_content)
+            
+            # 创建向量存储（Chroma 0.4+自动持久化）
             self.vector_store = Chroma.from_documents(
                 documents=splits,
                 embedding=embeddings,
@@ -247,22 +259,61 @@ class KnowledgeBaseManager:
             
         except Exception as e:
             print(f"知识库初始化失败: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def _load_documents(self) -> List:
         """加载知识库文档"""
-        from langchain_community.document_loaders import DirectoryLoader
+        from langchain_community.document_loaders import DirectoryLoader, TextLoader
         
         if not self.config.knowledge_base_dir.exists():
             return []
             
-        loader = DirectoryLoader(
-            str(self.config.knowledge_base_dir),
-            glob="**/*.txt",
-            loader_cls=TextLoader,
-            loader_kwargs={'encoding': 'utf-8'}
-        )
-        return loader.load()
+        documents = []
+        
+        # 支持的文件格式
+        file_patterns = ["**/*.txt", "**/*.md", "**/*.capl", "**/*.py"]
+        
+        for pattern in file_patterns:
+            try:
+                loader = DirectoryLoader(
+                    str(self.config.knowledge_base_dir),
+                    glob=pattern,
+                    loader_cls=TextLoader,
+                    loader_kwargs={'encoding': 'utf-8', 'autodetect_encoding': True}
+                )
+                docs = loader.load()
+                
+                # 确保文档内容格式正确
+                for doc in docs:
+                    if hasattr(doc, 'page_content'):
+                        # 确保内容是字符串，不是复杂对象
+                        content = doc.page_content
+                        if isinstance(content, (list, dict, tuple)):
+                            doc.page_content = str(content)
+                        elif not isinstance(content, str):
+                            doc.page_content = str(content)
+                        
+                        # 清理内容
+                        doc.page_content = doc.page_content.strip()
+                        
+                        # 确保内容不为空
+                        if not doc.page_content:
+                            continue
+                
+                # 过滤掉空文档
+                valid_docs = [doc for doc in docs if doc.page_content and doc.page_content.strip()]
+                documents.extend(valid_docs)
+                
+                if valid_docs:
+                    print(f"📁 加载 {pattern} 格式: {len(valid_docs)} 个有效文档")
+                    
+            except Exception as e:
+                print(f"⚠️  加载 {pattern} 格式失败: {e}")
+                continue
+        
+        return documents
     
     def get_retriever(self):
         """获取检索器"""
@@ -312,10 +363,28 @@ class CAPLGenerator:
             ])
             
             def format_docs(docs):
-                return "\n\n".join(doc.page_content for doc in docs)
+                return "\n\n".join(str(doc.page_content) for doc in docs)
             
+            # 修复：确保输入格式正确
+            def create_chain_input(requirement_str):
+                # 确保requirement是字符串
+                if isinstance(requirement_str, dict):
+                    requirement_str = str(requirement_str.get('requirement', str(requirement_str)))
+                elif not isinstance(requirement_str, str):
+                    requirement_str = str(requirement_str)
+                
+                # 获取相关文档
+                docs = retriever.invoke(requirement_str)
+                context_str = format_docs(docs)
+                
+                return {
+                    "context": context_str,
+                    "requirement": requirement_str
+                }
+            
+            # 使用自定义的链构建
             self.chain = (
-                {"context": retriever | format_docs, "requirement": RunnablePassthrough()}
+                create_chain_input
                 | prompt
                 | self.llm
                 | StrOutputParser()
