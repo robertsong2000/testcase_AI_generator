@@ -437,13 +437,24 @@ class CAPLGeneratorService:
         self.generator = CAPLGenerator(self.config)
         self.start_time = None
         
-    def process_file(self, file_path: str, debug_prompt: bool = False, **kwargs) -> Dict[str, Any]:
+    def process_file(self, file_path: str, debug_prompt: bool = False, rebuild_rag: bool = False, **kwargs) -> Dict[str, Any]:
         """处理单个文件"""
         self.start_time = time.time()
         
         try:
             # 确保输出目录存在
             self.config.output_dir.mkdir(exist_ok=True)
+            
+            # 处理RAG重构选项
+            if rebuild_rag and self.config.enable_rag:
+                print("🔄 检测到RAG重构选项，正在删除旧向量数据库...")
+                vector_db_path = self.config.vector_db_dir
+                if vector_db_path.exists():
+                    import shutil
+                    shutil.rmtree(vector_db_path)
+                    print(f"✅ 已删除旧向量数据库: {vector_db_path}")
+                else:
+                    print("ℹ️  向量数据库不存在，无需删除")
             
             # 初始化生成器
             self.generator.initialize()
@@ -529,11 +540,12 @@ def main():
     parser.add_argument('--model', help='使用的模型名称')
     parser.add_argument('--output-dir', help='输出目录')
     parser.add_argument('--enable-rag', action='store_true', help='启用RAG功能')
+    parser.add_argument('--rebuild-rag', action='store_true', help='重构RAG向量数据库（删除旧数据库并重新创建）')
     parser.add_argument('--context-length', type=int, help='上下文长度')
     parser.add_argument('--max-tokens', type=int, help='最大输出tokens')
     parser.add_argument('--temperature', type=float, help='生成温度')
     parser.add_argument('--top-p', type=float, help='top-p采样参数')
-    parser.add_argument('--debug-prompt', action='store_true', help='调试模式：打印完整的prompt信息')
+    parser.add_argument('--debug-prompt', action='store_true', help='调试模式，显示完整prompt')
     
     args = parser.parse_args()
     
@@ -578,17 +590,39 @@ def main():
     
     # 创建服务并处理文件
     service = CAPLGeneratorService(config)
-    result = service.process_file(args.file_path, debug_prompt=args.debug_prompt)
+    result = service.process_file(
+        args.file_path,
+        debug_prompt=args.debug_prompt,
+        rebuild_rag=args.rebuild_rag
+    )
     
-    if result["status"] == "success":
-        print("\n✅ CAPL代码生成成功")
-        print(f"   输出文件: {result['file_path']}")
-        print(f"   生成时间: {result['stats']['generation_time']}秒")
-        print(f"   代码长度: {result['stats']['code_length']}字符")
-        print(f"   估算token: {result['stats']['estimated_tokens']} tokens")
-        print(f"   输出速率: {result['stats']['token_rate']} tokens/秒")
+    # 显示配置信息
+    print("=" * 60)
+    print("📊 配置信息")
+    print("=" * 60)
+    print(f"🔧 API类型: {config.api_type}")
+    print(f"🔗 API地址: {config.api_url}")
+    print(f"🤖 模型名称: {config.model}")
+    print(f"🧠 嵌入模型: {config.embedding_model}")
+    print(f"📁 输出目录: {config.output_dir}")
+    print(f"📚 RAG功能: {'启用' if config.enable_rag else '禁用'}")
+    if config.enable_rag:
+        print(f"🔄 RAG重构: {'是' if args.rebuild_rag else '否'}")
+    print(f"🌡️  温度参数: {config.temperature}")
+    print(f"🎯 top-p参数: {config.top_p}")
+    print("=" * 60)
+    
+    # 处理结果
+    if result['status'] == 'success':
+        print(f"✅ CAPL代码生成成功！")
+        print(f"📄 输出文件: {result['file_path']}")
+        print(f"⏱️  生成时间: {result['stats']['generation_time']}秒")
+        print(f"📊 代码长度: {result['stats']['code_length']}字符")
+        print(f"🎯 估算tokens: {result['stats']['estimated_tokens']}")
+        print(f"⚡ 生成速度: {result['stats']['token_rate']} tokens/秒")
     else:
-        print(f"❌ 生成失败: {result['error']}")
+        print(f"❌ CAPL代码生成失败！")
+        print(f"💥 错误信息: {result['error']}")
         sys.exit(1)
 
 if __name__ == "__main__":
