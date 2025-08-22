@@ -47,8 +47,10 @@ def create_parser() -> argparse.ArgumentParser:
     # LLM配置
     parser.add_argument(
         '--api-type',
-        choices=['openai', 'anthropic', 'azure', 'local'],
-        help='API类型 (openai/anthropic/azure/local)'
+        type=str,
+        default='ollama',
+        choices=['ollama', 'openai'],
+        help='API类型 (ollama/openai)'
     )
     
     parser.add_argument(
