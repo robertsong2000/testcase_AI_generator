@@ -23,6 +23,8 @@ def create_parser() -> argparse.ArgumentParser:
   %(prog)s --test-rag "message filter"
   %(prog)s requirements.txt --debug-prompt
   %(prog)s requirements.txt --rebuild-rag
+  %(prog)s requirements.txt --no-use-example-code  # 禁用示例代码
+  %(prog)s requirements.txt --use-example-code     # 强制使用示例代码
         """
     )
     
@@ -87,12 +89,19 @@ def create_parser() -> argparse.ArgumentParser:
         help='测试RAG搜索功能'
     )
     
-    # 示例代码
+    # 示例代码配置
     parser.add_argument(
-        '--force-example',
+        '--use-example-code',
         action='store_true',
         default=True,
-        help='强制加载示例CAPL代码到知识库 (默认: 开启)'
+        help='强制使用示例CAPL代码，无论RAG是否启用 (默认: 开启)'
+    )
+    
+    parser.add_argument(
+        '--no-use-example-code',
+        action='store_false',
+        dest='use_example_code',
+        help='禁用示例CAPL代码，仅基于需求生成'
     )
     
     parser.add_argument(
@@ -154,8 +163,8 @@ def load_config(args) -> CAPLGeneratorConfig:
     if args.model:
         config.model_name = args.model
     
-    if args.force_example is not None:
-        config.force_load_examples = args.force_example
+    if args.use_example_code is not None:
+        config.use_example_code = args.use_example_code
     
     return config
 

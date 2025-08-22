@@ -52,6 +52,9 @@ class CAPLGeneratorConfig:
         
         # 显示配置
         self.show_doc_summary = os.getenv("SHOW_DOC_SUMMARY", "true").lower() == "true"
+        
+        # 示例代码配置
+        self.use_example_code = os.getenv("USE_EXAMPLE_CODE", "true").lower() == "true"
     
     def _get_knowledge_base_config(self) -> tuple[Path, Path]:
         """从配置文件读取知识库目录配置"""

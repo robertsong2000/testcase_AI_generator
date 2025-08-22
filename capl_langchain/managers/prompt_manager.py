@@ -21,12 +21,12 @@ class PromptTemplateManager:
             else:
                 prompt = self._get_default_prompt()
             
-            # 根据RAG启用状态决定如何处理示例代码
-            if self.config.enable_rag:
-                # 启用RAG时，提示使用知识库
+            # 根据RAG启用状态和use_example_code配置决定如何处理示例代码
+            if self.config.enable_rag and not self.config.use_example_code:
+                # 启用RAG但禁用示例代码时，提示使用知识库
                 example_placeholder = "# 示例代码已整合到RAG知识库中，将基于知识库内容生成"
-            else:
-                # 禁用RAG时，尝试加载示例代码文件
+            elif self.config.use_example_code:
+                # 强制使用示例代码时，无论RAG是否启用
                 if self.config.example_code_file.exists():
                     with open(self.config.example_code_file, 'r', encoding='utf-8') as f:
                         example_code = f.read()
@@ -34,6 +34,9 @@ class PromptTemplateManager:
                 else:
                     # 文件不存在时的回退提示
                     example_placeholder = "# 示例代码请参考知识库中的CAPL测试用例示例"
+            else:
+                # 禁用RAG且禁用示例代码时
+                example_placeholder = "# 基于测试需求生成CAPL代码，不使用示例代码"
             
             # 替换示例代码占位符（如果存在）
             placeholder_text = "示例代码已移至单独的文件 example_code.txt 中，以保护敏感代码内容。"
