@@ -18,6 +18,7 @@ def create_parser() -> argparse.ArgumentParser:
   %(prog)s requirements.txt
   %(prog)s requirements.txt --output ./generated/
   %(prog)s requirements.txt --disable-rag
+  %(prog)s requirements.txt -k 8             # 设置RAG检索返回8个文档
   %(prog)s --info
   %(prog)s --search "CAPL message handling"
   %(prog)s --test-rag "message filter"
@@ -66,7 +67,15 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '--disable-rag',
         action='store_true',
-        help='禁用RAG知识库功能'
+        help='禁用RAG功能'
+    )
+    
+    parser.add_argument(
+        '-k', '--k',
+        type=int,
+        default=4,
+        metavar='K',
+        help='RAG检索返回的文档数量 (默认: 4)'
     )
     
     parser.add_argument(
@@ -150,6 +159,9 @@ def load_config(args) -> CAPLGeneratorConfig:
     # 应用命令行参数
     if args.disable_rag:
         config.enable_rag = False
+    
+    if args.k is not None:
+        config.k = args.k
     
     if args.output:
         config.output_dir = Path(args.output)

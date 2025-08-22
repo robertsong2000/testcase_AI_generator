@@ -133,19 +133,22 @@ class CAPLGeneratorService:
             "token_rate": round(token_rate, 2)
         }
     
-    def test_rag_search(self, query: str, k: int = 4, show_summary: bool = True) -> List[Dict[str, Any]]:
+    def test_rag_search(self, query: str, k: int = None, show_summary: bool = True) -> List[Dict[str, Any]]:
         """测试RAG搜索功能"""
         if not self.config.enable_rag:
             print("⚠️  RAG功能未启用")
             return []
         
-        print(f"\n🔍 测试RAG搜索: '{query}'")
+        # 使用config中的k值作为默认值
+        search_k = k if k is not None else self.config.k
+        
+        print(f"\n🔍 测试RAG搜索: '{query}' (k={search_k})")
         
         # 确保生成器已初始化
         self.generator.initialize()
         
         # 执行搜索
-        documents = self.generator.search_knowledge_base(query, k)
+        documents = self.generator.search_knowledge_base(query, search_k)
         
         if documents:
             print(f"✅ 找到 {len(documents)} 个相关文档")

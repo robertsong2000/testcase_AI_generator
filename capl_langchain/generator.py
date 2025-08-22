@@ -35,11 +35,12 @@ class CAPLGenerator:
         # 构建处理链
         self._build_chain()
     
+    # 构建LangChain处理链
     def _build_chain(self):
         """构建LangChain处理链"""
         if self.config.enable_rag and self.kb_manager.get_retriever():
             # RAG模式
-            retriever = self.kb_manager.get_retriever()
+            retriever = self.kb_manager.get_retriever(self.config.k)
             
             prompt = ChatPromptTemplate.from_messages([
                 ("system", self.prompt_manager.system_prompt),

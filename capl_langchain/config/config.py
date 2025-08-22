@@ -31,6 +31,7 @@ class CAPLGeneratorConfig:
         
         # RAG配置
         self.enable_rag = os.getenv("ENABLE_RAG", "true").lower() == "true"
+        self.k = int(os.getenv("RAG_K", "4"))  # RAG检索返回的文档数量
         
         # 从配置文件读取知识库和向量数据库目录
         config_kb_dir, config_vector_dir = self._get_knowledge_base_config()

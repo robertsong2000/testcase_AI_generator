@@ -122,12 +122,17 @@ class KnowledgeBaseManager:
         
         return documents
     
-    def get_retriever(self):
-        """获取检索器"""
+    def get_retriever(self, k: int = None):
+        """获取检索器
+        
+        Args:
+            k: 返回的文档数量，如果为None则使用配置中的默认值
+        """
         if self.vector_store:
+            search_k = k if k is not None else self.config.k
             return self.vector_store.as_retriever(
                 search_type="similarity",
-                search_kwargs={"k": 4}
+                search_kwargs={"k": search_k}
             )
         return None
     
