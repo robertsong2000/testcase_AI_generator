@@ -55,6 +55,9 @@ class CAPLGeneratorConfig:
         self.knowledge_base_dir = self.project_root / "knowledge_base"
         self.vector_db_dir = self.project_root / "vector_db"
         self.embedding_model = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
+        
+        # 显示配置
+        self.show_doc_summary = os.getenv("SHOW_DOC_SUMMARY", "true").lower() == "true"
     
     def _get_prompt_template_path(self) -> Path:
         """从配置文件读取提示词模板路径"""
@@ -468,14 +471,18 @@ class CAPLGenerator:
                         except Exception:
                             source = str(source)
                         
-                        # 内容摘要
+                        # 内容摘要 - 通过配置控制显示
                         content = doc.page_content if hasattr(doc, 'page_content') else str(doc)
-                        summary = content[:150] + "..." if len(content) > 150 else content
                         
-                        print(f"   📄 文档{i}: {source}")
-                        print(f"      摘要: {summary}")
-                        print(f"      长度: {len(content)} 字符")
-                        print()
+                        # 检查是否需要显示摘要
+                        if self.config.show_doc_summary:
+                            summary = content[:150] + "..." if len(content) > 150 else content
+                            print(f"   📄 文档{i}: {source}")
+                            print(f"      摘要: {summary}")
+                            print(f"      长度: {len(content)} 字符")
+                            print()
+                        else:
+                            print(f"   📄 文档{i}: {source} ({len(content)} 字符)")
                 else:
                     print("⚠️  未找到相关文档，将基于通用知识生成")
                 
@@ -553,7 +560,7 @@ class CAPLGeneratorService:
         self.generator = CAPLGenerator(self.config)
         self.start_time = None
         
-    def process_file(self, file_path: str, debug_prompt: bool = False, rebuild_rag: bool = False, **kwargs) -> Dict[str, Any]:
+    def process_file(self, file_path: str, debug_prompt: bool = False, rebuild_rag: bool = False, show_summary: bool = True, **kwargs) -> Dict[str, Any]:
         """处理单个文件"""
         self.start_time = time.time()
         
@@ -611,6 +618,9 @@ class CAPLGeneratorService:
                     print("ℹ️  向量数据库不存在，将创建新的")
             else:
                 print("ℹ️  RAG功能未启用，使用通用知识生成")
+            
+            # 更新配置中的显示选项
+            self.generator.config.show_doc_summary = show_summary
             
             # 生成CAPL代码
             capl_code = self.generator.generate_capl_code(requirement)
@@ -742,6 +752,7 @@ def main():
     parser.add_argument('--test-rag', help='测试RAG搜索功能，输入查询内容')
     parser.add_argument('--k', type=int, default=4, help='RAG检索返回的文档数量')
     parser.add_argument('--show-summary', action='store_true', help='显示RAG文档摘要信息')
+    parser.add_argument('--hide-summary', action='store_true', help='隐藏RAG文档摘要信息，只显示文档列表')
     
     args = parser.parse_args()
     
@@ -759,6 +770,10 @@ def main():
         config.enable_rag = True
     if args.disable_rag:
         config.enable_rag = False
+    if args.hide_summary:
+        config.show_doc_summary = False
+    elif args.show_summary:
+        config.show_doc_summary = True
     
     # 创建服务
     service = CAPLGeneratorService(config)
