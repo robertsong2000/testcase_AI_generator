@@ -34,6 +34,10 @@ example_code.txt
 
 # 临时测试目录
 test_output/
+test/rag_output/
+
+# 向量数据库
+vector_db/
 
 # 评估日志目录
 evaluation/logs/
