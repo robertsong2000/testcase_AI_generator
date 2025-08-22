@@ -45,24 +45,63 @@ class CAPLGeneratorConfig:
         # 路径配置
         self.project_root = Path(__file__).parent
         self.output_dir = self.project_root / "capl"
-        
         # 从配置文件读取提示词模板路径
         self.prompt_template_file = self._get_prompt_template_path()
         self.example_code_file = self.project_root / "example_code.txt"
-        
         # RAG配置
         self.enable_rag = os.getenv("ENABLE_RAG", "true").lower() == "true"
-        self.knowledge_base_dir = self.project_root / "knowledge_base"
-        self.vector_db_dir = self.project_root / "vector_db"
+        
+        # 从配置文件读取知识库和向量数据库目录
+        config_kb_dir, config_vector_dir = self._get_knowledge_base_config()
+        
+        # 环境变量优先级最高，配置文件次之，最后使用默认值
+        custom_kb_dir = os.getenv("KNOWLEDGE_BASE_DIR")
+        if custom_kb_dir:
+            self.knowledge_base_dir = Path(custom_kb_dir)
+        else:
+            self.knowledge_base_dir = config_kb_dir
+            
+        custom_vector_dir = os.getenv("VECTOR_DB_DIR")
+        if custom_vector_dir:
+            self.vector_db_dir = Path(custom_vector_dir)
+        else:
+            self.vector_db_dir = config_vector_dir
+            
         self.embedding_model = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
         
         # 显示配置
         self.show_doc_summary = os.getenv("SHOW_DOC_SUMMARY", "true").lower() == "true"
     
+    def _get_knowledge_base_config(self) -> tuple[Path, Path]:
+        """从配置文件读取知识库目录配置"""
+        config_path = self.project_root / "prompt_config.ini"
+        default_kb_dir = self.project_root / "knowledge_base"
+        default_vector_dir = self.project_root / "vector_db"
+        
+        if config_path.exists():
+            try:
+                import configparser
+                config = configparser.ConfigParser()
+                config.read(config_path, encoding='utf-8')
+                
+                kb_dir_str = config['DEFAULT'].get('KNOWLEDGE_BASE_DIR', 'knowledge_base')
+                vector_dir_str = config['DEFAULT'].get('VECTOR_DB_DIR', 'vector_db')
+                
+                # 转换为绝对路径
+                kb_dir = Path(kb_dir_str) if Path(kb_dir_str).is_absolute() else self.project_root / kb_dir_str
+                vector_dir = Path(vector_dir_str) if Path(vector_dir_str).is_absolute() else self.project_root / vector_dir_str
+                
+                return kb_dir, vector_dir
+                
+            except Exception as e:
+                print(f"警告: 读取知识库配置失败，使用默认配置: {e}")
+        
+        return default_kb_dir, default_vector_dir
+    
     def _get_prompt_template_path(self) -> Path:
         """从配置文件读取提示词模板路径"""
         config_path = self.project_root / "prompt_config.ini"
-        default_template = "prompt_template_simple.txt"
+        default_template = "prompt_template.txt"
         
         if config_path.exists():
             try:
@@ -753,6 +792,8 @@ def main():
     parser.add_argument('--k', type=int, default=4, help='RAG检索返回的文档数量')
     parser.add_argument('--show-summary', action='store_true', help='显示RAG文档摘要信息')
     parser.add_argument('--hide-summary', action='store_true', help='隐藏RAG文档摘要信息，只显示文档列表')
+    parser.add_argument('--knowledge-base-dir', help='指定知识库目录路径')
+    parser.add_argument('--vector-db-dir', help='指定向量数据库目录路径')
     
     args = parser.parse_args()
     
@@ -774,6 +815,10 @@ def main():
         config.show_doc_summary = False
     elif args.show_summary:
         config.show_doc_summary = True
+    if args.knowledge_base_dir:
+        config.knowledge_base_dir = Path(args.knowledge_base_dir)
+    if args.vector_db_dir:
+        config.vector_db_dir = Path(args.vector_db_dir)
     
     # 创建服务
     service = CAPLGeneratorService(config)
