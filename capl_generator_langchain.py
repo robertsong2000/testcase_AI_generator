@@ -51,7 +51,7 @@ class CAPLGeneratorConfig:
         self.example_code_file = self.project_root / "example_code.txt"
         
         # RAG配置
-        self.enable_rag = os.getenv("ENABLE_RAG", "false").lower() == "true"
+        self.enable_rag = os.getenv("ENABLE_RAG", "true").lower() == "true"
         self.knowledge_base_dir = self.project_root / "knowledge_base"
         self.vector_db_dir = self.project_root / "vector_db"
         self.embedding_model = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
