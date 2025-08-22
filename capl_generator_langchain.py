@@ -677,8 +677,14 @@ class CAPLGeneratorService:
             "token_rate": round(token_rate, 2)
         }
     
-    def test_rag_search(self, query: str, k: int = 4) -> List[Dict[str, Any]]:
-        """测试RAG搜索功能"""
+    def test_rag_search(self, query: str, k: int = 4, show_summary: bool = True) -> List[Dict[str, Any]]:
+        """测试RAG搜索功能
+        
+        Args:
+            query: 搜索查询内容
+            k: 返回的文档数量
+            show_summary: 是否显示文档摘要信息，默认为True
+        """
         if not self.config.enable_rag:
             print("⚠️  RAG功能未启用")
             return []
@@ -689,18 +695,22 @@ class CAPLGeneratorService:
         self.generator.initialize()
         
         # 执行搜索
-        results = self.generator.get_document_info(query, k)
+        documents = self.generator.get_document_info(query, k)
         
-        if results:
-            print(f"✅ 找到 {len(results)} 个相关文档")
-            for i, result in enumerate(results, 1):
-                print(f"\n📄 文档{i}: {result['source']}")
-                print(f"   摘要: {result['summary']}")
-                print(f"   长度: {result['length']} 字符")
+        if documents:
+            print(f"✅ 找到 {len(documents)} 个相关文档")
+            if show_summary:
+                for i, doc in enumerate(documents, 1):
+                    print(f"\n📄 文档{i}: {doc['source']}")
+                    print(f"   摘要: {doc['summary']}")
+                    print(f"   长度: {doc['length']} 字符")
+            else:
+                for i, doc in enumerate(documents, 1):
+                    print(f"   📄 文档{i}: {doc['source']}")
         else:
             print("❌ 未找到相关文档")
         
-        return results
+        return documents
 
 def main():
     """主函数"""
@@ -715,6 +725,7 @@ def main():
     parser.add_argument('--rebuild-rag', action='store_true', help='重新构建RAG知识库')
     parser.add_argument('--test-rag', help='测试RAG搜索功能，输入查询内容')
     parser.add_argument('--k', type=int, default=4, help='RAG检索返回的文档数量')
+    parser.add_argument('--show-summary', action='store_true', help='显示RAG文档摘要信息')
     
     args = parser.parse_args()
     
@@ -739,7 +750,7 @@ def main():
     # 处理不同的操作模式
     if args.test_rag:
         # 测试RAG搜索模式
-        service.test_rag_search(args.test_rag, args.k)
+        service.test_rag_search(args.test_rag, args.k, show_summary=args.show_summary)
         return
     
     if not args.file_path:
@@ -755,7 +766,8 @@ def main():
     result = service.process_file(
         args.file_path,
         debug_prompt=args.debug_prompt,
-        rebuild_rag=args.rebuild_rag
+        rebuild_rag=args.rebuild_rag,
+        show_summary=args.show_summary
     )
     
     if result["status"] == "success":
