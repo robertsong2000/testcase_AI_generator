@@ -630,14 +630,38 @@ class CAPLGeneratorService:
             return f.read()
     
     def _save_result(self, original_path: str, capl_code: str) -> Path:
-        """保存生成的CAPL代码"""
-        original_name = Path(original_path).stem
-        output_file = self.config.output_dir / f"{original_name}.md"
+        """保存生成的CAPL代码
         
-        with open(output_file, 'w', encoding='utf-8') as f:
+        支持两种输出格式：
+        - .md 格式：Markdown格式的详细说明文档
+        - .can 格式：纯CAPL代码文件，可直接用于CANoe/CANalyzer
+        """
+        original_name = Path(original_path).stem
+        
+        # 同时生成两种格式的文件
+        md_file = self.config.output_dir / f"{original_name}.md"
+        can_file = self.config.output_dir / f"{original_name}.can"
+        
+        # 保存Markdown格式（包含详细说明）
+        with open(md_file, 'w', encoding='utf-8') as f:
             f.write(capl_code)
         
-        return output_file
+        # 保存.can格式（纯代码）
+        # 从生成的内容中提取代码块
+        import re
+        code_blocks = re.findall(r'```(?:capl)?\n(.*?)\n```', capl_code, re.DOTALL)
+        
+        if code_blocks:
+            # 如果有代码块，提取第一个代码块作为.can文件内容
+            pure_code = code_blocks[0].strip()
+        else:
+            # 如果没有找到代码块，使用原始内容
+            pure_code = capl_code
+        
+        with open(can_file, 'w', encoding='utf-8') as f:
+            f.write(pure_code)
+        
+        return md_file  # 返回主输出文件路径
     
     def _calculate_stats(self, capl_code: str) -> Dict[str, Any]:
         """计算生成统计信息"""
@@ -737,6 +761,8 @@ def main():
     if result["status"] == "success":
         print(f"✅ 生成成功！")
         print(f"📁 输出文件: {result['file_path']}")
+        print(f"📁 CAPL代码文件: {result['file_path'].replace('.md', '.can')}")
+        print(f"ℹ️  说明: .md文件包含详细说明和代码，.can文件为纯CAPL代码可直接导入CANoe/CANalyzer")
         print(f"⏱️  生成时间: {result['stats']['generation_time']}秒")
         print(f"📊 代码长度: {result['stats']['code_length']}字符")
         print(f"🔢 估算tokens: {result['stats']['estimated_tokens']}")
