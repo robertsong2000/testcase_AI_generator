@@ -567,6 +567,7 @@ def main():
     print(f"📊 API类型: {config.api_type}")
     print(f"🔗 API地址: {config.api_url}")
     print(f"🤖 模型名称: {config.model}")
+    print(f"🧠 嵌入模型: {config.embedding_model}")
     print(f"📁 输出目录: {config.output_dir}")
     print(f"📚 RAG功能: {'启用' if config.enable_rag else '禁用'}")
     print(f"📏 上下文长度: {config.context_length} tokens")
