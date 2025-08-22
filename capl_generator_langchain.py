@@ -323,6 +323,58 @@ class KnowledgeBaseManager:
                 search_kwargs={"k": 4}
             )
         return None
+    
+    def search_documents(self, query: str, k: int = 4) -> List[Dict[str, Any]]:
+        """搜索相关文档并返回详细信息"""
+        if not self.vector_store:
+            return []
+        
+        try:
+            retriever = self.vector_store.as_retriever(
+                search_type="similarity",
+                search_kwargs={"k": k}
+            )
+            
+            docs = retriever.invoke(query)
+            
+            # 提取文档信息
+            results = []
+            for doc in docs:
+                # 获取文档元信息
+                metadata = doc.metadata if hasattr(doc, 'metadata') else {}
+                source = metadata.get('source', '未知来源')
+                
+                # 获取相对路径
+                try:
+                    if source != '未知来源':
+                        source_path = Path(source)
+                        if source_path.is_absolute():
+                            # 转换为相对于知识库目录的路径
+                            try:
+                                source = str(source_path.relative_to(self.config.knowledge_base_dir))
+                            except ValueError:
+                                source = source_path.name
+                        else:
+                            source = str(source_path)
+                except Exception:
+                    source = str(source)
+                
+                # 内容摘要
+                content = doc.page_content if hasattr(doc, 'page_content') else str(doc)
+                summary = content[:200] + "..." if len(content) > 200 else content
+                
+                results.append({
+                    'source': source,
+                    'content': content,
+                    'summary': summary,
+                    'length': len(content)
+                })
+            
+            return results
+            
+        except Exception as e:
+            print(f"文档检索失败: {e}")
+            return []
 
 class CAPLGenerator:
     """基于LangChain的CAPL代码生成器"""
@@ -365,7 +417,7 @@ class CAPLGenerator:
             def format_docs(docs):
                 return "\n\n".join(str(doc.page_content) for doc in docs)
             
-            # 修复：确保输入格式正确
+            # 修复：确保输入格式正确，并显示检索信息
             def create_chain_input(requirement_str):
                 # 确保requirement是字符串
                 if isinstance(requirement_str, dict):
@@ -373,8 +425,44 @@ class CAPLGenerator:
                 elif not isinstance(requirement_str, str):
                     requirement_str = str(requirement_str)
                 
-                # 获取相关文档
+                # 获取相关文档并显示检索信息
+                print(f"\n🔍 正在检索知识库...")
                 docs = retriever.invoke(requirement_str)
+                
+                if docs:
+                    print(f"✅ 检索完成，找到 {len(docs)} 个相关文档")
+                    
+                    # 显示每个文档的信息
+                    for i, doc in enumerate(docs, 1):
+                        # 获取文档来源
+                        metadata = doc.metadata if hasattr(doc, 'metadata') else {}
+                        source = metadata.get('source', '未知来源')
+                        
+                        # 获取相对路径
+                        try:
+                            if source != '未知来源':
+                                source_path = Path(source)
+                                if source_path.is_absolute():
+                                    try:
+                                        source = str(source_path.relative_to(self.config.knowledge_base_dir))
+                                    except ValueError:
+                                        source = source_path.name
+                                else:
+                                    source = str(source_path)
+                        except Exception:
+                            source = str(source)
+                        
+                        # 内容摘要
+                        content = doc.page_content if hasattr(doc, 'page_content') else str(doc)
+                        summary = content[:150] + "..." if len(content) > 150 else content
+                        
+                        print(f"   📄 文档{i}: {source}")
+                        print(f"      摘要: {summary}")
+                        print(f"      长度: {len(content)} 字符")
+                        print()
+                else:
+                    print("⚠️  未找到相关文档，将基于通用知识生成")
+                
                 context_str = format_docs(docs)
                 
                 return {
@@ -428,6 +516,18 @@ class CAPLGenerator:
             
         except Exception as e:
             raise RuntimeError(f"读取文件失败: {str(e)}")
+    
+    def get_document_info(self, query: str, k: int = 4) -> List[Dict[str, Any]]:
+        """获取文档检索信息（用于调试和显示）"""
+        if not self.config.enable_rag:
+            print("⚠️  RAG功能未启用")
+            return []
+        
+        if not self.kb_manager.vector_store:
+            print("⚠️  知识库未初始化")
+            return []
+        
+        return self.kb_manager.search_documents(query, k)
 
 class CAPLGeneratorService:
     """CAPL生成器服务类，提供完整功能"""
@@ -473,6 +573,28 @@ class CAPLGeneratorService:
                 print(requirement)
                 print("=" * 60)
                 print("\n")
+            
+            # 显示RAG状态
+            if self.config.enable_rag:
+                print(f"\n📚 RAG功能已启用")
+                print(f"📁 知识库目录: {self.config.knowledge_base_dir}")
+                print(f"📁 向量数据库目录: {self.config.vector_db_dir}")
+                
+                # 检查向量数据库状态
+                vector_db_exists = self.config.vector_db_dir.exists() and \
+                                 any(self.config.vector_db_dir.glob("*"))
+                
+                if vector_db_exists:
+                    print("✅ 向量数据库已存在")
+                    # 列出数据库文件
+                    for item in self.config.vector_db_dir.rglob("*"):
+                        if item.is_file():
+                            size = item.stat().st_size
+                            print(f"   📄 {item.relative_to(self.config.vector_db_dir)} ({size} bytes)")
+                else:
+                    print("ℹ️  向量数据库不存在，将创建新的")
+            else:
+                print("ℹ️  RAG功能未启用，使用通用知识生成")
             
             # 生成CAPL代码
             capl_code = self.generator.generate_capl_code(requirement)
@@ -530,22 +652,45 @@ class CAPLGeneratorService:
             "estimated_tokens": estimated_tokens,
             "token_rate": round(token_rate, 2)
         }
+    
+    def test_rag_search(self, query: str, k: int = 4) -> List[Dict[str, Any]]:
+        """测试RAG搜索功能"""
+        if not self.config.enable_rag:
+            print("⚠️  RAG功能未启用")
+            return []
+        
+        print(f"\n🔍 测试RAG搜索: '{query}'")
+        
+        # 初始化知识库
+        self.generator.initialize()
+        
+        # 执行搜索
+        results = self.generator.get_document_info(query, k)
+        
+        if results:
+            print(f"✅ 找到 {len(results)} 个相关文档")
+            for i, result in enumerate(results, 1):
+                print(f"\n📄 文档{i}: {result['source']}")
+                print(f"   摘要: {result['summary']}")
+                print(f"   长度: {result['length']} 字符")
+        else:
+            print("❌ 未找到相关文档")
+        
+        return results
 
 def main():
     """主函数"""
     parser = argparse.ArgumentParser(description='基于LangChain的CAPL代码生成器')
-    parser.add_argument('file_path', help='输入的测试需求文件路径')
+    parser.add_argument('file_path', nargs='?', help='输入的测试需求文件路径')
     parser.add_argument('--api-type', choices=['ollama', 'openai'], help='API类型')
     parser.add_argument('--api-url', help='API服务地址')
-    parser.add_argument('--model', help='使用的模型名称')
-    parser.add_argument('--output-dir', help='输出目录')
+    parser.add_argument('--model', help='模型名称')
     parser.add_argument('--enable-rag', action='store_true', help='启用RAG功能')
-    parser.add_argument('--rebuild-rag', action='store_true', help='重构RAG向量数据库（删除旧数据库并重新创建）')
-    parser.add_argument('--context-length', type=int, help='上下文长度')
-    parser.add_argument('--max-tokens', type=int, help='最大输出tokens')
-    parser.add_argument('--temperature', type=float, help='生成温度')
-    parser.add_argument('--top-p', type=float, help='top-p采样参数')
+    parser.add_argument('--disable-rag', action='store_true', help='禁用RAG功能')
     parser.add_argument('--debug-prompt', action='store_true', help='调试模式，显示完整prompt')
+    parser.add_argument('--rebuild-rag', action='store_true', help='重新构建RAG知识库')
+    parser.add_argument('--test-rag', help='测试RAG搜索功能，输入查询内容')
+    parser.add_argument('--k', type=int, default=4, help='RAG检索返回的文档数量')
     
     args = parser.parse_args()
     
@@ -559,70 +704,45 @@ def main():
         config.api_url = args.api_url
     if args.model:
         config.model = args.model
-    if args.output_dir:
-        config.output_dir = Path(args.output_dir)
     if args.enable_rag:
         config.enable_rag = True
-    if args.context_length:
-        config.context_length = args.context_length
-    if args.max_tokens:
-        config.max_tokens = args.max_tokens
-    if args.temperature is not None:
-        config.temperature = args.temperature
-    if args.top_p is not None:
-        config.top_p = args.top_p
+    if args.disable_rag:
+        config.enable_rag = False
     
-    # 打印配置信息
-    print("=" * 50)
-    print("CAPL生成器配置信息")
-    print("=" * 50)
-    print(f"📊 API类型: {config.api_type}")
-    print(f"🔗 API地址: {config.api_url}")
-    print(f"🤖 模型名称: {config.model}")
-    print(f"🧠 嵌入模型: {config.embedding_model}")
-    print(f"📁 输出目录: {config.output_dir}")
-    print(f"📚 RAG功能: {'启用' if config.enable_rag else '禁用'}")
-    print(f"📏 上下文长度: {config.context_length} tokens")
-    print(f"📝 最大输出: {config.max_tokens} tokens")
-    print(f"🌡️  生成温度: {config.temperature}")
-    print(f"🎯 Top-P参数: {config.top_p}")
-    print("=" * 50)
-    
-    # 创建服务并处理文件
+    # 创建服务
     service = CAPLGeneratorService(config)
+    
+    # 处理不同的操作模式
+    if args.test_rag:
+        # 测试RAG搜索模式
+        service.test_rag_search(args.test_rag, args.k)
+        return
+    
+    if not args.file_path:
+        print("错误: 请提供输入文件路径或使用 --test-rag 测试RAG功能")
+        parser.print_help()
+        return
+    
+    # 正常处理文件
+    print("=" * 60)
+    print("CAPL代码生成器")
+    print("=" * 60)
+    
     result = service.process_file(
         args.file_path,
         debug_prompt=args.debug_prompt,
         rebuild_rag=args.rebuild_rag
     )
     
-    # 显示配置信息
-    print("=" * 60)
-    print("📊 配置信息")
-    print("=" * 60)
-    print(f"🔧 API类型: {config.api_type}")
-    print(f"🔗 API地址: {config.api_url}")
-    print(f"🤖 模型名称: {config.model}")
-    print(f"🧠 嵌入模型: {config.embedding_model}")
-    print(f"📁 输出目录: {config.output_dir}")
-    print(f"📚 RAG功能: {'启用' if config.enable_rag else '禁用'}")
-    if config.enable_rag:
-        print(f"🔄 RAG重构: {'是' if args.rebuild_rag else '否'}")
-    print(f"🌡️  温度参数: {config.temperature}")
-    print(f"🎯 top-p参数: {config.top_p}")
-    print("=" * 60)
-    
-    # 处理结果
-    if result['status'] == 'success':
-        print(f"✅ CAPL代码生成成功！")
-        print(f"📄 输出文件: {result['file_path']}")
+    if result["status"] == "success":
+        print(f"✅ 生成成功！")
+        print(f"📁 输出文件: {result['file_path']}")
         print(f"⏱️  生成时间: {result['stats']['generation_time']}秒")
         print(f"📊 代码长度: {result['stats']['code_length']}字符")
-        print(f"🎯 估算tokens: {result['stats']['estimated_tokens']}")
+        print(f"🔢 估算tokens: {result['stats']['estimated_tokens']}")
         print(f"⚡ 生成速度: {result['stats']['token_rate']} tokens/秒")
     else:
-        print(f"❌ CAPL代码生成失败！")
-        print(f"💥 错误信息: {result['error']}")
+        print(f"❌ 生成失败: {result['error']}")
         sys.exit(1)
 
 if __name__ == "__main__":
