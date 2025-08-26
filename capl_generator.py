@@ -221,7 +221,7 @@ def send_file_to_ollama(file_path, api_type=None, api_url=None, model=None, cont
     except Exception as e:
         error_msg = str(e)
         if "Connection" in error_msg or "connect" in error_msg.lower():
-            return f"发生错误: 连接失败 - 请确保Ollama服务已启动并正在监听正确的端口"
+            return f"发生错误: 连接失败 - 请确保Ollama服务已启动并正在监听正确的端口，是否使用本地代理"
         elif "404" in error_msg:
             return f"发生错误: 模型未找到 - 请运行 'ollama run qwen3:30b-a3b' 加载模型"
         else:
