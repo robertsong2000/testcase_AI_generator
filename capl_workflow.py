@@ -126,13 +126,6 @@ def main():
         for capl_file in capl_files:
             print(f"\n清理文件: {capl_file}")
             
-            # 运行循环检测器
-            if not run_command([
-                sys.executable, 'loop_detector.py', str(capl_file)
-            ], f"循环检测 - {capl_file.name}"):
-                print(f"❌ 循环检测失败: {capl_file.name}，停止执行后续步骤")
-                return 1
-            
             # 运行代码清理器
             if not run_command([
                 sys.executable, 'capl_cleaner.py', str(capl_file)
