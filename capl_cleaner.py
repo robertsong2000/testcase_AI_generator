@@ -16,21 +16,33 @@ def clean_capl_code(file_path):
         with open(file_path, 'r', encoding='utf-8') as file:
             content = file.read()
         
-        # 提取 CAPL 代码块
-        capl_pattern = r'```capl\s*\n(.*?)\n```'
-        capl_matches = re.findall(capl_pattern, content, re.DOTALL)
-        
-        if not capl_matches:
-            print(f"警告：在 {file_path} 中未找到 CAPL 代码块")
-            return False
-        
-        capl_code = capl_matches[0]
+        # 检查文件扩展名
+        if file_path.endswith('.can'):
+            # 直接处理纯 CAPL 文件
+            capl_code = content
+            is_markdown = False
+        else:
+            # 提取 Markdown 文件中的 CAPL 代码块
+            capl_pattern = r'```capl\s*\n(.*?)\n```'
+            capl_matches = re.findall(capl_pattern, content, re.DOTALL)
+            
+            if not capl_matches:
+                print(f"警告：在 {file_path} 中未找到 CAPL 代码块")
+                return False
+            
+            capl_code = capl_matches[0]
+            is_markdown = True
         
         # 清理重复的变量定义
         cleaned_code = remove_duplicate_definitions(capl_code)
         
-        # 替换原始内容
-        new_content = content.replace(f'```capl\n{capl_code}\n```', f'```capl\n{cleaned_code}\n```')
+        # 根据文件类型写回内容
+        if is_markdown:
+            # 替换 Markdown 文件中的原始内容
+            new_content = content.replace(f'```capl\n{capl_code}\n```', f'```capl\n{cleaned_code}\n```')
+        else:
+            # 直接写回纯 CAPL 文件
+            new_content = cleaned_code
         
         # 写回文件
         with open(file_path, 'w', encoding='utf-8') as file:
@@ -108,15 +120,21 @@ def analyze_capl_code(file_path):
         with open(file_path, 'r', encoding='utf-8') as file:
             content = file.read()
         
-        # 提取 CAPL 代码块
-        capl_pattern = r'```capl\s*\n(.*?)\n```'
-        capl_matches = re.findall(capl_pattern, content, re.DOTALL)
+        # 检查文件扩展名
+        if file_path.endswith('.can'):
+            # 直接处理纯 CAPL 文件
+            capl_code = content
+        else:
+            # 提取 Markdown 文件中的 CAPL 代码块
+            capl_pattern = r'```capl\s*\n(.*?)\n```'
+            capl_matches = re.findall(capl_pattern, content, re.DOTALL)
+            
+            if not capl_matches:
+                print(f"警告：在 {file_path} 中未找到 CAPL 代码块")
+                return
+            
+            capl_code = capl_matches[0]
         
-        if not capl_matches:
-            print(f"警告：在 {file_path} 中未找到 CAPL 代码块")
-            return
-        
-        capl_code = capl_matches[0]
         lines = capl_code.split('\n')
         
         variables = {}
