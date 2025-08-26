@@ -143,24 +143,8 @@ class CAPLGenerator:
             # 清理生成的代码
             cleaned_code = self._clean_generated_code(generated_code)
             
-            # 保存到文件
-            if output_file:
-                output_path = Path(output_file)
-            else:
-                # 生成默认文件名
-                timestamp = int(os.path.getmtime(__file__) if os.path.exists(__file__) else 0)
-                safe_requirement = re.sub(r'[^\w\-_.]', '_', requirement[:50])
-                filename = f"capl_test_{safe_requirement}_{timestamp}.cin"
-                output_path = self.config.output_dir / filename
-            
-            # 确保输出目录存在
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            with open(output_path, 'w', encoding='utf-8') as f:
-                f.write(cleaned_code)
-            
+            # 不再保存到中间文件，直接返回生成的代码
             print(f"✅ 代码生成完成！")
-            print(f"📁 文件保存至: {output_path}")
             
             return cleaned_code
             
