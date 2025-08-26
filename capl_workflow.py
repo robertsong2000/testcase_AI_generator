@@ -78,6 +78,10 @@ def main():
                        help='语法检查器输出格式')
     parser.add_argument('--output-dir', default='capl',
                        help='输出目录（默认: capl）')
+    parser.add_argument('--use-langchain', action='store_true',
+                       help='使用LangChain模式生成代码')
+    parser.add_argument('--disable-rag', action='store_true',
+                       help='在LangChain模式下禁用RAG')
     
     args = parser.parse_args()
     
@@ -97,21 +101,40 @@ def main():
         print("步骤 1: 生成 CAPL 代码")
         print("="*50)
         
-        if not run_command([
-            sys.executable, 'capl_generator.py', str(input_path)
-        ], "CAPL 代码生成"):
+        if args.use_langchain:
+            # 使用LangChain模式生成代码
+            command = [sys.executable, 'capl_generator_langchain.py', str(input_path)]
+            if args.disable_rag:
+                command.append('--disable-rag')
+            if args.output_dir:
+                command.extend(['--output', str(args.output_dir)])
+        else:
+            # 使用默认模式生成代码
+            command = [sys.executable, 'capl_generator.py', str(input_path)]
+        
+        if not run_command(command, "CAPL 代码生成"):
             print("❌ 代码生成失败，停止执行后续步骤")
             return 1
     
     # 查找生成的 CAPL 文件
     capl_files = []
     if output_dir.exists():
-        capl_files = list(output_dir.glob("*.can"))
+        # 只查找与输入需求文件对应的 CAPL 文件
+        input_stem = input_path.stem
+        capl_files = list(output_dir.glob(f"{input_stem}*.can"))
         if not capl_files:
             # 也检查 .md 文件（如果生成器输出为 markdown）
-            md_files = list(output_dir.glob("*.md"))
+            md_files = list(output_dir.glob(f"{input_stem}*.md"))
             if md_files:
                 print(f"发现 {len(md_files)} 个 Markdown 文件，但需要 .can 文件进行语法检查")
+    
+    # 如果使用LangChain模式，可能生成的文件在不同的目录结构中
+    if args.use_langchain and not capl_files:
+        # LangChain模式可能直接在output_dir中生成.can文件
+        input_stem = input_path.stem
+        langchain_capl_files = list(Path(args.output_dir).glob(f"{input_stem}*.can"))
+        if langchain_capl_files:
+            capl_files = langchain_capl_files
     
     if not capl_files and not args.skip_generation:
         print("❌ 未找到生成的 CAPL 文件，停止执行")
