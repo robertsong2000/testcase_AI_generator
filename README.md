@@ -248,7 +248,6 @@ python capl_generator.py --debug-prompt /path/to/your/file
 
 3. 清理生成的代码（可选）：
 ```bash
-python loop_detector.py capl/generated_file.can
 python capl_cleaner.py capl/generated_file.can
 ```
 

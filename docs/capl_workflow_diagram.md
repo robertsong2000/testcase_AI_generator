@@ -19,10 +19,7 @@ graph TD
     J -->|否| H
     J -->|是| K[步骤2: 代码清理]
     
-    K --> L[loop_detector.py]
-    L --> M{循环检测成功?}
-    M -->|否| H
-    M -->|是| N[capl_cleaner.py]
+    K --> N[capl_cleaner.py]
     N --> O{代码清理成功?}
     O -->|否| H
     O -->|是| P[步骤3: 语法检查]
@@ -36,7 +33,6 @@ graph TD
     
     %% 分步执行路径
     D --> V[手动执行capl_generator.py]
-    D --> W[手动执行loop_detector.py]
     D --> X[手动执行capl_cleaner.py]
     D --> Y[手动执行capl_checker.py]
     
@@ -48,8 +44,8 @@ graph TD
     
     class U success
     class H,R error
-    class F,L,N,S,V,W,X,Y process
-    class G,J,M,O,Q,T decision
+    class F,N,S,V,X,Y process
+    class G,J,O,Q,T decision
 ```
 
 ## 详细组件架构图
@@ -64,9 +60,8 @@ graph LR
     
     subgraph "核心处理层"
         B1[capl_generator.py<br/>代码生成器]
-        B2[loop_detector.py<br/>循环检测器]
-        B3[capl_cleaner.py<br/>代码清理器]
-        B4[capl_checker<br/>语法检查器]
+        B2[capl_cleaner.py<br/>代码清理器]
+        B3[capl_checker<br/>语法检查器]
     end
     
     subgraph "工作流程层"
@@ -95,25 +90,22 @@ graph LR
     B1 --> D1
     D1 --> B2
     B2 --> B3
-    B3 --> B4
-    B4 --> D2
+    B3 --> D2
     B2 --> D3
-    B3 --> D3
     
     C1 --> B1
     C1 --> B2
     C1 --> B3
-    C1 --> B4
     
     %% 样式定义
     classDef input fill:#e3f2fd,stroke:#1976d2,color:#1976d2
     classDef core fill:#f3e5f5,stroke:#7b1fa2,color:#7b1fa2
     classDef workflow fill:#e8f5e8,stroke:#388e3c,color:#388e3c
     classDef output fill:#fff3e0,stroke:#f57c00,color:#f57c00
-    classDef external fill:#fce4ec,stroke:#c2185b,color:#c2185b
+    classDef external fill:#fce4ec,stroke:#c218b5,color:#c218b5
     
     class A1,A2,A3 input
-    class B1,B2,B3,B4 core
+    class B1,B2,B3 core
     class C1 workflow
     class D1,D2,D3 output
     class E1,E2,E3 external
@@ -136,7 +128,6 @@ flowchart TD
     end
     
     subgraph "代码处理"
-        G[循环模式检测]
         H[重复内容清理]
         I[变量去重]
         J[格式规范化]
@@ -160,8 +151,7 @@ flowchart TD
     C --> D
     D --> E
     E --> F
-    F --> G
-    G --> H
+    F --> H
     H --> I
     I --> J
     J --> K
@@ -170,7 +160,6 @@ flowchart TD
     M --> N
     N --> O
     N --> P
-    G --> Q
     H --> Q
     I --> Q
     
@@ -179,11 +168,11 @@ flowchart TD
     classDef ai fill:#f3e5f5,stroke:#7b1fa2
     classDef process fill:#e8f5e8,stroke:#388e3c
     classDef check fill:#fff3e0,stroke:#f57c00
-    classDef output fill:#fce4ec,stroke:#c2185b
+    classDef output fill:#fce4ec,stroke:#c218b5
     
     class A,B input
     class C,D,E,F ai
-    class G,H,I,J process
+    class H,I,J process
     class K,L,M,N check
     class O,P,Q output
 ```
@@ -196,9 +185,7 @@ graph TD
     B -->|否| C[❌ 输出错误信息<br/>退出码: 1]
     B -->|是| D{找到CAPL文件?}
     D -->|否| E[❌ 未找到文件<br/>退出码: 1]
-    D -->|是| F{循环检测成功?}
-    F -->|否| G[❌ 循环检测失败<br/>退出码: 1]
-    F -->|是| H{代码清理成功?}
+    D -->|是| H{代码清理成功?}
     H -->|否| I[❌ 代码清理失败<br/>退出码: 1]
     H -->|是| J{语法检查器存在?}
     J -->|否| K[❌ 检查器不存在<br/>提示初始化子模块<br/>退出码: 1]
@@ -212,8 +199,8 @@ graph TD
     classDef decision fill:#fff3cd,stroke:#856404,color:#856404
     
     class N success
-    class C,E,G,I,K,M error
-    class B,D,F,H,J,L decision
+    class C,E,I,K,M error
+    class B,D,H,J,L decision
 ```
 
 ## 配置管理流程图
