@@ -76,8 +76,8 @@ def main():
     parser.add_argument('--checker-format', default='txt', 
                        choices=['txt', 'xml', 'json'],
                        help='语法检查器输出格式')
-    parser.add_argument('--output-dir', default='capl',
-                       help='输出目录（默认: capl）')
+    parser.add_argument('--output-dir', default='generated',
+                       help='输出目录（默认: generated')
     parser.add_argument('--use-langchain', action='store_true',
                        help='使用LangChain模式生成代码')
     parser.add_argument('--disable-rag', action='store_true',
