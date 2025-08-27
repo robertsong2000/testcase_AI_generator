@@ -1,0 +1,2030 @@
+[
+  {
+    "function_name": "abs",
+    "syntax": "double abs (double num)",
+    "description": "",
+    "parameters": [
+      {
+        "name": "num",
+        "description": "number to be converted"
+      }
+    ],
+    "returns": "Integer, long integer, or double",
+    "availability": "This function is supported in Version 2.5 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "atol",
+    "syntax": "long atol (char s[])",
+    "description": "Converts a string to a decimal number. If the string starts with “0x”, base 16 is used. Leading blanks are discarded.",
+    "parameters": [
+      {
+        "name": "s",
+        "description": "string to be converted"
+      }
+    ],
+    "returns": "Long integer",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "callAllOnEnvVar",
+    "syntax": "void callAllOnEnvVar ()",
+    "description": "Calls all event procedures for environment variables to execute (On EnvVar events).",
+    "parameters": [],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "This is usually done at the start of measurement to initialize environment variables, to start timers activated in response to changes of environment variables, or to send messages on the bus with the starting values of the environment variables.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "cancelTimer",
+    "syntax": "void cancelTimer (timer t)",
+    "description": "Stops a running timer that has been set with setTimer(). This prevents the timer event procedure from being executed.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "If a timer is no longer running or it has been expired, this function has no effect.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "canOffline",
+    "syntax": "dword canOffline(dword flags)",
+    "description": "Cuts the connection between a simulated network node and the bus. Form 1 only has an effect on the CAPL program. In Form 2 you can choose between the CAPL program and/or the Node Layer DLL.",
+    "parameters": [
+      {
+        "name": "flags",
+        "description": "1 (deactivates the CAPL program)"
+      },
+      {
+        "name": "flags",
+        "description": "2 (deactivates the Node Layer DLL)"
+      },
+      {
+        "name": "flags",
+        "description": "3 (deactivates both the CAPL program and the Node Layer DLL)"
+      }
+    ],
+    "returns": "Form2 returns the part of the node that was online before the function call. Equal to flags.",
+    "availability": "Available in all versions.",
+    "observation": "If this function is called in a CAPL program, that network node will not able to transmit messages onto the bus. However, it is still capable of receiving messages from the bus and updating the variables in that program. To activate the network node again, call the canOnline() function. In some applications, the offline approach may not be appropriate. A network node can be setup to start after a delay either within the CANoe tool or using the setStartDelay() function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "canOnline",
+    "syntax": "dword canOnline(dword flags)",
+    "description": "Restores the connection of the node to the bus. After a call to the function canOffline() the node can be connected to the bus with the function canOnline(). Messages sent from the node are passed through to the bus. Form 1 only has an effect on the CAPL program.  In Form 2 you can choose between the CAPL program and/or the Node Layer DLL.",
+    "parameters": [
+      {
+        "name": "flags",
+        "description": "1 activates the CAPL program"
+      },
+      {
+        "name": "flags",
+        "description": "2 activates the Node Layer DLL for Network Management"
+      },
+      {
+        "name": "flags",
+        "description": "3 activates both the CAPL program and the Node Layer"
+      }
+    ],
+    "returns": "Form2 returns the part of the node that was online before the function call.  Equal to flags.",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "canSetChannelAcc",
+    "syntax": "long canSetChannelAcc (long channel, dword code, dword mask)",
+    "description": "Sets an acceptance filter for a CAN controller. The SJA1000 chip used in all Vector CAN interfaces expect the filter partition into acceptance mask and acceptance code. For extended or 29-bit messages, the most significant bit for the mask and code are set.",
+    "parameters": [
+      {
+        "name": "channel",
+        "description": "CAN channel"
+      },
+      {
+        "name": "code",
+        "description": "acceptance code for CAN ID filtering"
+      },
+      {
+        "name": "mask",
+        "description": "acceptance mask for CAN ID filtering"
+      }
+    ],
+    "returns": "0 = successful !0 = unsuccessful",
+    "availability": "This function is supported in Version 5.0 and after.",
+    "observation": "This function only works with Vector drivers. The vcdndrvms.dll must be at least Version 4.2.40.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "canSetChannelMode",
+    "syntax": "long canSetChannelMode (long channel, dword setTX, dword setTXRQ)",
+    "description": "Activates/deactivates both the transmit (TX) and transmit request (TXRQ) states of the CAN controller. The settings affect all the analysis windows for tracing, displaying, and logging.",
+    "parameters": [
+      {
+        "name": "channel",
+        "description": "CAN channel"
+      }
+    ],
+    "returns": "0 = successful !0 = unsuccessful",
+    "availability": "This function is supported in Version 5.0 and after.",
+    "observation": "This function only works with Vector drivers. The vcdndrvms.dll must be at least Version 4.2.40.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "canSetChannelOutput",
+    "syntax": "long canSetChannelOutput (long channel, long silent)",
+    "description": "Activates/deactivates the acknowledgement of incoming messages for a channel. If in silent mode, the message is received on that channel but will not be acknowledge. That illustrates the spying functionality.",
+    "parameters": [
+      {
+        "name": "channel",
+        "description": "CAN channel"
+      }
+    ],
+    "returns": "0 = successful !0 = unsuccessful",
+    "availability": "This function is supported in Version 5.0 and after.",
+    "observation": "This function only works with Vector drivers. The vcdndrvms.dll must be at least Version 4.2.40.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "cos",
+    "syntax": "double cos (double x)",
+    "description": "Calculates the cosine of x.",
+    "parameters": [],
+    "returns": "Cosine of x",
+    "availability": "Available in all versions.",
+    "observation": "The “PI” is actually a keyword used in mathematical calculations.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "elCount",
+    "syntax": "long elCount (...)",
+    "description": "Determines the number of elements in one dimension of an array. See example for usage with multi-dimensional arrays.",
+    "parameters": [],
+    "returns": "Number of elements in the array",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "enableControl",
+    "syntax": "void EnableControl (char panel[], char control[], long enable)",
+    "description": "Activates/deactivates a control element on a panel.",
+    "parameters": [
+      {
+        "name": "panel",
+        "description": "Name of the panel (w/o it, all opened panels will be affected)"
+      },
+      {
+        "name": "control",
+        "description": "Name of the element (variable type is specified: EnVar or Signal) Ex: Panel help) (for Panel recorder) Panel control button)"
+      },
+      {
+        "name": "enable",
+        "description": "0 (disable) or 1 (enable)"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "If the control element is configured as a simple display, this command will have no effect on the element. Since no name is assigned to the Panel Recorder, the Panel Help or the Panel Control elements, only all or none of them can be activated in a given panel. The turned on or turned off state of an element remains intact at the start to the end of the measurement. Because of this, a defined state should be created for the beginning of the measurement for all the elements involved (e.g. within the Start event).",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "exp",
+    "syntax": "double exp (double x)",
+    "description": "Calculates the value of the exponential function with a given degree.",
+    "parameters": [
+      {
+        "name": "x",
+        "description": "value to calculate its exponent"
+      }
+    ],
+    "returns": "Exponent to base e",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "fileClose",
+    "syntax": "long fileClose (dword fileHandle)",
+    "description": "Closes a specified file referenced by a file handle.",
+    "parameters": [
+      {
+        "name": "fileHandle",
+        "description": "value of the file handle"
+      }
+    ],
+    "returns": "0 = unsuccessful 1 = successful",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The file handle was returned by the openFileRead() or openFileWrite() function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "fileGetBinaryBlock",
+    "syntax": "long fileGetBinaryBlock (byte buffer[], long buffsize, dword fileHandle)",
+    "description": "Reads characters from a file in binary format.",
+    "parameters": [
+      {
+        "name": "buffer",
+        "description": "buffer to store the characters"
+      },
+      {
+        "name": "buffsize",
+        "description": "maximum number of characters to get"
+      },
+      {
+        "name": "fileHandle",
+        "description": "value of the file handle"
+      }
+    ],
+    "returns": "Number of characters read",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The source file must be opened in binary format by the openFileRead() function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "fileGetString",
+    "syntax": "long fileGetString (char buffer[], long buffsize, dword fileHandle)",
+    "description": "Reads a string from a file. The returned string contains a new line character.",
+    "parameters": [
+      {
+        "name": "buffer",
+        "description": "buffer to store the string of characters"
+      },
+      {
+        "name": "buffsize",
+        "description": "length of the string"
+      },
+      {
+        "name": "fileHandle",
+        "description": "value of the file handle"
+      }
+    ],
+    "returns": "0 = unsuccessful 1 = successful",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "Characters continue to be read until the end of line is reached or the number of read characters is equal to buffsize - 1 .",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "fileGetStringSZ",
+    "syntax": "long fileGetStringSZ (char buffer[], long buffsize, dword fileHandle)",
+    "description": "Reads a string from a file. The new line character is not included in the string.",
+    "parameters": [
+      {
+        "name": "buffer",
+        "description": "buffer to store the string of characters"
+      },
+      {
+        "name": "buffsize",
+        "description": "length of the string"
+      },
+      {
+        "name": "fileHandle",
+        "description": "value of the file handle"
+      }
+    ],
+    "returns": "0 = unsuccessful 1 = successful",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "Characters continue to be read until the end of line is reached or the number of read characters is equal to buffsize - 1 .",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "filePutString",
+    "syntax": "long filePutString (char buffer[], long buffsize, dword fileHandle)",
+    "description": "Writes a string to a file.",
+    "parameters": [
+      {
+        "name": "buffer",
+        "description": "the string of characters"
+      },
+      {
+        "name": "buffsize",
+        "description": "number of characters to write"
+      },
+      {
+        "name": "fileHandle",
+        "description": "value of the file handle"
+      }
+    ],
+    "returns": "0 = unsuccessful 1 = successful",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The file handle is returned by the openFileWrite() function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "fileRewind",
+    "syntax": "long fileRewind (dword fileHandle)",
+    "description": "Resets the position pointer to the beginning of the file.",
+    "parameters": [
+      {
+        "name": "fileHandle",
+        "description": "value of the file handle"
+      }
+    ],
+    "returns": "0 = unsuccessful 1 = successful",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "fileWriteBinaryBlock",
+    "syntax": "long fileWriteBinaryBlock (byte buffer[], long buffsize, dword fileHandle)",
+    "description": "Writes characters to a file in binary format. The source file must be opened in binary format.",
+    "parameters": [
+      {
+        "name": "buffer",
+        "description": "the block of characters to write"
+      },
+      {
+        "name": "buffsize",
+        "description": "maximum number of characters to write"
+      },
+      {
+        "name": "fileHandle",
+        "description": "value of the file handle"
+      }
+    ],
+    "returns": "Number of characters written",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The file handle is returned by the setWritePath() function opened in binary format.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getBusContext",
+    "syntax": "dword getBusContext ()",
+    "description": "Gets the current bus context of the network node (Gateway).",
+    "parameters": [],
+    "returns": "Bus context of the current network node (Gateway)",
+    "availability": "This function is supported in Version 3.2 and after.",
+    "observation": "The bus context plays a role exclusively in modeling gateways. In this case, a series of CAPL functions such as canOnline() and canOffline() may have more than one meaning in terms of the bus interface (channel) to be used. A similar type of problem occurs when identical node layer modules are used simultaneously within a CAPL block. A distinction must be made between the instances of the node layer, both for calls to CAPL functions that are implemented in the node layers and for implementing callbacks. To facilitate this distinction, a bus context is placed in the CAPL program by the runtime environment while the node layer is executing a callback. This context unambiguously identifies the node layer that is making the call. In a similar manner, the call of a CAPL function that is implemented in a node layer is forwarded on to the appropriate node layer, depending on the current bus context. This also applies to the CAPL functions canOnline() and canOffline().",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getBusNameContext",
+    "syntax": "dword getBusNameContext (char name[])",
+    "description": "Gets the bus context of the bus given by its name.",
+    "parameters": [
+      {
+        "name": "name",
+        "description": "the name of the bus"
+      }
+    ],
+    "returns": "0 = bus not exist unsigned value = bus context given by the name of the bus",
+    "availability": "This function is supported in Version 3.2 and after.",
+    "observation": "The bus context plays a role exclusively in modeling gateways. In this case, a series of CAPL functions such as canOnline() and canOffline() may have more than one meaning in terms of the bus interface (channel) to be used. A similar type of problem occurs when identical node layer modules are used simultaneously within a CAPL block. A distinction must be made between the instances of the node layer, both for calls to CAPL functions that are implemented in the node layers and for implementing callbacks. To facilitate this distinction, a bus context is placed in the CAPL program by the runtime environment while the node layer is executing a callback. This context unambiguously identifies the node layer that is making the call. In a similar manner, the call of a CAPL function that is implemented in a node layer is forwarded on to the appropriate node layer, depending on the current bus context. This also applies to the CAPL functions canOnline() and canOffline().",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getCardType",
+    "syntax": "long getCardType ()",
+    "description": "",
+    "parameters": [],
+    "returns": "Type of interface: 0 = DBB196 - Daimler-Benz Board with Full CAN 1 = DBB196B - Daimler-Benz Board with Basic CAN 2 = CANIB - Bosch CANIB 3 = DEMO - Demo driver 6 = CANAC2 - Softing AC2/200/ANA 7 = CANAC2X - Softing AC2/527/ANA 8 = CPC/PP - EMS wish module 9 = INDIGO - Silicon Graphics Indigo2 10 = CANCARD - PCMCIA 11 Bit 12 = CANAC2B - Softing AC2/527 11 Bit 13 = VAN462 – NSI VAN card 14 = VANDEMO – VAN Demo driver 15 = Peak CAN-Dongle 16 = Vector CAN-Dongle 17 = Vector PCMCIA CANcardX",
+    "availability": "Available in all versions.",
+    "observation": "This function is needed, for example, to program the BTR (Bit Timing Register) and OCR (Output Control Register) values.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getCardTypeEx",
+    "syntax": "int getCardTypeEx (int channel)",
+    "description": "",
+    "parameters": [
+      {
+        "name": "channel",
+        "description": "channel number"
+      }
+    ],
+    "returns": "Type of interface: 0 = DBB196 - Daimler-Benz Board with Full CAN 1 = DBB196B - Daimler-Benz Board with Basic CAN 2 = CANIB - Bosch CANIB 3 = DEMO - Demo driver 6 = CANAC2 - Softing AC2/200/ANA 7 = CANAC2X - Softing AC2/527/ANA 8 = CPC/PP - EMS wish module 9 = INDIGO - Silicon Graphics Indigo2 10 = CANCARD - PCMCIA 11 Bit 12 = CANAC2B - Softing AC2/527 11 Bit 13 = VAN462 – NSI VAN card 14 = VANDEMO – VAN Demo driver 15 = Peak CAN-Dongle 16 = Vector CAN-Dongle 17 = Vector PCMCIA CANcardX 20 = Softing PCMCIA CANcard SJA1000 25 = Vector PCMCIA CANcardXL 27 = Vector USB CANcase 29 = Vector PCI CANboard 30 = Vector PCI CANboard for Compact PCI",
+    "availability": "This function is supported in Version 5.0 and after.",
+    "observation": "This function is needed, for example, to program the BTR (Bit Timing Register) and OCR (Output Control Register) values.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getChipType",
+    "syntax": "long getChipType (long channel)",
+    "description": "",
+    "parameters": [
+      {
+        "name": "channel",
+        "description": "0 (both channels) = 1 (channel 1) = 2 (channel 2)"
+      }
+    ],
+    "returns": "Type of controller with the following values:  5   NEC 72005 200 Philips PCA82C200 462 MHS29C462 VAN Controller 526 Intel 82526 527 Intel 82527 1000, 1001  Philips SJA1000",
+    "availability": "Available in all versions.",
+    "observation": "This function may return other types of controller. Demo tool versions return the result 0 or simulate one of  the existing types. If an attempt is made to access a nonexistent channel (e.g. Channel 2 for CPC/PP) or if the driver used does not support this function, the functional result is 0.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getDrift",
+    "syntax": "int getDrift ()",
+    "description": "Determines the constant deviation after drift is set.",
+    "parameters": [],
+    "returns": "The drift in parts per thousand",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getJitterMax",
+    "syntax": "int getJitterMax ()",
+    "description": "Determines the upper deviation limit allowed when jitter is set.",
+    "parameters": [],
+    "returns": "Upper deviation in parts per thousand",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getJitterMin",
+    "syntax": "int getJitterMin ()",
+    "description": "Determines the lower deviation limit allowed when jitter is set.",
+    "parameters": [],
+    "returns": "Lower deviation in parts per thousand",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getLocalTime",
+    "syntax": "void getLOcalTime (long timeArray[])",
+    "description": "Fills an array with details of the date and time.",
+    "parameters": [
+      {
+        "name": "timeArray",
+        "description": "array of type long with at least 9 entries The entries of the array will be filled with the following information: timeArray[0] = Seconds (0 – 59) timeArray[1] = Minutes (0 – 59) timeArray[2] = Hours (0 – 23) timeArray[3] = Day of the month (1 – 31) timeArray[4] = Month of year (0 – 11) timeArray[5] = Year (since 1900) timeArray[6] = Day of week (0 – 6) timeArray[7] = Day of year (0 – 365) timeArray[8] = Daylight Savings Time (0 = not)"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getLocalTimeString",
+    "syntax": "void getLOcalTimeString (char timeBuffer[])",
+    "description": "Fills a string with details of the date and time. The format of the string is ddd mmm dd hh:mm:ss yyyy (e.g., “Fri Aug 21 15:22:24 1998\").",
+    "parameters": [
+      {
+        "name": "timeBuffer",
+        "description": "date and time string (must be at least 26 characters long)"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "The time string is null-terminated.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getMessageAttrInt",
+    "syntax": "long getMessageAttrInt (pg parameterGroup, char attributeName[])",
+    "description": "",
+    "parameters": [
+      {
+        "name": "Msg",
+        "description": "message variable"
+      },
+      {
+        "name": "attributeName",
+        "description": "name of attribute"
+      }
+    ],
+    "returns": "0 = attribute not found value = successful default attribute value = message attribute value not assigned",
+    "availability": "This function is supported in Version 3.1 and after.",
+    "observation": "The attribute must be of type integer. The attribute should be found directly by its selector syntax (<Message variable>.<Attribute name> e.g. ABSdata.msgCycleTime). The advantage to call this function instead of using the selector approach is any changes made to the attribute in the database while CANalyzer/CANoe’s measurement is running is updated to the new attribute value.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getProFileArray",
+    "syntax": "long getProFileArray (char section[], char entry[], char buffer[], long buffsize, char filename[])",
+    "description": "Reads an array of byte values from an INI-formatted file.",
+    "parameters": [
+      {
+        "name": "section",
+        "description": "section within file"
+      },
+      {
+        "name": "entry",
+        "description": "name of variable"
+      },
+      {
+        "name": "buffer",
+        "description": "buffer for bytes to be read"
+      },
+      {
+        "name": "buffsize",
+        "description": "size of buffer in bytes"
+      },
+      {
+        "name": "filename",
+        "description": "name of data file"
+      }
+    ],
+    "returns": "Number of bytes read",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The values can be decimal or hexadecimal with the “0x” prefix. Values can be separated by spaces, tabs, commas, semicolons, or slashes. The file path is set by either the setWritePath() or setFilePath() function. If neither function is used, the data file must be located either in the same directory as the databases file(s) or configuration file(s) of CANalyzer/CANoe.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getProFileFloat",
+    "syntax": "long getProFileFloat (char section[], char entry[], long def, char filename[])",
+    "description": "Reads a float value from an INI-formatted file.",
+    "parameters": [
+      {
+        "name": "section",
+        "description": "section within file"
+      },
+      {
+        "name": "entry",
+        "description": "name of variable"
+      },
+      {
+        "name": "def",
+        "description": "default return value in case of error"
+      },
+      {
+        "name": "filename",
+        "description": "name of data file"
+      }
+    ],
+    "returns": "Valid float value or the default value",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The value is only returned if it is found and valid, else the default value is returned as the functional result. The file path is set by either the setWritePath() or setFilePath() function. If neither function is used, the data file must be located either in the same directory as the databases file(s) or configuration file(s) of CANalyzer/CANoe.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getProFileInt",
+    "syntax": "long getProFileInt (char section[], char entry[],long def, char filename[])",
+    "description": "Reads an integer value from an INI-formatted file.",
+    "parameters": [
+      {
+        "name": "section",
+        "description": "section within file"
+      },
+      {
+        "name": "entry",
+        "description": "name of variable"
+      },
+      {
+        "name": "def",
+        "description": "default return value in case of error"
+      },
+      {
+        "name": "filename",
+        "description": "name of data file"
+      }
+    ],
+    "returns": "Valid integer value or the default value",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The value is only returned if it is found and valid. Else the default value is returned as the functional result. The file path is set by either the setWritePath() or setFilePath() function. If neither function is used, the data file must be located either in the same directory as the databases file(s) or configuration file(s) of CANalyzer/CANoe.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getProFileString",
+    "syntax": "long getProFileString (char section[], char entry[], char def[], char buffer[], long buffsize, char filename[])",
+    "description": "Reads a string value from an INI-formatted file.",
+    "parameters": [
+      {
+        "name": "section",
+        "description": "section within file"
+      },
+      {
+        "name": "entry",
+        "description": "name of variable"
+      },
+      {
+        "name": "def",
+        "description": "default return value in case of error"
+      },
+      {
+        "name": "buffer",
+        "description": "buffer for characters to be read"
+      },
+      {
+        "name": "buffsize",
+        "description": "size of buffer in bytes"
+      },
+      {
+        "name": "filename",
+        "description": "name of data file"
+      }
+    ],
+    "returns": "Number of bytes read",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The value is only returned if it is found and valid. Else the default value is returned as the functional result. The file path is set by either the setWritePath() or setFilePath() function. If neither function is used, the data file must be located either in the same directory as the databases file(s) or configuration file(s) of CANalyzer/CANoe.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getStartdelay",
+    "syntax": "int getStartdelay ()",
+    "description": "Determines the delay time value configured for a network node in the Simulation Setup window.",
+    "parameters": [],
+    "returns": "0 = delay not set !0 = delay time value",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getValue",
+    "syntax": "long getValue (EnvVarName, byte buffer[], long offset)",
+    "description": "",
+    "parameters": [
+      {
+        "name": "EnvVarName",
+        "description": "environment variable name"
+      },
+      {
+        "name": "buffer",
+        "description": "environment variable value"
+      },
+      {
+        "name": "offset",
+        "description": "starting position (byte)"
+      }
+    ],
+    "returns": "Environment variable value for Forms 1 and 2 Number of bytes copied for Form 3, 4, and 5",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "getValueSize",
+    "syntax": "int getValueSize (EnvVarName)",
+    "description": "",
+    "parameters": [
+      {
+        "name": "EnvVarName",
+        "description": "environment variable name"
+      }
+    ],
+    "returns": "Number of bytes",
+    "availability": "Available in all versions.",
+    "observation": "For environment variables of type string, the string length plus the terminating null character will be returned.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "halt",
+    "syntax": "void halt ()",
+    "description": "Halts the execution of the simulation. The simulation is resume with the <F9> key. The halt instruction is ignored in Real mode.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "This function is only effective if CANoe is in the Simulated mode instead of the default Real mode. In addition, the halt instruction causes an update to the variables displayed on the Inspect pane of the Write window.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "inport",
+    "syntax": "byte inport (word addr)",
+    "description": "Reads a byte from the parallel port.",
+    "parameters": [
+      {
+        "name": "addr",
+        "description": "port address The built-in constants LPT1, LPT2, and LPT3 can be used as a port address:"
+      },
+      {
+        "name": "LPT1",
+        "description": "0x378"
+      },
+      {
+        "name": "LPT2",
+        "description": "0x278"
+      },
+      {
+        "name": "LPT3",
+        "description": "0x3BC"
+      }
+    ],
+    "returns": "Port value",
+    "availability": "Available in all versions.",
+    "observation": "For Windows NT and 2000 users, a generic I/O driver must be installed to use this function. Follow the Readme.txt file in the Exec\\GpIoDrv directory.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "inportLPT",
+    "syntax": "byte inportLPT (word addr)",
+    "description": "Reads a byte from the parallel port.",
+    "parameters": [
+      {
+        "name": "addr",
+        "description": "port address The built-in constants LPT1, LPT2, and LPT3 can be used as a port address:"
+      },
+      {
+        "name": "LPT1",
+        "description": "0x378"
+      },
+      {
+        "name": "LPT2",
+        "description": "0x278"
+      },
+      {
+        "name": "LPT3",
+        "description": "0x3BC"
+      }
+    ],
+    "returns": "Port value",
+    "availability": "This function is supported in Version 3.1 and after.",
+    "observation": "This function changes the transmission mode of the parallel port automatically to input. If you want to read from a parallel port, the port has to be in a bi-directional mode (PS/2 or “Byte” Modus). Please check this in the CMOS setup (BIOS). Also for Windows NT and 2000 users, a generic I/O driver must be installed to use this function. Follow the Readme.txt file in the Exec\\GpIoDrv directory.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "inspect",
+    "syntax": "void inspect ()",
+    "description": "Updates the variables in the Inspect pane of the Write window.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "isExtId",
+    "syntax": "long isExtId (message msg)",
+    "description": "Checks parameter for extended identifier (29 bit).",
+    "parameters": [
+      {
+        "name": "msg",
+        "description": "message variable"
+      },
+      {
+        "name": "id",
+        "description": "message identifier"
+      }
+    ],
+    "returns": "0 = false 1 = true",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "isStatisticAcquisitionRunning",
+    "syntax": "int isStatisticAcquisitionRunning ()",
+    "description": "Tests whether an acquisition range has already been activated in the Statistics window.",
+    "parameters": [],
+    "returns": "0 = not running 1 = running",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The CAPL program block this function appears must be located directly before the Statistics block in the Analysis Branch of CANalyzer and CANoe.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "isStdId",
+    "syntax": "long isStdId (message msg)",
+    "description": "Checks parameter for standard identifier (11 bit).",
+    "parameters": [
+      {
+        "name": "msg",
+        "description": "message variable"
+      },
+      {
+        "name": "id",
+        "description": "message identifier"
+      }
+    ],
+    "returns": "0 = not standard 1 = standard",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "keypressed",
+    "syntax": "dword keypressed ()",
+    "description": "",
+    "parameters": [],
+    "returns": "Key code of the pressed key If the 8 lower bits do not equal 0, keypressed() returns the ASCII code of the next key in the keyboard buffer. If the 8 lower bits do not equal 0, the 8 upper bits represent the extended key code (see IBM PC Technical Reference Manual).",
+    "availability": "Available in all versions.",
+    "observation": "Only one key can be pressed at a time.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "ltoa",
+    "syntax": "void ltoa (long val, char s[], long base)",
+    "description": "Converts a number of a specific base into a string. The string must be large enough to accept the converted number!",
+    "parameters": [
+      {
+        "name": "val",
+        "description": "number to be converted"
+      },
+      {
+        "name": "s",
+        "description": "string which will contain the converted number"
+      },
+      {
+        "name": "base",
+        "description": "numeric base"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "makeRGB",
+    "syntax": "long makeRGB (long Red, long Green, long Blue)",
+    "description": "Calculates the color value from the three primary color components.",
+    "parameters": [
+      {
+        "name": "Red",
+        "description": "Red color component (0 – 255)"
+      },
+      {
+        "name": "Green",
+        "description": "Green color component (0 – 255)"
+      },
+      {
+        "name": "Blue",
+        "description": "Blue color component (0 – 255)"
+      }
+    ],
+    "returns": "Color value",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "This is a very useful function if any color properties in the panels require changes.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "mkExtId",
+    "syntax": "dword mkExtId (dword id)",
+    "description": "Generates an extended (29-bit) message identifier from a standard (11-bit) message identifier.",
+    "parameters": [
+      {
+        "name": "id",
+        "description": "message identifier"
+      }
+    ],
+    "returns": "Extended message identifier",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "openFileRead",
+    "syntax": "dword openFileRead (char filename[], dword mode)",
+    "description": "Opens a file for read access.",
+    "parameters": [
+      {
+        "name": "filename",
+        "description": "name of file"
+      }
+    ],
+    "returns": "File handle used for read operations 0 = unsuccessful",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "openFileWrite",
+    "syntax": "dword openFileWrite (char filename[], dword mode)",
+    "description": "Opens a file for write access. An already existing file will be overwritten.",
+    "parameters": [
+      {
+        "name": "filename",
+        "description": "name of file"
+      }
+    ],
+    "returns": "File handle used for write operations.  0 = unsucessful",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "Use the setWritePath() function to write to another directory; the default directory is the same as the active saved configuration.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "outport",
+    "syntax": "void outport (word addr, byte value)",
+    "description": "Outputs a byte to a parallel port.",
+    "parameters": [
+      {
+        "name": "addr",
+        "description": "port address"
+      },
+      {
+        "name": "value",
+        "description": "byte to send"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "For Windows NT and 2000 users, a generic I/O driver must be installed to use this function. Follow the Readme.txt file in the Exec\\GpIoDrv directory.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "outportLPT",
+    "syntax": "byte outportLPT (word addr, byte value)",
+    "description": "Outputs a byte to a parallel port.",
+    "parameters": [
+      {
+        "name": "value",
+        "description": "byte to send"
+      },
+      {
+        "name": "addr",
+        "description": "port address or predefined LPTx constant The built-in constants LPT1, LPT2, and LPT3 can be used as a port address:"
+      },
+      {
+        "name": "LPT1",
+        "description": "0x378"
+      },
+      {
+        "name": "LPT2",
+        "description": "0x278"
+      },
+      {
+        "name": "LPT3",
+        "description": "0x3BC"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.1 and after.",
+    "observation": "This function changes the transmission mode of the parallel port automatically to output. If you want to write to a parallel port, the port has to be in a bi-directional mode (PS/2 or “Byte” Modus). Please check this in the CMOS setup (BIOS). Also for Windows NT and 2000 users, a generic I/O driver must be installed to use this function. Follow the Readme.txt file in the Exec\\GpIoDrv directory.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "output",
+    "syntax": "void output (message msg)",
+    "description": "Sends different types of messages from the program block onto the CAN bus.",
+    "parameters": [
+      {
+        "name": "msg",
+        "description": "message of a specific type"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "This function supports other types of message from different buses or protocols. See example below.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "putValue",
+    "syntax": "void putValue (EnvVarName, byte val[], long offset)",
+    "description": "Sets an environment variable. For character array or string environment variables (Form 3, 4, and 5) the active value is saved to a buffer.",
+    "parameters": [
+      {
+        "name": "EnvVarName",
+        "description": "environment variable name"
+      },
+      {
+        "name": "val",
+        "description": "environment variable value"
+      },
+      {
+        "name": "offset",
+        "description": "starting position (byte)"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "putValueToControl",
+    "syntax": "void putValueToControl (char panel[], char control[], VANmessage val)",
+    "description": "Displays a value to the Multi-Display element on a panel. The value can be numeric, string, or data bytes from a specific message type.",
+    "parameters": [
+      {
+        "name": "panel",
+        "description": "panel title"
+      },
+      {
+        "name": "control",
+        "description": "name of the Multi-Display element"
+      },
+      {
+        "name": "val",
+        "description": "value of various format from numeric to text to message data bytes"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.0 and after.",
+    "observation": "Environment variables are not used when using this function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "random",
+    "syntax": "dword random (dword x)",
+    "description": "Calculates a random value n such that 0 <= n < x.",
+    "parameters": [
+      {
+        "name": "x",
+        "description": "upper limit for the random value."
+      }
+    ],
+    "returns": "Random value",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "replayResume",
+    "syntax": "dword replayResume (char pName[])",
+    "description": "Resumes a Replay block after it was suspended by the replaySuspend() function.",
+    "parameters": [
+      {
+        "name": "pName",
+        "description": "name of the Replay block"
+      }
+    ],
+    "returns": "1 = successful 0 = cannot be resumed or the Replay block does not exist",
+    "availability": "This function is supported in Version 4.0 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "replayStart",
+    "syntax": "dword replayStart (char pName[])",
+    "description": "Starts a Replay block to replay the associated log file. The data at the beginning of the file always starts replaying first.",
+    "parameters": [
+      {
+        "name": "pName",
+        "description": "name of the Replay block"
+      }
+    ],
+    "returns": "1 = successful 0 = cannot be started or the Replay block does not exist",
+    "availability": "This function is supported in Version 4.0 and after. To replay a file that has been suspended or paused, use the replayResume() function.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "replayState",
+    "syntax": "dword replayState (char pName)",
+    "description": "",
+    "parameters": [
+      {
+        "name": "pName",
+        "description": "name of the Replay block"
+      }
+    ],
+    "returns": "-1 = Replay block does not exist 0 = Replay block is stopped 1 = Replay block is running 2 = Replay block is suspended",
+    "availability": "This function is supported in Version 4.0 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "replayStop",
+    "syntax": "dword replayStop (char pName)",
+    "description": "Stops a Replay block from replaying.",
+    "parameters": [
+      {
+        "name": "pName",
+        "description": "name of the Replay block"
+      }
+    ],
+    "returns": "1 = successful 0 = cannot be stopped or the Replay block does not exist",
+    "availability": "This function is supported in Version 4.0 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "replaySuspend",
+    "syntax": "dword replaySuspend (char pName)",
+    "description": "Suspends a Replay block from replaying. The Replay Block can be resumed by the replayResume() function.",
+    "parameters": [
+      {
+        "name": "pName",
+        "description": "name of the Replay block"
+      }
+    ],
+    "returns": "1 = successful 0 = cannot be suspended or the Replay block does not exist",
+    "availability": "This function is supported in Version 4.0 and after. To resume back at the beginning of the file, use the replayStart() function.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "resetCan",
+    "syntax": "void resetCan ()",
+    "description": "Resets all the CAN controller.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "Typical condition when this function is invoked is when the CAN controller went “busoff”. Since execution of the function takes some time and the CAN controller is briefly disconnected from the bus, messages can be lost during a reset. To only reset  a specific CAN controller by channel number, use the resetCanEx() function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "resetCanEx",
+    "syntax": "void resetCanEx (long channel)",
+    "description": "Resets the CAN controller for a specific CAN channel.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "Typical condition when this function is invoked is when the CAN controller went “busoff”. Since execution of the function takes some time and the CAN controller is briefly disconnected from the bus, messages can be lost during a reset. To reset all the CAN controller at once, use the resetCan() function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "runError",
+    "syntax": "void runError (long err, long x)",
+    "description": "Triggers a run-time error. Outputs the error message to the Write window indicating the error number, the passed number, and then terminates the measurement.",
+    "parameters": [
+      {
+        "name": "err",
+        "description": "numbers that are represented in CANalyzer/CANoe as references for the user (values under 1000 are reserved for internal purposes)"
+      },
+      {
+        "name": "x",
+        "description": "reserved for future expansion (can be any number)"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setBtr",
+    "syntax": "void setBtr (long channel, byte btr0, byte btr1)",
+    "description": "Sets the baud rate based on the Bit Timing Register of a CAN controller. The values become effective until the next call of the function resetCan() or resetCanEx().",
+    "parameters": [
+      {
+        "name": "channel",
+        "description": "0 (both CAN controllers) 1 (channel 1) 2 (channel 2)"
+      },
+      {
+        "name": "btr0",
+        "description": "value of Bit Timing Register 0"
+      },
+      {
+        "name": "btr1",
+        "description": "value of Bit Timing Register 1"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setBusContext",
+    "syntax": "dword setBusContext (dword context)",
+    "description": "Sets the bus context of the network node (Gateway). The bus context plays a role exclusively in modeling gateways. In this case, a series of CAPL functions such as canOnline() and canOffline() may have more than one meaning in terms of the bus interface (channel) to be used. A similar type of problem occurs when identical node layer modules are used simultaneously within a CAPL block. A distinction must be made between the instances of the node layer, both for calls to CAPL functions that are implemented in the node layers and for implementing callbacks. To facilitate this distinction, a bus context is placed in the CAPL program by the runtime environment while a callback is being executed by the node layer. This context unambiguously identifies the node layer that is making the call. In a similar manner, the call of a CAPL function that is implemented in a node layer is forwarded on to the appropriate node layer, depending on the current bus context. This also applies to the CAPL functions mentioned above, canOnline() and canOffline().",
+    "parameters": [
+      {
+        "name": "context",
+        "description": "the new context to be set"
+      }
+    ],
+    "returns": "Bus context that was valid before the call was made",
+    "availability": "This function is supported in Version 3.2 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setCanCabsMode",
+    "syntax": "long setCanCabsMode (long ntype, long nchannel, long nmode, long nflags)",
+    "description": "Sets the mode of a CANcab. The modes do not apply to all CANcabs .",
+    "parameters": [
+      {
+        "name": "ntype",
+        "description": "unused; must be set to 0"
+      },
+      {
+        "name": "nchannel",
+        "description": "CAN channel"
+      },
+      {
+        "name": "nmode",
+        "description": "0 (NORMAL) 1 (SLEEP) 2 (HI-VOLTAGE) 3 (HI-SPEED) 4 (DUAL_WIRE) 5 (SINGLE_WIRE_LOW) 6 (SIGNLE-WIRE_HIGH) 7 (RESERVED) 8 (EVA_1) 9 (EVA_2) 10 (EVA_3)"
+      },
+      {
+        "name": "nflags",
+        "description": "0 (AUTOWAKEUP; only together with SLEEP mode) 1 (HIGHPRIO; only together with CANcab 5790c, to clear tx-buffers"
+      }
+    ],
+    "returns": "0 = successful !0 = unsuccessful",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setControlBackColor",
+    "syntax": "void setControlBackColor (char panel[], char control[], long color)",
+    "description": "Sets the background color of panel elements.",
+    "parameters": [
+      {
+        "name": "panel",
+        "description": "panel name (“” – references all opened panels)"
+      },
+      {
+        "name": "control",
+        "description": "name of the panel element (“” – references all elements on the panel)"
+      },
+      {
+        "name": "color",
+        "description": "color value (e.g. calculated by makeRGB() function)"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setControlForeColor",
+    "syntax": "void setControlForeColor (char panel[], char control[], long color)",
+    "description": "Sets the foreground color of panel elements.",
+    "parameters": [
+      {
+        "name": "panel",
+        "description": "panel name (“” – references all opened panels)"
+      },
+      {
+        "name": "control",
+        "description": "name of the panel element (“” – references all elements on the panel)"
+      },
+      {
+        "name": "color",
+        "description": "color value (e.g. calculated by makeRGB() function)"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setControlProperty",
+    "syntax": "void setControlProperty (char panel[], char control[], char property[], char value[])",
+    "description": "Sets a property of an ActiveX control.",
+    "parameters": [
+      {
+        "name": "panel",
+        "description": "panel name (“” – references all opened panels)"
+      },
+      {
+        "name": "control",
+        "description": "name of the panel element (“” – references all elements on the panel)"
+      },
+      {
+        "name": "property",
+        "description": "name of the property"
+      },
+      {
+        "name": "value",
+        "description": "value to be set (long, float or string value)"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setDrift",
+    "syntax": "void setDrift (int drift)",
+    "description": "Sets the constant deviation for timers of a network node. Inputs for the two values may lie between –10000 and 10000 (corresponds to –100.00% and 100.00%). If the value does not lie within this range, a message is output in the Write window.",
+    "parameters": [
+      {
+        "name": "drift",
+        "description": "integer for the constant deviation"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "Setting a drift causes any existing jitter to be reset.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setFilePath",
+    "syntax": "void setFilePath (char path[], unsigned int mode)",
+    "description": "Sets the read and write path to the directory. The path can be given as absolute or relative to the currently active configuration.",
+    "parameters": [
+      {
+        "name": "path",
+        "description": "the path to the directory"
+      },
+      {
+        "name": "mode",
+        "description": "0 (read only) 1 (write only) 2 (both read/write)"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setJitter",
+    "syntax": "void setJitter (int min, int max)",
+    "description": "Sets the jitter interval for the timers of a network node. The two values may lie between –10000 and 10000 (corresponds to –100.00% and 100.00%). If one of the two values does not lie within this range, a message is output in the Write window.",
+    "parameters": [
+      {
+        "name": "min",
+        "description": "integer for the lower interval limit"
+      },
+      {
+        "name": "max",
+        "description": "integer for the upper interval limit"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "Setting a jitter causes any existing drift to be reset. To utilize both jitter and drift simultaneously, look at the example below.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setOcr",
+    "syntax": "void setOcr (long channel, byte ocr)",
+    "description": "Sets the CAN controller’s Output Control Register. The value become effective until the next call of the function resetCan() or resetCanEx(). It should be noted that this value depends on the CAN platform used or the CAN hardware used (CANcardX or XL does not require this function call).",
+    "parameters": [
+      {
+        "name": "channel",
+        "description": "0 (both CAN controllers) 1 (channel 1) 2 (channel 2)"
+      },
+      {
+        "name": "ocr",
+        "description": "value of the Output Control Registers"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setPortBits",
+    "syntax": "void setPortBits (byte mode)",
+    "description": "This function is replaced by an simplified function, setCanCabsMode(). Both functions are used to set the mode of a CANcab or CANpiggy (CAN transceivers). Be extremely careful on using this function. First, this function applies to both CAN channels. Second, not all CANcabs or CANpiggies can have different mode settings. Highspeed 82C251 (251 in short) transceiver does not use this function because it can only operate in normal mode.",
+    "parameters": [
+      {
+        "name": "mode",
+        "description": "8 bits parameter used to set both CAN transceivers on a controller (e.g. CANcardX, CANcardXL) Transceiver: 252, 1041, 1053, 1054 (Bit 4-7 must be zeros) Channels CAN 1 CAN 2 Bit Location Bit 0 Bit 1 Bit 2 Bit 3 Normal Mode 1 0 1 0 Sleep Mode 0 1 0 1 No Change 0 0 0 0 No Change 1 1 1 1 Please note that bit 7 is most significant and bit 0 is least significant bit. Transceiver: 5790 (Bit 6-7 must be zeros) Channels CAN 1 CAN 2 Bit Location Bit 0 Bit 1 Bit 2 Bit 3 HighVoltage Mode 1 0 1 0 HighSpeed Mode 0 1 0 1 Sleep Mode 0 0 0 0 Normal Mode 1 1 1 1 For the single-wired CAN transceiver 5790, bit 4 for high priority on Channel 1, bit 5 for high priority on Channel 2. These high priority flags are used to clear all transmit buffers."
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setPostTrigger",
+    "syntax": "void setPostTrigger (long postTriggerTime)",
+    "description": "Sets the posttrigger time for logging. The posttrigger time set with this function is valid until the end of the measurement or until the next call of this function.",
+    "parameters": [
+      {
+        "name": "postTriggerTime",
+        "description": "new posttrigger time in milliseconds (-1 will set it until measurement stops)"
+      }
+    ],
+    "returns": "0 = unsuccessful 1 = successful",
+    "availability": "Available in all versions.",
+    "observation": "The post-trigger can also be set with the stopLogging() function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setPreTrigger",
+    "syntax": "void setPreTrigger (long preTriggerTime)",
+    "description": "Sets the pretrigger time for logging. The pretrigger time set with this function is valid until the end of the measurement or until the next call of this function.",
+    "parameters": [
+      {
+        "name": "preTriggerTime",
+        "description": "new pretrigger time in milliseconds"
+      }
+    ],
+    "returns": "0 = unsuccessful 1 = successful",
+    "availability": "Available in all versions.",
+    "observation": "The pre-trigger can also be set with the startLogging() function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setStartDelay",
+    "syntax": "void setStartDelay (int delay)",
+    "description": "Sets up a delay time for a network node to start. This function can only be called in the preStart event procedure. After it is called, the delay time can no longer be changed.",
+    "parameters": [
+      {
+        "name": "delay",
+        "description": "time to delay in ms (0 to 99999)"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "It is possible in CANoe to set up a network node to start with a delay by right-clicking on the network node and select Configuration. If a network node simulation require to pause its message transmission, the canOffline() and canOnline() functions are used.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setTimer",
+    "syntax": "void setTimer (timer t, long duration)",
+    "description": "Sets a timer in milliseconds or seconds depending on the data type.",
+    "parameters": [
+      {
+        "name": "t",
+        "description": "timer variable of either milliseconds or seconds resolution"
+      },
+      {
+        "name": "duration",
+        "description": "timer duration in either milliseconds or seconds"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setWriteDbgLevel",
+    "syntax": "void setWriteDbgLevel (unsigned int priority)",
+    "description": "Sets the priority level for the writeDbgLevel() CAPL function. The output priority can be set for every network node.",
+    "parameters": [
+      {
+        "name": "priority",
+        "description": "priority of current CAPL node for outputs to the Write window (0 to 15) 0 = only write outputs with a priority of 0 are shown in the Write window 5 = write outputs with a priority ranging from 0 to 5 are shown 15 = all outputs are shown"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.1 and after.",
+    "observation": "After applying this function, use the writeDbgLevel() function to output text into the Write window if the priority is greater than or equal to the set priority.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "setWritePath",
+    "syntax": "void setWritePath (char relativeOrAbsolutePath[])",
+    "description": "Sets the write path for the function openFileWrite(). The path can be given as absolute or relative to the current configuration.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "sin",
+    "syntax": "double sin (double x)",
+    "description": "Calculates the sine of x.",
+    "parameters": [
+      {
+        "name": "x",
+        "description": "value in radians whose sine is to be calculated"
+      }
+    ],
+    "returns": "Sine of x",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "snprintf",
+    "syntax": "long snprintf (char buffer[], long len, char format[], ...)",
+    "description": "This function corresponds to the C function sprintf(), but also with an parameter to indicate the maximum length of the buffer. The overall length of the buffer may not exceed 100.",
+    "parameters": [],
+    "returns": "Length of buffer",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "sqrt",
+    "syntax": "double sqrt (double x)",
+    "description": "Calculates the square root of the parameter.",
+    "parameters": [
+      {
+        "name": "x",
+        "description": "value whose square root is to be calculated"
+      }
+    ],
+    "returns": "Square root of x",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "startLogging",
+    "syntax": "void startLogging (char blockName[], long preTriggerTime)",
+    "description": "Form 1 – starts all Logging blocks immediately, bypassing all logging trigger settings Form 2 – starts a specific Logging block Form 3 – starts a specific Logging block with a pre-trigger logging time",
+    "parameters": [
+      {
+        "name": "blockName",
+        "description": "name of Logging block"
+      },
+      {
+        "name": "preTriggerTime",
+        "description": "pre-trigger time in milliseconds"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "startStatisticAcquisition",
+    "syntax": "void startStatisticAcquisition()",
+    "description": "Activates a new acquisition range in the Statistics window. If an acquisition range has already been activated, the function has no effect since it cannot influence the currently active range.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The CAPL program block this function appears must be located directly before the Statistics block in the Analysis Branch of CANalyzer and CANoe.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "stop",
+    "syntax": "void stop()",
+    "description": "Stops the ongoing measurement immediately.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "Available in all versions. Under the Bus Off condition of a CAN controller, the CANalyzer or CANoe measurement doesn’t have to be stopped in order to reinitialize the controller to communicate again. A reset can be perform while the measurement is running with either the resetCAN() or resetCANEx() function.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "stopLogging",
+    "syntax": "void stopLogging (char blockName[], long postTriggerTime)",
+    "description": "Form 1 – stops all Logging blocks immediately, bypassing all logging trigger settings Form 2 – stops a specific Logging block Form 3 – stops a specific Logging block with a post-trigger logging time",
+    "parameters": [
+      {
+        "name": "blockName",
+        "description": "name of Logging block"
+      },
+      {
+        "name": "postTriggerTime",
+        "description": "post-trigger time in milliseconds"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 4.1 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "stopStatisticAcquisition",
+    "syntax": "void stopStatisticAcquisition()",
+    "description": "Stops an already started acquisition range in the Statistics window. If no acquisition range has been started yet, this function has no effect.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The CAPL program block this function appears must be located directly before the Statistics block in the Analysis Branch of CANalyzer and CANoe.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "strlen",
+    "syntax": "long strlen (char s[])",
+    "description": "Determines the length of string s.",
+    "parameters": [
+      {
+        "name": "s",
+        "description": "string whose length we wish to find"
+      }
+    ],
+    "returns": "Length of string",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "strncat",
+    "syntax": "void strncat (char dest[], char src[], long len)",
+    "description": "Concatenates two strings into one.",
+    "parameters": [
+      {
+        "name": "dest",
+        "description": "original string to be concatenated"
+      },
+      {
+        "name": "src",
+        "description": "string to append"
+      },
+      {
+        "name": "len",
+        "description": "the maximum length of the resulting string"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "The function ensures that there is a terminating ‘\\0’ in the destination string. Thus, a maximum number of characters minus 1 are copied.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "strncmp",
+    "syntax": "void strncmp (char s1[], char s2[], long len)",
+    "description": "Compares two strings together up to a specific number of characters",
+    "parameters": [
+      {
+        "name": "s2",
+        "description": "strings to compare"
+      },
+      {
+        "name": "len",
+        "description": "number of characters to compare"
+      }
+    ],
+    "returns": "-1 = if s1 < s2 0 = if s1 = s2 1 = if s2 > s1",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "strncpy",
+    "syntax": "void strncpy (char dest[], char src[], long len)",
+    "description": "Copies one string to replace another up to a specific number of characters.",
+    "parameters": [
+      {
+        "name": "dest",
+        "description": "original string to be replaced"
+      },
+      {
+        "name": "src",
+        "description": "new string to copy"
+      },
+      {
+        "name": "len",
+        "description": "number of characters to copy + 1"
+      }
+    ],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "The function ensures that there is a terminating ‘\\0’ in the destination string. Thus, a maximum number of characters minus 1 are copied.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "swapDWord",
+    "syntax": "dword swapDWord (dword x)",
+    "description": "Swaps four bytes of data.",
+    "parameters": [
+      {
+        "name": "x",
+        "description": "value whose bytes are to be swapped"
+      }
+    ],
+    "returns": "Value with bytes swapped",
+    "availability": "Available in all versions.",
+    "observation": "CAPL arithmetic follows the little-endian format (Intel). The function swaps bytes to transits to and from the big-endian format (Motorola).",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "swapInt",
+    "syntax": "int swapInt (int x)",
+    "description": "Swaps two bytes of data.",
+    "parameters": [
+      {
+        "name": "x",
+        "description": "value whose bytes are to be swapped"
+      }
+    ],
+    "returns": "Value with bytes swapped",
+    "availability": "Available in all versions.",
+    "observation": "CAPL arithmetic follows the little-endian format (Intel). The function swaps bytes to transits to and from the big-endian format (Motorola).",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "swapLong",
+    "syntax": "long swapLong (long x)",
+    "description": "Swaps four bytes of data.",
+    "parameters": [
+      {
+        "name": "x",
+        "description": "value whose bytes are to be swapped"
+      }
+    ],
+    "returns": "Value with bytes swapped",
+    "availability": "Available in all versions.",
+    "observation": "CAPL arithmetic follows the little-endian format (Intel). The function swaps bytes to transits to and from the big-endian format (Motorola).",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "swapWord",
+    "syntax": "word swapWord (word x)",
+    "description": "Swaps two bytes of data. CAPL arithmetic follows the little-endian format (Intel). The function swaps bytes to transits to and from the big-endian format (Motorola).",
+    "parameters": [
+      {
+        "name": "x",
+        "description": "value whose bytes are to be swapped"
+      }
+    ],
+    "returns": "Value with bytes swapped",
+    "availability": "Available in all versions.",
+    "observation": "CAPL arithmetic follows the little-endian format (Intel). The function swaps bytes to transits to and from the big-endian format (Motorola).",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "sysExit",
+    "syntax": "void sysExit ()",
+    "description": "Exits the system (CANalyzer or CANoe) from within a CAPL program.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "All captured data will be lost with an exception to the data already logged into a file.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "sysMinimize",
+    "syntax": "void sysMinimize ()",
+    "description": "Minimizes or restores the application window of CANalyzer or CANoe.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "timeDiff",
+    "syntax": "long timeDiff (message msg1, message msg2)",
+    "description": "Calculates the time difference between messages or between a message and the current measurement time in ms.",
+    "parameters": [
+      {
+        "name": "msg2",
+        "description": "messages to get the time difference"
+      }
+    ],
+    "returns": "Time difference in ms",
+    "availability": "Available in all versions. The most precise can be access by the TIME message selector. The resolution return by this selector is in 10 microseconds (assigned by the CAN controller). The syntax is a message variable follow by a period and then the word “TIME”.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "timeNow",
+    "syntax": "dword timeNow ()",
+    "description": "",
+    "parameters": [],
+    "returns": "Time since the start of the current measurement in units of 10 µsec.",
+    "availability": "Available in all versions. This time is established with the help of the PC timer with a resolution of 1 msec. To get a precise time stamp of a message, use the TIME message selector. The resolution return by this selector is in 10 microseconds(assigned by the CAN controller). The syntax is a message variable follow by a period and then the word “TIME”.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "timeNowFloat",
+    "syntax": "dword timeNowFloat ()",
+    "description": "",
+    "parameters": [],
+    "returns": "Time since the start of the current measurement in units of 10 µsec.",
+    "availability": "Available in all versions. This time is established with the help of the PC timer with a resolution of 1 msec. To get a precise time stamp of a message, use the TIME message selector. The resolution return by this selector is in 10 microseconds(assigned by the CAN controller). The syntax is a message variable follow by a period and then the word “TIME”.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "trigger",
+    "syntax": "void trigger ()",
+    "description": "Activates logging.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "Available in all versions. The newer startLogging() and stopLogging() functions can handle logging more extensively.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "valOfId",
+    "syntax": "long valOfId (message m)",
+    "description": "",
+    "parameters": [
+      {
+        "name": "id",
+        "description": "message identifier"
+      },
+      {
+        "name": "m",
+        "description": "message variable"
+      }
+    ],
+    "returns": "Identifier as long value",
+    "availability": "Available in all versions. It may be helpful sometimes just to use the ID message selector to access the message identifier. The syntax is the name of the message follow by a period and then the word “ID”.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "write",
+    "syntax": "void write (char format[], ...)",
+    "description": "Outputs a text message to the Write window.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "This function is identical to the printf() function used in the C language.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeClear",
+    "syntax": "void writeClear (dword identifier)",
+    "description": "Clears the texts of a pane in the Write window except the All pane.",
+    "parameters": [
+      {
+        "name": "identifier",
+        "description": "0 (System pane) = 1 (CAPL pane) = x (pane identifier returned by function writeCreate())"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.2 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeCreate",
+    "syntax": "dword writeCreate (char name[])",
+    "description": "Creates a new pane in the Write window.",
+    "parameters": [
+      {
+        "name": "name",
+        "description": "the name of the new pane"
+      }
+    ],
+    "returns": "Identifier to this new pane",
+    "availability": "This function is supported in Version 3.2 and after.",
+    "observation": "",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeDbgLevel",
+    "syntax": "void writeDbgLevel (unsigned int priority, char format1[], char format2[], ...)",
+    "description": "Outputs a message to the write window after a priority check with the node. The priority level can be set for every network node using the setWriteDbgLevel() function.",
+    "parameters": [
+      {
+        "name": "priority",
+        "description": "output priority from 0 to 15"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "This function can be used for debugging to vary the output to the write window.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeDestroy",
+    "syntax": "void writeDestroy (dword identifier)",
+    "description": "Removes a user-defined pane from the Write Window.",
+    "parameters": [
+      {
+        "name": "identifier",
+        "description": "identifier to the pane previously returned by the writeCreate() function"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.2 and after.",
+    "observation": "That pane must be created by the writeCreate() function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeEx",
+    "syntax": "void writeEx (dword identifier, dword severity, char format[], ...)",
+    "description": "Writes to a Write window without first executing a line feed.",
+    "parameters": [
+      {
+        "name": "x",
+        "description": "pane identifier returned by writeCreate()"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.2 and after.",
+    "observation": "For writing to a log file, severity = 0 means write with comments and severity = 1 means write without comments.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeLineEx",
+    "syntax": "void writeLineEx (dword identifier, dword severity, char format[], ...)",
+    "description": "Writes to a Write window by first executing a line feed.",
+    "parameters": [
+      {
+        "name": "x",
+        "description": "pane identifier returned by writeCreate()"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.2 and after.",
+    "observation": "For writing to a log file, severity = 0 means write with comments and severity = 1 means write without comments.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeProFileFloat",
+    "syntax": "long writeProFileFloat (char section[], char entry[], float value, char filename[])",
+    "description": "Writes a float value to an INI-formatted file. Any existing value will be overwritten.",
+    "parameters": [
+      {
+        "name": "section",
+        "description": "section within file"
+      },
+      {
+        "name": "entry",
+        "description": "name of variable"
+      },
+      {
+        "name": "value",
+        "description": "float value to write"
+      },
+      {
+        "name": "filename",
+        "description": "name of data file"
+      }
+    ],
+    "returns": "0 = unsuccessful 1 = successful",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The file path is set by either the setWritePath() or setFilePath() function. If neither function is used, the data file must be located either in the same directory as the databases file(s) or configuration file(s) of CANalyzer/CANoe.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeProFileInt",
+    "syntax": "long writeProFileInt (char section[], char entry[], long value, char filename[])",
+    "description": "Writes an integer value to an INI-formatted file. Any existing value will be overwritten.",
+    "parameters": [
+      {
+        "name": "section",
+        "description": "section within file"
+      },
+      {
+        "name": "entry",
+        "description": "name of variable"
+      },
+      {
+        "name": "value",
+        "description": "integer value to write"
+      },
+      {
+        "name": "filename",
+        "description": "name of data file"
+      }
+    ],
+    "returns": "0 = unsuccessful 1 = successful",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The file path is set by either the setWritePath() or setFilePath() function. If neither function is used, the data file must be located either in the same directory as the databases file(s) or configuration file(s) of CANalyzer/CANoe.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeProFileString",
+    "syntax": "long writeProFileString (char section[], char entry[], char value[], char filename[])",
+    "description": "Writes a string value to an INI-formatted file. Any existing value will be overwritten.",
+    "parameters": [
+      {
+        "name": "section",
+        "description": "section within file"
+      },
+      {
+        "name": "entry",
+        "description": "name of variable"
+      },
+      {
+        "name": "value",
+        "description": "string value to write"
+      },
+      {
+        "name": "filename",
+        "description": "name of data file"
+      }
+    ],
+    "returns": "0 = unsuccessful 1 = successful",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "The file path is set by either the setWritePath() or setFilePath() function. If neither function is used, the data file must be located either in the same directory as the databases file(s) or configuration file(s) of CANalyzer/CANoe.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeTextBkgColor",
+    "syntax": "void writeTextBkgColor (dword paneID, dword red. dword green, dword blue)",
+    "description": "Sets the background color of a specific pane in the Write window. That pane may be created by the writeCreate() function.",
+    "parameters": [
+      {
+        "name": "paneID",
+        "description": "identifier to the pane previously returned by the writeCreate()"
+      },
+      {
+        "name": "red",
+        "description": "intensity of the red color (0 to 255)"
+      },
+      {
+        "name": "green",
+        "description": "intensity of the green color (0 to 255)"
+      },
+      {
+        "name": "blue",
+        "description": "intensity of the blue color (0 to 255)"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 5.0 and after.",
+    "observation": "Background color can be changed in a new pane created by the writeCreate() function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeTextColor",
+    "syntax": "void writeTextColor (dword paneID, dword red. dword green, dword blue)",
+    "description": "Sets the text color of a specific pane in the Write window. That pane may be created by the writeCreate() function.",
+    "parameters": [
+      {
+        "name": "paneID",
+        "description": "identifier to the pane previously returned by the writeCreate()"
+      },
+      {
+        "name": "red",
+        "description": "intensity of the red color (0 to 255)"
+      },
+      {
+        "name": "green",
+        "description": "intensity of the green color (0 to 255)"
+      },
+      {
+        "name": "blue",
+        "description": "intensity of the blue color (0 to 255)"
+      }
+    ],
+    "returns": "None",
+    "availability": "This function is supported in Version 5.0 and after.",
+    "observation": "Text color can be changed in a new pane created by the writeCreate() function.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeToLog",
+    "syntax": "void writeToLog (char format[], ...)",
+    "description": "Writes an output string to an ASCII logging file. Since the compiler cannot check the format string, illegal format entries will lead to undefined results.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "Available in all versions.",
+    "observation": "Data is only written to a log file when logging is enabled in CANalyzer or CANoe. A call to this function is ignored when logging is disabled. Use the writeToLogEx() function to output without a timestamp and the comment characters “//”.",
+    "branch_compatibility": {}
+  },
+  {
+    "function_name": "writeToLogEX",
+    "syntax": "void writeToLogEX (char format[], ...)",
+    "description": "Writes an output string to an ASCII logging file. Since the compiler cannot check the format string, illegal format entries will lead to undefined results.",
+    "parameters": [],
+    "returns": "None",
+    "availability": "This function is supported in Version 3.0 and after.",
+    "observation": "Data is only written to a log file when logging is enabled in CANalyzer or CANoe. A call to this function is ignored when logging is disabled. Use the writeToLog() function to output with a timestamp and the comment characters “//”.",
+    "branch_compatibility": {}
+  }
+]
