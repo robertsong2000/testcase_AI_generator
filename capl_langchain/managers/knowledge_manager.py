@@ -6,7 +6,10 @@ from typing import Any, Dict, List
 
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_community.document_loaders.json_loader import JSONLoader
-from langchain_community.vectorstores import Chroma
+try:
+    from langchain_chroma import Chroma
+except ImportError:
+    from langchain_community.vectorstores import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from ..config.config import CAPLGeneratorConfig
@@ -34,10 +37,18 @@ class KnowledgeBaseManager:
             if self._is_cache_valid():
                 print("📦 发现有效缓存，跳过知识库初始化...")
                 embeddings = EmbeddingFactory.create_embeddings(self.config)
-                self.vector_store = Chroma(
-                    persist_directory=str(self.config.vector_db_dir),
-                    embedding_function=embeddings
-                )
+                try:
+                    from langchain_chroma import Chroma
+                    self.vector_store = Chroma(
+                        persist_directory=str(self.config.vector_db_dir),
+                        embedding_function=embeddings
+                    )
+                except ImportError:
+                    from langchain_community.vectorstores import Chroma
+                    self.vector_store = Chroma(
+                        persist_directory=str(self.config.vector_db_dir),
+                        embedding_function=embeddings
+                    )
                 return True
             
             print("🔄 初始化知识库...")
@@ -69,12 +80,21 @@ class KnowledgeBaseManager:
                     # 确保内容是字符串
                     doc.page_content = str(doc.page_content)
             
-            # 创建向量存储（Chroma 0.4+自动持久化）
-            self.vector_store = Chroma.from_documents(
-                documents=splits,
-                embedding=embeddings,
-                persist_directory=str(self.config.vector_db_dir)
-            )
+            # 创建向量存储（使用langchain-chroma）
+            try:
+                from langchain_chroma import Chroma
+                self.vector_store = Chroma.from_documents(
+                    documents=splits,
+                    embedding=embeddings,
+                    persist_directory=str(self.config.vector_db_dir)
+                )
+            except ImportError:
+                from langchain_community.vectorstores import Chroma
+                self.vector_store = Chroma.from_documents(
+                    documents=splits,
+                    embedding=embeddings,
+                    persist_directory=str(self.config.vector_db_dir)
+                )
             
             # 创建缓存标记文件
             self._create_cache_marker()
