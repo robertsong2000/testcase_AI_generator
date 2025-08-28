@@ -75,9 +75,9 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '-k', '--k',
         type=int,
-        default=4,
+        default=8,
         metavar='K',
-        help='RAG检索返回的文档数量 (默认: 4)'
+        help='RAG检索返回的文档数量 (默认: 8)'
     )
     
     parser.add_argument(
