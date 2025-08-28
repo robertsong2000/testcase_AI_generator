@@ -15,19 +15,20 @@ def create_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 使用示例:
-  %(prog)s requirements.txt
+  %(prog)s requirements.txt                          # 默认流式输出
+  %(prog)s requirements.txt --no-stream            # 禁用流式输出
   %(prog)s requirements.txt --output ./generated/
   %(prog)s requirements.txt --disable-rag
-  %(prog)s requirements.txt -k 8                    # 设置RAG检索返回8个文档
+  %(prog)s requirements.txt -k 8                   # 设置RAG检索返回8个文档
   %(prog)s --info
   %(prog)s --search "CAPL message handling"
   %(prog)s --test-rag "message filter"
   %(prog)s requirements.txt --debug-prompt
   %(prog)s requirements.txt --rebuild-rag
-  %(prog)s requirements.txt --no-use-example-code   # 禁用示例代码
-  %(prog)s requirements.txt --use-example-code      # 强制使用示例代码
-  %(prog)s requirements.txt --chunk-size 600        # 平衡场景配置
-  %(prog)s requirements.txt --chunk-overlap 100     # 平衡场景配置
+  %(prog)s requirements.txt --no-use-example-code  # 禁用示例代码
+  %(prog)s requirements.txt --use-example-code     # 强制使用示例代码
+  %(prog)s requirements.txt --chunk-size 600       # 平衡场景配置
+  %(prog)s requirements.txt --chunk-overlap 100    # 平衡场景配置
   %(prog)s requirements.txt --chunk-size 800 --chunk-overlap 150  # 完整上下文配置
         """
     )
@@ -156,11 +157,11 @@ def create_parser() -> argparse.ArgumentParser:
         help='隐藏生成摘要'
     )
     
-    # 流式输出
+    # 流式输出控制
     parser.add_argument(
-        '--stream',
+        '--no-stream',
         action='store_true',
-        help='启用流式输出，实时显示生成的代码'
+        help='禁用流式输出，使用传统阻塞式生成'
     )
     
     # 信息查询
@@ -337,7 +338,7 @@ def main():
             debug_prompt=args.debug_prompt,
             rebuild_rag=args.rebuild_rag,
             show_summary=args.show_summary,
-            stream=args.stream
+            stream=not args.no_stream  # 默认启用流式输出，除非指定--no-stream
         )
         
         if result["status"] == "success":

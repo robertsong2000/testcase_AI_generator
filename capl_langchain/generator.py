@@ -176,32 +176,34 @@ class CAPLGenerator:
             
             print(f"\n🤖 开始流式生成CAPL代码...")
             print(f"📋 需求: {requirement[:100]}...")
-            print(f"⏳ 正在生成中...")
             
             # 使用流式输出
             if hasattr(self.llm, 'stream'):
-                # 构建prompt
+                # 确保初始化
+                if self.chain is None:
+                    self.initialize()
+                
+                # 显示检索信息（与非流式模式一致）
                 if self.config.enable_rag and self.kb_manager.get_retriever():
                     retriever = self.kb_manager.get_retriever(self.config.k)
-                    
-                    # 获取相关文档
-                    print(f"🔍 正在检索知识库...")
                     docs = retriever.invoke(requirement)
-                    context = "\n\n".join(str(doc.page_content) for doc in docs)
                     
-                    prompt = f"""基于以下知识库内容生成CAPL代码：
-
-相关上下文：
-{context}
-
-测试需求：
-{requirement}"""
-                else:
-                    prompt = requirement
+                    if docs:
+                        print(f"✅ 检索完成，找到 {len(docs)} 个相关文档")
+                        for i, doc in enumerate(docs, 1):
+                            metadata = doc.metadata if hasattr(doc, 'metadata') else {}
+                            source = metadata.get('source', '未知来源')
+                            content = doc.page_content if hasattr(doc, 'page_content') else str(doc)
+                            print(f"  📄 文档 {i}: {source} ({len(content)} 字符)")
+                            print(f"     摘要: {content[:100]}{'...' if len(content) > 100 else ''}")
+                    else:
+                        print("⚠️  未找到相关文档，将使用通用模板")
                 
-                # 流式生成
+                print(f"⏳ 正在生成中...")
+                
+                # 使用完整的LangChain处理链进行流式生成
                 full_code = ""
-                for chunk in self.llm.stream(prompt):
+                for chunk in self.chain.stream(requirement):
                     if chunk:
                         content = str(chunk)
                         full_code += content
@@ -210,7 +212,6 @@ class CAPLGenerator:
                 # 清理最终代码
                 cleaned_code = self._clean_generated_code(full_code)
                 if cleaned_code != full_code:
-                    # 如果清理后有变化，输出清理后的版本
                     yield "\n" + cleaned_code[len(full_code):] if len(cleaned_code) > len(full_code) else ""
                 
             else:

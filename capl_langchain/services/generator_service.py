@@ -24,7 +24,7 @@ class CAPLGeneratorService:
                     rebuild_rag: bool = False,
                     force_rebuild: bool = False,
                     show_summary: bool = True,
-                    stream: bool = False) -> Dict[str, Any]:
+                    stream: bool = True) -> Dict[str, Any]:
         """处理单个文件的高级封装"""
         
         try:
