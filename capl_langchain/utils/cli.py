@@ -135,13 +135,6 @@ def create_parser() -> argparse.ArgumentParser:
         help='禁用示例CAPL代码，仅基于需求生成'
     )
     
-    parser.add_argument(
-        '--no-force-example',
-        action='store_false',
-        dest='force_example',
-        help='不强制加载示例CAPL代码'
-    )
-    
     # 统计和摘要
     parser.add_argument(
         '--show-summary',
