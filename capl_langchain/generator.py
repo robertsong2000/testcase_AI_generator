@@ -241,9 +241,9 @@ class CAPLGenerator:
         }
         
         if self.config.enable_rag and self.config.knowledge_base_dir.exists():
-            # 获取文档数量
+            # 获取文档数量（包括所有支持的文件类型）
             documents = []
-            for pattern in ["**/*.txt", "**/*.md", "**/*.capl", "**/*.py"]:
+            for pattern in ["**/*.txt", "**/*.md", "**/*.capl", "**/*.py", "**/*.json"]:
                 documents.extend(list(self.config.knowledge_base_dir.glob(pattern)))
             info['documents_loaded'] = len(documents)
         
