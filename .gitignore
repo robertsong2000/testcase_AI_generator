@@ -49,3 +49,9 @@ results/
 generated/
 testcases/
 backup/
+
+# 知识库文件（不应提交到版本控制）
+knowledge_base/body_test_syntax_guide.md
+knowledge_base/capl_test_framework_guide.md
+knowledge_base/common_libraries_overview.md
+knowledge_base/README.md
