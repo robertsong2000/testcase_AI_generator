@@ -23,7 +23,8 @@ class CAPLGeneratorService:
                     debug_prompt: bool = False,
                     rebuild_rag: bool = False,
                     force_rebuild: bool = False,
-                    show_summary: bool = True) -> Dict[str, Any]:
+                    show_summary: bool = True,
+                    stream: bool = False) -> Dict[str, Any]:
         """处理单个文件的高级封装"""
         
         try:
@@ -51,19 +52,83 @@ class CAPLGeneratorService:
                 print(self.generator.prompt_manager.system_prompt)
                 print("=" * 50)
             
-            # 生成CAPL代码
-            capl_code = self.generator.generate_code(requirement)
+            # 根据模式选择生成方式
+            if stream:
+                return self._process_file_stream(file_path, requirement, show_summary)
+            else:
+                # 传统阻塞式生成
+                capl_code = self.generator.generate_code(requirement)
+                
+                # 保存结果（多格式）
+                result = self._save_result(file_path, capl_code)
+                
+                # 计算统计信息
+                stats = self._calculate_stats(capl_code)
+                
+                return {
+                    "status": "success",
+                    "file_path": str(result),
+                    "capl_file": str(result).replace('.md', '.can'),
+                    "stats": stats,
+                    "error": None
+                }
             
-            # 保存结果（多格式）
-            result = self._save_result(file_path, capl_code)
+        except Exception as e:
+            return {
+                "status": "error",
+                "file_path": None,
+                "capl_file": None,
+                "stats": {},
+                "error": str(e)
+            }
+    
+    def _process_file_stream(self, file_path: str, requirement: str, show_summary: bool = True) -> Dict[str, Any]:
+        """流式处理单个文件"""
+        try:
+            # 生成输出文件路径
+            original_name = Path(file_path).stem
+            output_file = self.config.output_dir / f"{original_name}.md"
+            
+            # 确保输出目录存在
+            self.config.output_dir.mkdir(parents=True, exist_ok=True)
+            
+            print(f"📁 输出文件: {output_file}")
+            
+            # 使用流式生成
+            capl_code = ""
+            with open(output_file, 'w', encoding='utf-8') as f:
+                print("\n" + "="*50)
+                print("🔄 开始流式生成代码...")
+                print("="*50)
+                
+                # 流式输出到控制台和文件
+                for chunk in self.generator.generate_code_stream(requirement):
+                    print(chunk, end='', flush=True)
+                    f.write(chunk)
+                    capl_code += chunk
+                
+                print("\n" + "="*50)
+                print("✅ 流式生成完成！")
+            
+            # 同时生成.can文件
+            can_file = self.config.output_dir / f"{original_name}.can"
+            code_blocks = re.findall(r'```(?:capl)?\n(.*?)\n```', capl_code, re.DOTALL)
+            
+            if code_blocks:
+                pure_code = code_blocks[0].strip()
+            else:
+                pure_code = capl_code
+            
+            with open(can_file, 'w', encoding='utf-8') as f:
+                f.write(pure_code)
             
             # 计算统计信息
             stats = self._calculate_stats(capl_code)
             
             return {
                 "status": "success",
-                "file_path": str(result),
-                "capl_file": str(result).replace('.md', '.can'),
+                "file_path": str(output_file),
+                "capl_file": str(can_file),
                 "stats": stats,
                 "error": None
             }

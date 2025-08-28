@@ -129,7 +129,7 @@ class CAPLGenerator:
             )
     
     def generate_code(self, requirement: str, output_file: Optional[str] = None) -> str:
-        """生成CAPL代码"""
+        """生成CAPL代码（阻塞式，保持向后兼容）"""
         try:
             if self.chain is None:
                 self.initialize()
@@ -153,6 +153,78 @@ class CAPLGenerator:
             import traceback
             traceback.print_exc()
             return f"// 代码生成失败: {str(e)}"
+    
+    def generate_code_stream(self, requirement: str, output_file: Optional[str] = None):
+        """流式生成CAPL代码
+        
+        这是一个生成器函数，可以实时输出生成的代码内容。
+        使用示例：
+            generator = CAPLGenerator(config)
+            for chunk in generator.generate_code_stream("测试需求"):
+                print(chunk, end='', flush=True)
+        
+        Args:
+            requirement: 需求描述
+            output_file: 可选的输出文件路径
+            
+        Yields:
+            str: 生成的代码片段
+        """
+        try:
+            if self.chain is None:
+                self.initialize()
+            
+            print(f"\n🤖 开始流式生成CAPL代码...")
+            print(f"📋 需求: {requirement[:100]}...")
+            print(f"⏳ 正在生成中...")
+            
+            # 使用流式输出
+            if hasattr(self.llm, 'stream'):
+                # 构建prompt
+                if self.config.enable_rag and self.kb_manager.get_retriever():
+                    retriever = self.kb_manager.get_retriever(self.config.k)
+                    
+                    # 获取相关文档
+                    print(f"🔍 正在检索知识库...")
+                    docs = retriever.invoke(requirement)
+                    context = "\n\n".join(str(doc.page_content) for doc in docs)
+                    
+                    prompt = f"""基于以下知识库内容生成CAPL代码：
+
+相关上下文：
+{context}
+
+测试需求：
+{requirement}"""
+                else:
+                    prompt = requirement
+                
+                # 流式生成
+                full_code = ""
+                for chunk in self.llm.stream(prompt):
+                    if chunk:
+                        content = str(chunk)
+                        full_code += content
+                        yield content
+                
+                # 清理最终代码
+                cleaned_code = self._clean_generated_code(full_code)
+                if cleaned_code != full_code:
+                    # 如果清理后有变化，输出清理后的版本
+                    yield "\n" + cleaned_code[len(full_code):] if len(cleaned_code) > len(full_code) else ""
+                
+            else:
+                # 回退到阻塞式生成
+                print("⚠️  当前LLM不支持流式输出，使用阻塞式生成...")
+                code = self.generate_code(requirement, output_file)
+                yield code
+                
+        except Exception as e:
+            error_msg = f"// 代码生成失败: {str(e)}"
+            yield error_msg
+            print(f"❌ 代码生成失败: {e}")
+            import traceback
+            traceback.print_exc()
     
     def _clean_generated_code(self, code: str) -> str:
         """清理生成的代码"""

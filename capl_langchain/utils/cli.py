@@ -156,6 +156,13 @@ def create_parser() -> argparse.ArgumentParser:
         help='隐藏生成摘要'
     )
     
+    # 流式输出
+    parser.add_argument(
+        '--stream',
+        action='store_true',
+        help='启用流式输出，实时显示生成的代码'
+    )
+    
     # 信息查询
     parser.add_argument(
         '--info',
@@ -329,7 +336,8 @@ def main():
             file_path=args.input,
             debug_prompt=args.debug_prompt,
             rebuild_rag=args.rebuild_rag,
-            show_summary=args.show_summary
+            show_summary=args.show_summary,
+            stream=args.stream
         )
         
         if result["status"] == "success":
