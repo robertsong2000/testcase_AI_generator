@@ -183,22 +183,6 @@ class CAPLGenerator:
                 if self.chain is None:
                     self.initialize()
                 
-                # 显示检索信息（与非流式模式一致）
-                if self.config.enable_rag and self.kb_manager.get_retriever():
-                    retriever = self.kb_manager.get_retriever(self.config.k)
-                    docs = retriever.invoke(requirement)
-                    
-                    if docs:
-                        print(f"✅ 检索完成，找到 {len(docs)} 个相关文档")
-                        for i, doc in enumerate(docs, 1):
-                            metadata = doc.metadata if hasattr(doc, 'metadata') else {}
-                            source = metadata.get('source', '未知来源')
-                            content = doc.page_content if hasattr(doc, 'page_content') else str(doc)
-                            print(f"  📄 文档 {i}: {source} ({len(content)} 字符)")
-                            print(f"     摘要: {content[:100]}{'...' if len(content) > 100 else ''}")
-                    else:
-                        print("⚠️  未找到相关文档，将使用通用模板")
-                
                 print(f"⏳ 正在生成中...")
                 
                 # 使用完整的LangChain处理链进行流式生成
