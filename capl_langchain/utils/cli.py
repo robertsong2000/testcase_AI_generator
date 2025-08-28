@@ -276,10 +276,15 @@ def main():
         # 使用高级服务
         from ..services.generator_service import CAPLGeneratorService
         service = CAPLGeneratorService(config)
-        
+
         # 测试RAG搜索
         if args.test_rag:
             service.test_rag_search(args.test_rag, show_summary=True)
+            return
+
+        # 重建RAG知识库
+        if args.rebuild_rag:
+            service.process_file("dummy", rebuild_rag=True)
             return
         
         # 处理输入

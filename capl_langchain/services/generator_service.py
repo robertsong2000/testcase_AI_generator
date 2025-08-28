@@ -22,6 +22,7 @@ class CAPLGeneratorService:
                     file_path: str, 
                     debug_prompt: bool = False,
                     rebuild_rag: bool = False,
+                    force_rebuild: bool = False,
                     show_summary: bool = True) -> Dict[str, Any]:
         """处理单个文件的高级封装"""
         
@@ -39,6 +40,7 @@ class CAPLGeneratorService:
                 
                 # 重新初始化知识库
                 self.generator.kb_manager.initialize_knowledge_base()
+                print("✅ RAG知识库重建完成")
             
             # 读取需求
             requirement = self._read_file(file_path)

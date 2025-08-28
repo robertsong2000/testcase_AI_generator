@@ -21,7 +21,7 @@ class KnowledgeBaseManager:
         self.vector_store = None
         
     def initialize_knowledge_base(self) -> bool:
-        """初始化知识库"""
+        """初始化知识库，支持智能缓存"""
         if not self.config.enable_rag:
             return False
             
@@ -29,6 +29,18 @@ class KnowledgeBaseManager:
             # 确保知识库目录存在
             self.config.knowledge_base_dir.mkdir(exist_ok=True)
             self.config.vector_db_dir.mkdir(exist_ok=True)
+            
+            # 检查缓存是否有效
+            if self._is_cache_valid():
+                print("📦 发现有效缓存，跳过知识库初始化...")
+                embeddings = EmbeddingFactory.create_embeddings(self.config)
+                self.vector_store = Chroma(
+                    persist_directory=str(self.config.vector_db_dir),
+                    embedding_function=embeddings
+                )
+                return True
+            
+            print("🔄 初始化知识库...")
             
             # 加载文档
             documents = self._load_documents()
@@ -64,7 +76,10 @@ class KnowledgeBaseManager:
                 persist_directory=str(self.config.vector_db_dir)
             )
             
-            print(f"知识库初始化完成，共加载 {len(documents)} 个文档，{len(splits)} 个文本块")
+            # 创建缓存标记文件
+            self._create_cache_marker()
+            
+            print(f"✅ 知识库初始化完成，共加载 {len(documents)} 个文档，{len(splits)} 个文本块")
             return True
             
         except Exception as e:
@@ -75,11 +90,13 @@ class KnowledgeBaseManager:
     
     def _load_documents(self) -> List:
         """加载知识库文档"""
+        documents = []
         knowledge_base_path = Path(self.config.knowledge_base_dir)
         if not knowledge_base_path.exists():
+            print(f"⚠️ 知识库目录不存在: {knowledge_base_path}")
             return []
             
-        documents = []
+        print(f"📁 正在加载知识库: {knowledge_base_path}")
         
         # 支持的文件格式和对应的加载器
         file_configs = [
@@ -135,7 +152,41 @@ class KnowledgeBaseManager:
         json_docs = self._load_json_documents()
         documents.extend(json_docs)
         
+        print(f"📊 总共加载 {len(documents)} 个文档")
         return documents
+
+    def _is_cache_valid(self) -> bool:
+        """检查缓存是否有效"""
+        cache_marker = self.config.vector_db_dir / ".cache_marker"
+        
+        # 检查缓存标记文件是否存在
+        if not cache_marker.exists():
+            return False
+        
+        # 检查向量数据库是否存在且完整
+        if not (self.config.vector_db_dir / "chroma.sqlite3").exists():
+            return False
+        
+        # 检查知识库文件是否有更新
+        cache_mtime = cache_marker.stat().st_mtime
+        
+        # 遍历知识库目录中的所有文件
+        knowledge_files = []
+        for pattern in ["**/*.txt", "**/*.md", "**/*.capl", "**/*.py", "**/*.json"]:
+            knowledge_files.extend(self.config.knowledge_base_dir.glob(pattern))
+        
+        # 如果有任何知识库文件比缓存新，则缓存无效
+        for file_path in knowledge_files:
+            if file_path.stat().st_mtime > cache_mtime:
+                return False
+        
+        return True
+
+    def _create_cache_marker(self):
+        """创建缓存标记文件"""
+        cache_marker = self.config.vector_db_dir / ".cache_marker"
+        cache_marker.touch()
+        print("📦 缓存标记文件已创建")
     
     def get_retriever(self, k: int = None):
         """获取检索器
