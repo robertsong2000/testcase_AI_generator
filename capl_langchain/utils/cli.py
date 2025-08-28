@@ -18,14 +18,17 @@ def create_parser() -> argparse.ArgumentParser:
   %(prog)s requirements.txt
   %(prog)s requirements.txt --output ./generated/
   %(prog)s requirements.txt --disable-rag
-  %(prog)s requirements.txt -k 8             # 设置RAG检索返回8个文档
+  %(prog)s requirements.txt -k 8                    # 设置RAG检索返回8个文档
   %(prog)s --info
   %(prog)s --search "CAPL message handling"
   %(prog)s --test-rag "message filter"
   %(prog)s requirements.txt --debug-prompt
   %(prog)s requirements.txt --rebuild-rag
-  %(prog)s requirements.txt --no-use-example-code  # 禁用示例代码
-  %(prog)s requirements.txt --use-example-code     # 强制使用示例代码
+  %(prog)s requirements.txt --no-use-example-code   # 禁用示例代码
+  %(prog)s requirements.txt --use-example-code      # 强制使用示例代码
+  %(prog)s requirements.txt --chunk-size 600        # 平衡场景配置
+  %(prog)s requirements.txt --chunk-overlap 100     # 平衡场景配置
+  %(prog)s requirements.txt --chunk-size 800 --chunk-overlap 150  # 完整上下文配置
         """
     )
     
@@ -78,6 +81,22 @@ def create_parser() -> argparse.ArgumentParser:
         default=8,
         metavar='K',
         help='RAG检索返回的文档数量 (默认: 8)'
+    )
+    
+    parser.add_argument(
+        '--chunk-size',
+        type=int,
+        default=400,
+        metavar='SIZE',
+        help='文档分块大小，单位字符 (默认: 400 - 高精度场景)'
+    )
+    
+    parser.add_argument(
+        '--chunk-overlap',
+        type=int,
+        default=50,
+        metavar='OVERLAP',
+        help='文档分块重叠大小，单位字符 (默认: 50 - 高精度场景)'
     )
     
     parser.add_argument(
@@ -164,6 +183,12 @@ def load_config(args) -> CAPLGeneratorConfig:
     
     if args.k is not None:
         config.k = args.k
+        
+    if args.chunk_size is not None:
+        config.chunk_size = args.chunk_size
+        
+    if args.chunk_overlap is not None:
+        config.chunk_overlap = args.chunk_overlap
     
     if args.output:
         config.output_dir = Path(args.output)

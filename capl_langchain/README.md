@@ -56,6 +56,9 @@ python3 capl_generator_langchain_new.py --search "CAPL测试"
 # 生成代码
 python3 capl_generator_langchain_new.py "测试车门锁功能"
 python3 capl_generator_langchain_new.py test_requirements.md --output test.cin
+
+# 使用优化参数（可选）
+python3 capl_generator_langchain_new.py "测试需求" --temperature 0.3 --max-tokens 2000 --top-p 0.9
 ```
 
 ## 配置

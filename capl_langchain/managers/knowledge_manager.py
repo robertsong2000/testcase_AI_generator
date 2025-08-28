@@ -36,10 +36,10 @@ class KnowledgeBaseManager:
                 print("警告: 知识库中没有找到文档")
                 return False
                 
-            # 分割文档
+            # 分割文档 - 使用可配置的参数优化token消耗
             text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size=1000,
-                chunk_overlap=200,
+                chunk_size=self.config.chunk_size,      # 可配置的分块大小
+                chunk_overlap=self.config.chunk_overlap,  # 可配置的重叠大小
                 length_function=len
             )
             splits = text_splitter.split_documents(documents)

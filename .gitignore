@@ -55,3 +55,7 @@ knowledge_base/body_test_syntax_guide.md
 knowledge_base/capl_test_framework_guide.md
 knowledge_base/common_libraries_overview.md
 knowledge_base/README.md
+knowledge_base/body_library.json
+
+testcases_frontwiper/
+testcases_head_lamps/

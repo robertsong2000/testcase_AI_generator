@@ -32,6 +32,8 @@ class CAPLGeneratorConfig:
         # RAG配置
         self.enable_rag = os.getenv("ENABLE_RAG", "true").lower() == "true"
         self.k = int(os.getenv("RAG_K", "4"))  # RAG检索返回的文档数量
+        self.chunk_size = int(os.getenv("CHUNK_SIZE", "400"))  # 文档分块大小 - 高精度场景默认值
+        self.chunk_overlap = int(os.getenv("CHUNK_OVERLAP", "50"))  # 文档分块重叠大小 - 高精度场景默认值
         
         # 从配置文件读取知识库和向量数据库目录
         config_kb_dir, config_vector_dir = self._get_knowledge_base_config()
