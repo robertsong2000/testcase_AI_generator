@@ -135,6 +135,53 @@ class CAPLGeneratorService:
             "token_rate": round(token_rate, 2)
         }
     
+    def calculate_prompt_tokens(self, requirement: str, include_rag_context: bool = True) -> Dict[str, Any]:
+        """计算prompt的token数量"""
+        system_prompt = self.generator.prompt_manager.system_prompt
+        
+        # 基础prompt
+        base_prompt = system_prompt + "\n\n" + requirement
+        base_length = len(base_prompt)
+        base_tokens = max(1, base_length // 4)
+        
+        # 如果启用RAG，计算上下文token
+        rag_context_tokens = 0
+        rag_context_length = 0
+        if include_rag_context and self.config.enable_rag:
+            # 确保生成器初始化
+            self.generator.initialize()
+            
+            # 获取相关文档
+            try:
+                retriever = self.generator.kb_manager.get_retriever(self.config.k)
+                if retriever:
+                    # 获取文档内容
+                    docs = retriever.invoke(requirement)
+                    if docs:
+                        for doc in docs:
+                            content = doc.page_content if hasattr(doc, 'page_content') else str(doc)
+                            rag_context_length += len(content)
+                        rag_context_tokens = max(1, rag_context_length // 4)
+            except Exception as e:
+                print(f"⚠️  获取RAG上下文时出错: {e}")
+        
+        # 总prompt
+        total_length = base_length + rag_context_length
+        total_tokens = base_tokens + rag_context_tokens
+        
+        return {
+            "system_prompt_length": len(system_prompt),
+            "system_prompt_tokens": max(1, len(system_prompt) // 4),
+            "requirement_length": len(requirement),
+            "requirement_tokens": max(1, len(requirement) // 4),
+            "base_prompt_length": base_length,
+            "base_prompt_tokens": base_tokens,
+            "rag_context_length": rag_context_length,
+            "rag_context_tokens": rag_context_tokens,
+            "total_prompt_length": total_length,
+            "total_prompt_tokens": total_tokens
+        }
+    
     def test_rag_search(self, query: str, k: int = None, show_summary: bool = True) -> List[Dict[str, Any]]:
         """测试RAG搜索功能"""
         if not self.config.enable_rag:

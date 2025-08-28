@@ -170,6 +170,12 @@ def create_parser() -> argparse.ArgumentParser:
         help='搜索知识库内容'
     )
     
+    parser.add_argument(
+        '--count-tokens',
+        action='store_true',
+        help='计算输入需求的token数量（包括prompt模板和RAG上下文）'
+    )
+    
     return parser
 
 
@@ -271,6 +277,33 @@ def main():
         
         if args.search:
             search_knowledge_base(config, args.search)
+            return
+            
+        # Token计数模式
+        if args.count_tokens:
+            if not args.input:
+                print("❌ 错误: --count-tokens 需要指定输入文件")
+                return 1
+            
+            requirement = load_requirements(args.input)
+            
+            from ..services.generator_service import CAPLGeneratorService
+            service = CAPLGeneratorService(config)
+            
+            print("📊 计算prompt token数量...")
+            tokens_info = service.calculate_prompt_tokens(requirement)
+            
+            print(f"\n📋 Token统计:")
+            print(f"   系统提示词: {tokens_info['system_prompt_tokens']} tokens ({tokens_info['system_prompt_length']} 字符)")
+            print(f"   需求内容: {tokens_info['requirement_tokens']} tokens ({tokens_info['requirement_length']} 字符)")
+            print(f"   基础prompt: {tokens_info['base_prompt_tokens']} tokens ({tokens_info['base_prompt_length']} 字符)")
+            
+            if config.enable_rag:
+                print(f"   RAG上下文: {tokens_info['rag_context_tokens']} tokens ({tokens_info['rag_context_length']} 字符)")
+                print(f"   总prompt: {tokens_info['total_prompt_tokens']} tokens ({tokens_info['total_prompt_length']} 字符)")
+            else:
+                print(f"   总prompt: {tokens_info['base_prompt_tokens']} tokens (RAG未启用)")
+            
             return
         
         # 使用高级服务
