@@ -1,0 +1,1576 @@
+{
+  "Test Feature Set CAPL Functions": {
+    "ADAS": [
+      {
+        "function": "TestGetWaitADASDetectedObject",
+        "description": "Retrieves the name of the Detected Object that triggered the wait function."
+      },
+      {
+        "function": "TestWaitForADASDetectedObjectDistance",
+        "description": "Waits for a Detected Object for which the distance is above/below a specified value"
+      },
+      {
+        "function": "TestWaitForADASDetectedObjectSpeed",
+        "description": "Waits for a Detected Object for with a speed above/below a specified value."
+      },
+      {
+        "function": "TestWaitForADASDetectedObjectTimeToCollision",
+        "description": "Waits for the occurrence of the first Detected Object matching the Time To Impact (TTI) conditions passed as arguments."
+      },
+      {
+        "function": "TestWaitForADASGroundTruthObjectDistance",
+        "description": "Waits for the occurrence of the first Moving Object matching the distance conditions passed as arguments."
+      },
+      {
+        "function": "TestWaitForADASGroundTruthObjectDistance",
+        "description": "Waits for the occurrence of the first Moving Object matching the distance conditions passed as arguments."
+      },
+      {
+        "function": "TestWaitForADASGroundTruthObjectInLane",
+        "description": "Waits for a Moving Object which is completely in the given lane."
+      },
+      {
+        "function": "TestWaitForADASGroundTruthObjectInSameLane",
+        "description": "Waits for a Moving Object which is completely in the lane of the ego vehicle."
+      },
+      {
+        "function": "TestWaitForADASGroundTruthObjectLaneSwitch",
+        "description": "Waits for a Moving Object which switches lane."
+      },
+      {
+        "function": "TestWaitForADASGroundTruthObjectSpeed",
+        "description": "Waits for the occurrence of the first Moving Object matching the speed conditions passed as arguments."
+      },
+      {
+        "function": "TestWaitForADASGroundTruthObjectTimeToCollision",
+        "description": "Waits for the occurrence of the first Moving Object matching the Time To Collision (TTC) conditions passed as arguments."
+      }
+    ],
+    "AUTOSAR PDU": [
+      {
+        "function": "TestGetWaitPDUData",
+        "description": "Calls up the content of a PDU."
+      },
+      {
+        "function": "TestGetWaitPDUsFrameData",
+        "description": "Calls up the content of a message, packet or frame of a PDU."
+      },
+      {
+        "function": "TestJoinPDUEvent",
+        "description": "Completes the current set of \"joined events\" with the transmitted event."
+      },
+      {
+        "function": "TestWaitForPDU",
+        "description": "Waits for the occurrence of the specified PDU."
+      },
+      {
+        "function": "TestGetWaitPDUsTPIPv4DstAddr",
+        "description": "Requests the IPv4 destination address."
+      },
+      {
+        "function": "TestGetWaitPDUsTPIPv4SrcAddr",
+        "description": "Requests the IPv4 source address."
+      },
+      {
+        "function": "TestGetWaitPDUsTPIPv6DstAddr",
+        "description": "Requests the IPv6 destination address."
+      },
+      {
+        "function": "TestGetWaitPDUsTPIPv6SrcAddr",
+        "description": "Requests the IPv6 source address."
+      },
+      {
+        "function": "TestGetWaitPDUsTPTCPDstPort",
+        "description": "Requests the TCP destination port."
+      },
+      {
+        "function": "TestGetWaitPDUsTPTCPSrcPort",
+        "description": "Requests the TCP source port."
+      },
+      {
+        "function": "TestGetWaitPDUsTPUDPDstPort",
+        "description": "Requests the UDP destination port."
+      },
+      {
+        "function": "TestGetWaitPDUsTPUDPSrcPort",
+        "description": "Requests the UDP source port."
+      }
+    ],
+    "Collection of Event Information": [
+      {
+        "function": "testGetJoinedEventOccured",
+        "description": "Retrieves the occurrence and the occurrence time of a joined event."
+      },
+      {
+        "function": "TestGetLastWaitElapsedTimeNS",
+        "description": "Indicates the period of time for which the last wait function executed had to wait until being triggered."
+      },
+      {
+        "function": "TestGetLastWaitResult",
+        "description": "Makes he last occurred return value of a TestWait instruction available."
+      },
+      {
+        "function": "TestGetStringInput",
+        "description": "Returns the result of the last successful call of TestWaitForStringInput."
+      },
+      {
+        "function": "TestGetValueInput",
+        "description": "Returns the result of the last successful call of TestWaitForValueInput."
+      },
+      {
+        "function": "TestGetWaitEventMsgData",
+        "description": "Calls up the message content."
+      },
+      {
+        "function": "TestGetWaitEventSysVarData",
+        "description": "Retrieves the system variable value that has led to the resume of a joined wait statement."
+      },
+      {
+        "function": "testGetWaitEthernetPacketData",
+        "description": "If a Ethernet packet is the last event that triggers a wait instruction, the packet's content can be called up."
+      },
+      {
+        "function": "TestGetWaitSomeIpMessageData",
+        "description": "If a valid SOME/IP message is the last event that triggers a wait instruction, the SOME/IP message content can be called up."
+      },
+      {
+        "function": "TestGetWaitSomeIpSDData",
+        "description": "If a valid SOME/IP Service Discovery entry is the last event that triggers a wait instruction, the content of the SOME/IP Service Discovery entry can be called up."
+      },
+      {
+        "function": "TestGetWaitFrFrameData",
+        "description": "If a valid FlexRay frame is the last event that triggers a wait instruction, the frame's content can be called up."
+      },
+      {
+        "function": "TestGetWaitFrFrameErrorData",
+        "description": "If a FlexRay frame error is the last event that triggers a wait instruction, the event's content can be called up."
+      },
+      {
+        "function": "TestGetWaitFrNullFrameData",
+        "description": "If a FlexRay Null Frame is the last event that triggers a wait instruction, the frame's content can be called up."
+      },
+      {
+        "function": "TestGetWaitFrPDUData",
+        "description": "If a valid FlexRay PDU is the last event that triggers a wait instruction, the PDU's content can be called up."
+      },
+      {
+        "function": "TestGetWaitFrPOCStateData",
+        "description": "If an event indicating a change of state on the FlexRay Communication Controller's protocol operation state machine is the last event that triggers a wait instruction, the event's content can be called up."
+      },
+      {
+        "function": "TestGetWaitFrStartCycleData",
+        "description": "If a FlexRay start cycle is the last event that triggers a wait instruction, the event's content can be called up."
+      },
+      {
+        "function": "TestGetWaitFrSymbolData",
+        "description": "If a FlexRay symbol event is the last event that triggers a wait instruction, the event's content can be called up."
+      },
+      {
+        "function": "TestGetWaitLinCSErrorData",
+        "description": "Retrieves the data of a checksum error."
+      },
+      {
+        "function": "TestGetWaitLinLongDominantSignalData",
+        "description": "If LIN LongDominantSignal is the last event that triggers a wait instruction, the frame content can be called up with this function."
+      },
+      {
+        "function": "TestGetWaitLinETFSingleResponseData",
+        "description": "Calls up the event content."
+      },
+      {
+        "function": "TestGetWaitLinHdrData",
+        "description": "Calls up the header content."
+      },
+      {
+        "function": "TestGetWaitLinReceiveErrData",
+        "description": "Calls up the error content."
+      },
+      {
+        "function": "TestGetWaitLinSpikeData",
+        "description": "If LIN Spike is the last event that triggers a wait instruction, the frame content can be called up with tis function."
+      },
+      {
+        "function": "TestGetWaitLinSyncErrorData",
+        "description": "Retrieves the data of a synchronization error."
+      },
+      {
+        "function": "TestGetWaitLinTransmErrData",
+        "description": "Calls up the frame content."
+      },
+      {
+        "function": "testGetWaitScopeEventData",
+        "description": "Retrieves the data of Scope event."
+      },
+      {
+        "function": "testGetWaitScopeSignalTransitionTime",
+        "description": "Measures the transition time of rising and falling edges of a message within the defined area."
+      },
+      {
+        "function": "testWaitForScopeAnalyseBitSegments",
+        "description": "Starts an analysis for the defined bit segments for each bit, which is within the defined range."
+      },
+      {
+        "function": "testWaitForScopeEvent",
+        "description": "Waits for the occurrence of Scope event."
+      },
+      {
+        "function": "testWaitForScopeFitData",
+        "description": "The defined frame cutout is shown in the scope's graph view. (CAN)"
+      },
+      {
+        "function": "testWaitForScopeFitDataFr",
+        "description": "The defined frame cutout is shown in the scope's graph view. (FlexRay)"
+      },
+      {
+        "function": "testWaitForScopeShowEdges",
+        "description": "The defined frame cutout of the previously transition time measurement frame together with a bitmask is shown in the scope's graph view."
+      },
+      {
+        "function": "testWaitScopeGetSerialBitAnalysisData",
+        "description": "Get specific data for a serial bit analysis."
+      },
+      {
+        "function": "testWaitScopeGetSerialBitAnalysisViolationData",
+        "description": "If the serial bit analysis has found errors, the violations can be requested with this function."
+      },
+      {
+        "function": "testWaitScopeAnalyseSignal",
+        "description": "Checks the bits of a message against the defined bitmask."
+      },
+      {
+        "function": "testWaitScopeExportData",
+        "description": "Export the scope measurement."
+      },
+      {
+        "function": "testWaitScopeGetAnalysedBitSegments",
+        "description": "Request the analysis data for a single bit."
+      },
+      {
+        "function": "testWaitScopeGetBitInfo",
+        "description": "After a signal was analyzed, the average values of the voltages of CAN_H, CAN_L, and CAN_Diff are calculated for a defined bit range."
+      },
+      {
+        "function": "testWaitScopeGetEyeDiagramAnalysis",
+        "description": "Used to request the analysis data for a violation found with the eye diagram analysis"
+      },
+      {
+        "function": "testWaitScopeGetMaskViolation",
+        "description": "Retrieve the data of the bitmask violations."
+      },
+      {
+        "function": "testWaitScopeGetMessageBits",
+        "description": "Gets specific bit values from a message."
+      },
+      {
+        "function": "testWaitScopePerformEdgeAnalysis",
+        "description": "Measures different edge parameters for falling or rising edges of a frame or node."
+      },
+      {
+        "function": "testWaitScopePerformEyeDiagramAnalysis",
+        "description": "Used to check bits against a defined bitmask."
+      },
+      {
+        "function": "testWaitScopePerformSerialBitAnalysis",
+        "description": "Checks the bits of a message against the defined bitmask."
+      },
+      {
+        "function": "testWaitScopePerformSignalTransitionTime",
+        "description": "Measures the transition time of rising and falling edges of a message within the defined area on bit level."
+      },
+      {
+        "function": "testWaitScopeShowMask",
+        "description": "The defined frame cutout together with a previously defined bitmask is shown in the scope's graph view."
+      },
+      {
+        "function": "TestGetWaitJ1939PGData",
+        "description": "If a J1939 parameter group event is the last event that triggers a wait instruction, the message content can be called up."
+      },
+      {
+        "function": "TestWaitForJ1939DTC",
+        "description": "Waits until a defined Parameter Group and a defined Diagnostic Trouble Code (DTC) is received or a timeout occurred."
+      },
+      {
+        "function": "TestWaitForJ1939DmWithoutSPN",
+        "description": "Waits for the occurrence of a diagnostic message with or without a defined DTC or SPN."
+      },
+      {
+        "function": "TestWaitForJ1939PG",
+        "description": "Waits for the occurrence of the specified message aMessage."
+      },
+      {
+        "function": "TestWaitForA429Word",
+        "description": "Waits for the occurrence of the valid specified A429 message."
+      }
+    ],
+    "Communication Concept": [
+      {
+        "function": "TestJoinChange",
+        "description": "Join the change of a function bus value entity to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinChangeCountGreater",
+        "description": "Join the change counter of a function bus value entity reaching a given value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinChangeFlag",
+        "description": "Join the change flag of a function bus value entity being set to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinForAnswer",
+        "description": "Join the answer to the call to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinForNextCall",
+        "description": "Join the answer to the call to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinImplValue",
+        "description": "Join the wait for a communication or distributed object impl value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinImplValueFloat",
+        "description": "Join the wait for a communication or distributed object impl value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinImplValueInRangeFloat",
+        "description": "Join the wait for a communication or distributed object impl value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinImplValueInRangeSInt",
+        "description": "Join the wait for a communication or distributed object impl value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinImplValueInRangeUInt",
+        "description": "Join the wait for a communication or distributed object impl value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinImplValueOutsideRangeFloat",
+        "description": "Join the wait for a communication or distributed object impl value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinImplValueOutsideRangeSInt",
+        "description": "Join the wait for a communication or distributed object impl value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinImplValueOutsideRangeUInt",
+        "description": "Join the wait for a communication or distributed object impl value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinImplValueSInt",
+        "description": "Join the wait for a communication or distributed object impl value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinImplValueString",
+        "description": "Join the wait for a communication or distributed object impl value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinImplValueUInt",
+        "description": "Join the wait for a communication or distributed object impl value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinPhysValueFloat",
+        "description": "Join the wait for a communication or distributed object phys value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinPhysValueInRangeFloat",
+        "description": "Join the wait for a communication or distributed object phys value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinPhysValueInRangeSInt",
+        "description": "Join the wait for a communication or distributed object phys value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinPhysValueInRangeUInt",
+        "description": "Join the wait for a communication or distributed object phys value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinPhysValueOutsideRangeFloat",
+        "description": "Join the wait for a communication or distributed object phys value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinPhysValueOutsideRangeSInt",
+        "description": "Join the wait for a communication or distributed object phys value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinPhysValueOutsideRangeUInt",
+        "description": "Join the wait for a communication or distributed object phys value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinPhysValueSInt",
+        "description": "Join the wait for a communication or distributed object phys value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinPhysValueUInt",
+        "description": "Join the wait for a communication or distributed object phys value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinUpdate",
+        "description": "Join the update of a function bus value entity to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinUpdateCountGreater",
+        "description": "Join the update counter of a function bus value entity reaching a given value to the current set of waiting events."
+      },
+      {
+        "function": "TestJoinUpdateFlag",
+        "description": "Join the update flag of a function bus value entity being set to the current set of waiting events."
+      },
+      {
+        "function": "TestValidateImplValue",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidateImplValueFloat",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidateImplValueInRangeFloat",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidateImplValueInRangeSInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidateImplValueInRangeUInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidateImplValueOutsideRangeFloat",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidateImplValueOutsideRangeSInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidateImplValueOutsideRangeUInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidateImplValueSInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidateImplValueString",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidateImplValueUInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidatePhysValueFloat",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidatePhysValueInRangeFloat",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidatePhysValueInRangeSInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidatePhysValueInRangeUInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidatePhysValueOutsideRangeFloat",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidatePhysValueOutsideRangeSInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidatePhysValueOutsideRangeUInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidatePhysValueSInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestValidatePhysValueUInt",
+        "description": "Validates a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForAnswer",
+        "description": "Waits for the answer to a method call."
+      },
+      {
+        "function": "TestWaitForChange",
+        "description": "Waits for the next change of a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForChangeCountGreater",
+        "description": "Waits for changes of a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForChangeFlag",
+        "description": "Waits for the change flag of a communication or distributed object value to be set."
+      },
+      {
+        "function": "TestWaitForImplValue",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForImplValueFloat",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForImplValueInRangeFloat",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForImplValueInRangeSInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForImplValueInRangeUInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForImplValueOutsideRangeFloat",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForImplValueOutsideRangeSInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForImplValueOutsideRangeUInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForImplValueSInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForImplValueString",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForImplValueUInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForNextCall",
+        "description": "Waits for the next call of the method to occur at the simulated provider."
+      },
+      {
+        "function": "TestWaitForPhysValueFloat",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForPhysValueInRangeFloat",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForPhysValueInRangeSInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForPhysValueInRangeUInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForPhysValueOutsideRangeFloat",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForPhysValueOutsideRangeSInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForPhysValueOutsideRangeUInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForPhysValueSInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForPhysValueUInt",
+        "description": "Waits for a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForUpdate",
+        "description": "Waits for the next update of a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForUpdateCountGreater",
+        "description": "Waits for update of a communication or distributed object value."
+      },
+      {
+        "function": "TestWaitForUpdateFlag",
+        "description": "Waits for the update flag of a communication or distributed object value to be set."
+      }
+    ],
+    "Composed Wait Points": [
+      {
+        "function": "TestJoinAnd",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestWaitForAllJoinedEvents",
+        "description": "Waits for the current set of joined events."
+      },
+      {
+        "function": "TestWaitForJoinedEvent",
+        "description": "Waits for the specified joined event."
+      },
+      {
+        "function": "TestJoinEthernetPacket",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinEthernetLinkStatus",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinEthernetPhyState",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinSomeIpMessage",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinSomeIpSD",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinFrFrameErrorEvent",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinFrFrameEvent",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinFrFrameEvent",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinFrNullFrameEvent",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinFrPDUEvent",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinFrPOCState",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinFrStartCycleEvent",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinFrSymbolEvent",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinLinCSErrorEvent",
+        "description": "Adds an event to the set of joined events."
+      },
+      {
+        "function": "TestJoinLinETFSingleResponseEvent",
+        "description": "Adds an event of type LIN Event-triggered Frame Single Response to the set of joined events."
+      },
+      {
+        "function": "TestJoinLinLongDominantSignal",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinLinSpike",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinLinSyncErrorEvent",
+        "description": "Adds an event of type synchronization error to the set of joined events."
+      },
+      {
+        "function": "TestJoinLinHeaderEvent",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinJ1939DTCEvent",
+        "description": "Completes the current set of joined events with the transmitted J1939 Suspect Parameter Number event."
+      },
+      {
+        "function": "TestJoinJ1939PGEvent",
+        "description": "Completes the current set of joined events with the transmitted event."
+      },
+      {
+        "function": "TestJoinA429WordEvent",
+        "description": "Completes the current set of joined events with the transmitted event."
+      }
+    ],
+    "Constraints and Conditions": [
+      {
+        "function": "TestAddCondition",
+        "description": "Adds an event object or an event text as a condition."
+      },
+      {
+        "function": "TestAddConstraint",
+        "description": "Adds an event object or an event text as a constraint."
+      },
+      {
+        "function": "TestCheckCondition",
+        "description": "Checks whether the specified condition was already injured."
+      },
+      {
+        "function": "TestCheckConstraint",
+        "description": "Checks whether the specified constraint was already injured."
+      },
+      {
+        "function": "TestRemoveCondition",
+        "description": "Removes an event object or an event text that was added as a condition."
+      },
+      {
+        "function": "TestRemoveConstraint",
+        "description": "Removes an event object or an event text that was added as a constraint."
+      }
+    ],
+    "Diagnostic Test Support": [
+      {
+        "function": "TestCollectDiagEcuInformation",
+        "description": "Sends diagnostic requests to the currently selected diagnostic target and writes the responses to the report file."
+      },
+      {
+        "function": "TestJoinDiagResponseFromEcu",
+        "description": "Adds an event to the set of joined events."
+      },
+      {
+        "function": "TestJoinDiagVariantIdentificationCompleted",
+        "description": "Adds an event to the set of joined events that will fire when the variant identification started for the given ECU is completed."
+      },
+      {
+        "function": "TestReportWriteDiagObject",
+        "description": "Writes the specified object in the test report as a HTML table."
+      },
+      {
+        "function": "TestReportWriteDiagResponse",
+        "description": "Writes the received response of the request in the test report as a HTML table."
+      },
+      {
+        "function": "TestValidateDiagAuth",
+        "description": "Initiates the diagnostics authentication process and waits until this process has completed."
+      },
+      {
+        "function": "TestValidateDiagAuthGeneric",
+        "description": "Initiates the diagnostics authentication process and waits until this process has generic completed."
+      },
+      {
+        "function": "testWaitForDiagAuthCompleted",
+        "description": "Initiates the diagnostics authentication process and waits until this process has completed."
+      },
+      {
+        "function": "testWaitForDiagAuthGenericCompleted",
+        "description": "Initiates the diagnostics authentication process and waits until this process has generic completed."
+      },
+      {
+        "function": "TestWaitForDiagChangedActiveVariant",
+        "description": "Changes the active variant for the current target."
+      },
+      {
+        "function": "TestWaitForDiagECUVariantIdentificationCompleted",
+        "description": "Waits for the completion of the automatic variant identification algorithm."
+      },
+      {
+        "function": "TestWaitForDiagRequestSent",
+        "description": "Waits until the previously sent request has been sent to the ECU."
+      },
+      {
+        "function": "TestWaitForDiagResponse",
+        "description": "Waits for arrival of the response to the given request."
+      },
+      {
+        "function": "TestWaitForDiagResponseStart",
+        "description": "Waits for the arrival of the response to a sent request."
+      },
+      {
+        "function": "TestWaitForDiagSetIdentifiedVariant",
+        "description": "Performs a variant identification and activates the found variant."
+      },
+      {
+        "function": "TestWaitForDiagVariantIdentificationCompleted",
+        "description": "Waits for the completion of the automatic variant identification algorithm."
+      },
+      {
+        "function": "TestWaitForDoIPActivationLineStartup",
+        "description": "Waits until DoIP Activation Line start-up time has passed."
+      },
+      {
+        "function": "TestWaitForGenerateKeyFromSeed",
+        "description": "Generates the security key from the seed using the configured Seed and Key DLL."
+      },
+      {
+        "function": "TestWaitForUnlockEcu",
+        "description": "Tries to unlock an ECU."
+      },
+      {
+        "function": "TestWaitForDiagSecurityTaskCompleted",
+        "description": "Initiates the diagnostics generic security task and waits until this task has completed."
+      }
+    ],
+    "Fault Injection Functions": [
+      {
+        "function": "TestDisableMsg",
+        "description": "Prevents all sending of the message except the sending by calling the function testSetMsgEvent."
+      },
+      {
+        "function": "TestDisableMsgAllTx",
+        "description": "Prevents all sendings of tx messages of the node except the sending with testSetMsgEvent."
+      },
+      {
+        "function": "TestEnableMsg",
+        "description": "Enables the sending of the message."
+      },
+      {
+        "function": "TestEnableMsgAllTx",
+        "description": "Enables the sending of all tx messages of a node."
+      },
+      {
+        "function": "testILSetMessageProperty",
+        "description": "Sets the internal property of a message, assigned to the node."
+      },
+      {
+        "function": "testILSetNodeProperty",
+        "description": "Changes an internal property of the specified node."
+      },
+      {
+        "function": "TestResetAllFaultInjections",
+        "description": "Reset all fault injection settings."
+      },
+      {
+        "function": "TestResetMsgCycleTime",
+        "description": "Resets the cycle time of the message to the database cycle time."
+      },
+      {
+        "function": "TestResetMsgDlc",
+        "description": "Resets the Dlc of the message to the Dlc of the database."
+      },
+      {
+        "function": "TestSetMsgCycleTime",
+        "description": "Assigns a new cycle time to the message."
+      },
+      {
+        "function": "TestSetMsgDlc",
+        "description": "Assigns a new DLC to the message."
+      },
+      {
+        "function": "TestSetMsgEvent",
+        "description": "Sends the message once."
+      }
+    ],
+    "OEM Add-on Based Fault Injection Functions": [
+      {
+        "function": "TestDisableCRCCalculation",
+        "description": "Disables the CRC calculation of a message."
+      },
+      {
+        "function": "TestDisableMsgSequenceCounter",
+        "description": "Disables the message sequence counter."
+      },
+      {
+        "function": "TestDisableUpdateBit",
+        "description": "Disables the standard behavior of the update bit and sets the value of the update bit to a constant value."
+      },
+      {
+        "function": "TestEnableCRCCalculation",
+        "description": "Enables the CRC calculation of a message."
+      },
+      {
+        "function": "TestEnableMsgSequenceCounter",
+        "description": "Enables the message sequence counter."
+      },
+      {
+        "function": "TestEnableUpdateBit",
+        "description": "Enables the standard behavior of the update bit."
+      },
+      {
+        "function": "TestFRILCalculateChecksum",
+        "description": "Calculates the corresponding CRC checksum based on the payload."
+      },
+      {
+        "function": "TestFRILEnableTimingCyclic",
+        "description": "Controls the cyclic timing of PDUs. The cyclic timing can be enabled/ disabled."
+      },
+      {
+        "function": "TestFRILEnableTimingEvtTrg",
+        "description": "Controls the event triggered timing of PDUs. The event triggered timing can be enabled/ disabled."
+      },
+      {
+        "function": "TestFRILEnableTimingImmed",
+        "description": "Controls the immediate timing of PDUs. The immediate timing can be enabled/ disabled."
+      }
+    ],
+    "Parallel Functions": [
+      {
+        "function": "testStartParallel",
+        "description": "Starts a parallel test execution."
+      },
+      {
+        "function": "testWaitForParallel",
+        "description": "Waits for a specific parallel test execution."
+      },
+      {
+        "function": "testWaitForAllParallel",
+        "description": "Waits for all current parallel test executions."
+      }
+    ],
+    "Signaling of User-defined Events": [
+      {
+        "function": "TestSupplyTextEvent",
+        "description": "Signals the specified event."
+      }
+    ],
+    "Signal Based Tests": [
+      {
+        "function": "checkSignalInRange",
+        "description": "Checks the value of the signal, the system variable or the environment variable against a condition."
+      },
+      {
+        "function": "CheckSignalMatch",
+        "description": "Checks a given value against the value of the signal, the system variable or the environment variable."
+      },
+      {
+        "function": "TestValidateSignalMatch",
+        "description": "Checks a given value against the value of the signal, the system variable or the environment variable."
+      },
+      {
+        "function": "GetRawSignal",
+        "description": "Retrieves the current raw value of a signal."
+      },
+      {
+        "function": "getSignal",
+        "description": "Gets the value of a signal."
+      },
+      {
+        "function": "getSignalTime",
+        "description": "Gets the time point when the signal value has been changed to the current value."
+      },
+      {
+        "function": "RegisterSignalDriver",
+        "description": "Registers the given callback as a 'signal driver' for the signal."
+      },
+      {
+        "function": "SetRawSignal",
+        "description": "Sets the raw value of a signal."
+      },
+      {
+        "function": "SetSignal",
+        "description": "Sets the transmitted signal to the accompanying value."
+      },
+      {
+        "function": "TestResetEnvVarValue",
+        "description": "Resets an environment variable to initial value."
+      },
+      {
+        "function": "TestResetNamespaceDistObjValues",
+        "description": "Resets all distributed objects member values of the given namespace (and all sub-namespaces) to their initial value.."
+      },
+      {
+        "function": "TestResetNamespaceSysVarValues",
+        "description": "Resets all system variables of the given namespace (and all sub-namespaces) to their initial value."
+      },
+      {
+        "function": "TestResetNodeSignalValues",
+        "description": "Resets all tx-signals of a node to their initial value."
+      },
+      {
+        "function": "TestResetSignalValue",
+        "description": "Resets a signal to initial value."
+      },
+      {
+        "function": "TestResetSysVarValue",
+        "description": "Resets a system variable to initial value."
+      }
+    ],
+    "Symbol Recording": [
+      {
+        "function": "TestReportAddToRecordingGroup",
+        "description": "Adds a symbol to the recording group in the test report."
+      },
+      {
+        "function": "TestReportCreateRecordingGroup",
+        "description": "Creates a recording group in the test report."
+      },
+      {
+        "function": "TestReportStartRecording",
+        "description": "Starts the recording of a symbol in the test report."
+      },
+      {
+        "function": "TestReportStartRecordingGroup",
+        "description": "Starts the recording of the recording group in the test report."
+      },
+      {
+        "function": "TestReportStopAllRecordings",
+        "description": "Stops all recordings in the test report."
+      },
+      {
+        "function": "TestReportStopRecording",
+        "description": "Stops the recording of the symbol in the test report."
+      },
+      {
+        "function": "TestReportStopRecordingGroup",
+        "description": "Stops the recording of the recording group in the test report."
+      }
+    ],
+    "Test Controlling": [
+      {
+        "function": "TestSetEcuOffline",
+        "description": "Disconnects the ECU from the bus."
+      },
+      {
+        "function": "TestSetEcuOnline",
+        "description": "Connects the ECU to the bus."
+      },
+      {
+        "function": "testStartParallel",
+        "description": "Starts parallel execution of the specified function."
+      }
+    ],
+    "Test Execution": [
+      {
+        "function": "TestGetTestExecutionVerdict",
+        "description": "Gets the verdict of a finished test execution."
+      },
+      {
+        "function": "TestStartTestExecution",
+        "description": "Starts the test execution."
+      },
+      {
+        "function": "TestStopTestExecution",
+        "description": "Stops the test execution."
+      },
+      {
+        "function": "TestWaitForTestExecutionFinished",
+        "description": "Waits until the test execution is finished."
+      }
+    ],
+    "Test Feature Set for K-Line": [
+      {
+        "function": "TestGetWaitEventKLineByte",
+        "description": "If a byte is the last event that triggers a wait instruction, the content can be called up with this function."
+      },
+      {
+        "function": "TestGetWaitEventKLineFrame",
+        "description": "If a K-Line frame is the last event that triggers a wait instruction, the content can be called up with this function."
+      },
+      {
+        "function": "TestWaitForDiagChannelClosed",
+        "description": "Waits for the occurrence of the state change of a diagnostic channel to the state Closed."
+      },
+      {
+        "function": "TestWaitForDiagChannelConnected",
+        "description": "Waits for the occurrence of the state change of a diagnostic channel to the state Connected."
+      },
+      {
+        "function": "TestWaitForDiagKLineByteReceived",
+        "description": "Waits for the occurrence of a received byte."
+      },
+      {
+        "function": "TestWaitForDiagKLineByteTransmitted",
+        "description": "Waits for the occurrence of a transmitted byte."
+      },
+      {
+        "function": "TestWaitForDiagKLineFrameReceived",
+        "description": "Waits for the occurrence of a received valid message."
+      },
+      {
+        "function": "TestWaitForDiagKLineFrameTransmitted",
+        "description": "Waits for the occurrence of a transmitted valid message."
+      }
+    ],
+    "Test Report": [
+      {
+        "function": "TestCaseComment",
+        "description": "Within a test case a commentary can be taken over into the report."
+      },
+      {
+        "function": "testGetCurrentTestCaseID",
+        "description": "Returns the ID of the current test case."
+      },
+      {
+        "function": "testGetCurrentTestCaseTitle",
+        "description": "Returns the name of the current test case."
+      },
+      {
+        "function": "testGetTestConfigurationName",
+        "description": "Returns the name of the test configuration."
+      },
+      {
+        "function": "testGetTestUnitName",
+        "description": "Returns the name of the test unit."
+      },
+      {
+        "function": "TestReportAddEngineerInfo",
+        "description": "Information pairs of name and description can be taken up into the report in the areas TestEngineer, TestSetUp, and device (SUT)."
+      },
+      {
+        "function": "TestReportAddExtendedInfo",
+        "description": "Takes over information into the protocol that is not subject to processing by aCANoe DE product."
+      },
+      {
+        "function": "TestReportAddExternalRef",
+        "description": "Adds an external reference to the report."
+      },
+      {
+        "function": "TestReportAddImage",
+        "description": "Takes over the reference to a file that contains an image into the protocol."
+      },
+      {
+        "function": "TestReportAddMiscInfo",
+        "description": "Information pairs of name and description can be taken up into an additional information area in the report."
+      },
+      {
+        "function": "TestReportAddMiscInfoBlock",
+        "description": "Generates a new information block for additional information pairs in the report."
+      },
+      {
+        "function": "TestReportAddWindowCapture",
+        "description": "Creates a screen capture of a Graphics, Statistics, Data or Trace Window."
+      },
+      {
+        "function": "TestReportFileName",
+        "description": "Sets the name of the report file using the user interface."
+      },
+      {
+        "function": "TestReportWriteDiagObject",
+        "description": "Writes the specified object in the test report as a HTML table."
+      },
+      {
+        "function": "TestReportWriteDiagResponse",
+        "description": "Writes the received response of the request in the test report as a HTML table."
+      }
+    ],
+    "Test Status": [
+      {
+        "function": "testGetCurrentCycle",
+        "description": "Returns the current cycle of the test."
+      },
+      {
+        "function": "TestAcquireStatusLED",
+        "description": "Assigns the test module state to an LED (standalone mode)."
+      }
+    ],
+    "Test Structuring": [
+      {
+        "function": "TestCaseDescription",
+        "description": "Writes a description text for a test case into the report."
+      },
+      {
+        "function": "TestCaseSkipped",
+        "description": "Marks a test case as unexecuted."
+      },
+      {
+        "function": "TestCaseTitle",
+        "description": "The title of a test case is acquired automatically from the test case name in the CAPL program."
+      },
+      {
+        "function": "testCasePrecondition",
+        "description": "Sets a precondition to be fulfilled."
+      },
+      {
+        "function": "TestCaseReportMeasuredValue",
+        "description": "Adds a report entry in the measured values table."
+      },
+      {
+        "function": "TestFunctionTitle",
+        "description": "Sets the title of the current test function."
+      },
+      {
+        "function": "TestGroupBegin",
+        "description": "Opens a test group."
+      },
+      {
+        "function": "TestGroupEnd",
+        "description": "Closes a test group."
+      },
+      {
+        "function": "TestInfoTable",
+        "description": "Creates a new table to display structured data in the test report."
+      },
+      {
+        "function": "TestInfoHeadingBegin",
+        "description": "Starts a header row into a table."
+      },
+      {
+        "function": "TestInfoHeadingEnd",
+        "description": "Ends a header row."
+      },
+      {
+        "function": "TestInfoRow",
+        "description": "Starts a row in a table."
+      },
+      {
+        "function": "TestInfoCell",
+        "description": "Adds a cell to a previous row or header row."
+      },
+      {
+        "function": "TestModuleDescription",
+        "description": "Writes a description text for the test module into the report."
+      },
+      {
+        "function": "TestModuleTitle",
+        "description": "The title of the test module is acquired automatically from the name of the test node in the simulation structure."
+      },
+      {
+        "function": "testSequencePrecondition",
+        "description": "Sets a precondition to be fulfilled."
+      },
+      {
+        "function": "TestSequenceTitle",
+        "description": "Sets the title of the current test sequence."
+      },
+      {
+        "function": "TestStep",
+        "description": "Reports a test step without influence on the result."
+      },
+      {
+        "function": "TestStep, TestStepPass, TestStepFail, TestStepWarning, TestStepInconclusive, TestStepErrorInTestSystem",
+        "description": "Describes a test step that causes an error in test system."
+      },
+      {
+        "function": "TestStepFail",
+        "description": "Describes a test step that causes an error."
+      },
+      {
+        "function": "TestStep, TestStepPass, TestStepFail, TestStepWarning, TestStepInconclusive, TestStepErrorInTestSystem",
+        "description": "Describes a test step which can not clearly marked as passed or failed ."
+      },
+      {
+        "function": "TestStepPass",
+        "description": "Reports a test step that was executed as expected."
+      },
+      {
+        "function": "TestStepWarning",
+        "description": "Describes a test case that was executed without errors but whose result could contribute to a problem later on."
+      }
+    ],
+    "Verdict Interaction": [
+      {
+        "function": "TestCaseFail",
+        "description": "Sets the verdict of the current test case to fail."
+      },
+      {
+        "function": "TestGetVerdictLastTestCase",
+        "description": "Returns the verdict of the last elapsed or current test case."
+      },
+      {
+        "function": "TestGetVerdictModule",
+        "description": "Returns the current verdict out of the test module."
+      },
+      {
+        "function": "TestSetVerdictModule",
+        "description": "Sets the verdict of the test module."
+      },
+      {
+        "function": "TestStepFail",
+        "description": "Describes a test step that causes an error."
+      }
+    ],
+    "[VT System]": [
+      {
+        "function": "TestWaitForVTSStateRestore",
+        "description": "restores the default or start state of VT System channels."
+      }
+    ],
+    "Wait Instructions": [
+      {
+        "function": "TestAddRange",
+        "description": "Adds a new range that is allowed for dialog input."
+      },
+      {
+        "function": "TestAddTriggerTesterAction",
+        "description": "Creates a trigger for a tester action."
+      },
+      {
+        "function": "TestAddValueTableEntry",
+        "description": "Adds a new value table entry."
+      },
+      {
+        "function": "TestCreateInputRange",
+        "description": "Creates an input dialog."
+      },
+      {
+        "function": "TestCreateInputTable",
+        "description": "Creates a selection dialog."
+      },
+      {
+        "function": "TestCreateTesterAction",
+        "description": "Creates a tester action."
+      },
+      {
+        "function": "TestGetByteInput",
+        "description": "After a dialog with byte input is closed you can use this function to get the input."
+      },
+      {
+        "function": "testIsAsynchronousCheckEvaluationEnabled",
+        "description": "Return true if asynchronous evaluation of background checks is enabled."
+      },
+      {
+        "function": "TestValidateSystemCall",
+        "description": "Starts an external application and reports the result."
+      },
+      {
+        "function": "TestValidateSystemCallWithExitCode",
+        "description": "Starts an external application and checks its exit code. The result is reported."
+      },
+      {
+        "function": "TestValidateTesterAction",
+        "description": "Creates a popup window with given tester instruction."
+      },
+      {
+        "function": "TestValidateTesterConfirmation",
+        "description": "Creates a popup window that presents the given string to the tester. The result is reported."
+      },
+      {
+        "function": "testWaitForAllParallel",
+        "description": "Waits until execution of all parallel threads finished."
+      },
+      {
+        "function": "TestWaitForAuxEvent",
+        "description": "Waits for the signaling of the specified auxiliary event from a connected NodeLayer module."
+      },
+      {
+        "function": "TestWaitForByteInput",
+        "description": "Opens a dialog for byte array input."
+      },
+      {
+        "function": "testWaitForCheckQuery",
+        "description": "Request status data from the asynchronous evaluation for a specific check."
+      },
+      {
+        "function": "testWaitForHILAPISignalGeneratorFinished",
+        "description": "Waits until a running generator has finished."
+      },
+      {
+        "function": "testWaitForHILAPISignalGeneratorLoaded",
+        "description": "Waits until a signal generator is fully loaded and ready to start."
+      },
+      {
+        "function": "TestWaitForInput",
+        "description": "After you have created a value table or range dialog use this function to open the dialog."
+      },
+      {
+        "function": "TestWaitForMeasurementEnd",
+        "description": "Waits for the end of the measurement."
+      },
+      {
+        "function": "TestWaitForMessageBox",
+        "description": "Creates a popup window that presents the given string to the tester."
+      },
+      {
+        "function": "testWaitForParallel",
+        "description": "Waits until execution of the specified thread has finished."
+      },
+      {
+        "function": "TestWaitForReplay",
+        "description": "Starts playing the replay file and waits until the execution has been finished."
+      },
+      {
+        "function": "TestWaitForRawSignalMatch",
+        "description": "Checks the given raw value against the value of the signal. The resolution of the signal is considered."
+      },
+      {
+        "function": "TestWaitForSignalChange",
+        "description": "Waits for an event from a signal which value is changed."
+      },
+      {
+        "function": "TestWaitForSignalInRange",
+        "description": "Checks if the signal, the system or the environment variable value is within or outside a defined value range."
+      },
+      {
+        "function": "TestWaitForSignalMatch",
+        "description": "Checks if a given value matches the value of the signal, the system variable or the environment variable."
+      },
+      {
+        "function": "TestWaitForSignalUpdate",
+        "description": "Waits for an event from a signal."
+      },
+      {
+        "function": "TestWaitForSysVar",
+        "description": "Waits for the next system variable."
+      },
+      {
+        "function": "TestWaitForStringInput",
+        "description": "Creates a dialog in which the tester can enter a text."
+      },
+      {
+        "function": "TestWaitForSyscall",
+        "description": "Starts an external application and check its exit code."
+      },
+      {
+        "function": "TestWaitForTesterConfirmation",
+        "description": "Creates a popup window and waits for tester confirmation."
+      },
+      {
+        "function": "TestWaitForTextEvent",
+        "description": "Waits for the signaling of the specified textual event from the individual test module."
+      },
+      {
+        "function": "TestWaitForTimeout",
+        "description": "Waits until the expiration of the specified timeout time."
+      },
+      {
+        "function": "TestWaitForTimeoutSilent",
+        "description": "Waits until the expiration of the specified timeout time. The function does not write in the Test Feature Set report."
+      },
+      {
+        "function": "testWaitForValueChangePropagation",
+        "description": "Wait until values (SVs, VEs) are propagated to the asynchronous evaluation."
+      },
+      {
+        "function": "TestWaitForUserFileSync",
+        "description": "Starts synchronization of user files between client and server system in a distributed environment."
+      },
+      {
+        "function": "TestWaitForValueInput",
+        "description": "Creates a dialog in which the tester can enter a number."
+      },
+      {
+        "function": "TestWaitForBusIntegration",
+        "description": "Waits for Bus Integration of a specified CAN channel."
+      },
+      {
+        "function": "TestWaitForMessage",
+        "description": "Waits for the occurrence of a specified message."
+      },
+      {
+        "function": "TestWaitForSignalAvailable",
+        "description": "Tests the availability of a specific signal and waits if necessary until its availability."
+      },
+      {
+        "function": "TestWaitForSignalsAvailable",
+        "description": "Tests the availability of all the send signals of a node and waits if necessary until all the send signals of the node are available."
+      },
+      {
+        "function": "TestWaitForEthernetLinkStatus",
+        "description": "Waits for an Ethernet link status."
+      },
+      {
+        "function": "TestWaitForEthernetPacket",
+        "description": "Waits for the occurrence of the first Ethernet packet matching the conditions passed as arguments."
+      },
+      {
+        "function": "TestWaitForEthernetPhyState",
+        "description": "Waits for the occurrence of the specified Ethernet PHY state."
+      },
+      {
+        "function": "TestWaitForSomeIpMessage",
+        "description": "Waits for the next SOME/IP message to occur that meets the conditions passed as arguments."
+      },
+      {
+        "function": "TestWaitForSomeIpSD",
+        "description": "Waits for the next SOME/IP Service Discovery entry to occur that meets the conditions passed as arguments."
+      },
+      {
+        "function": "TestWaitForFrFrame",
+        "description": "Waits for the occurrence of the valid specified FlexRay frame."
+      },
+      {
+        "function": "TestWaitForFrFrameError",
+        "description": "Waits for the occurrence of FlexRay frame error event."
+      },
+      {
+        "function": "TestWaitForFrNullFrame",
+        "description": "Waits for the occurrence of the specified FlexRay Null Frame."
+      },
+      {
+        "function": "TestWaitForFrPDU",
+        "description": "Waits for the occurrence of the valid specified FlexRay PDU event."
+      },
+      {
+        "function": "TestWaitForFrPOCState",
+        "description": "Waits for the occurrence of change of state on the FlexRay Communication Controller's protocol operation state machine."
+      },
+      {
+        "function": "TestWaitForFrStartCycle",
+        "description": "Waits for the occurrence of the specified FlexRay start cycle event."
+      },
+      {
+        "function": "TestWaitForFrSymbol",
+        "description": "Waits for the occurrence of a FlexRay symbol on the bus."
+      },
+      {
+        "function": "TestWaitForSignalAvailable",
+        "description": "Tests the availability of a specific signal and waits if necessary until its availability."
+      },
+      {
+        "function": "TestWaitForSignalsAvailable",
+        "description": "Tests the availability of all the send signals of a node and waits if necessary until all the send signals of the node are available."
+      },
+      {
+        "function": "TestWaitForLinBitStreamStatus",
+        "description": "Waits until the sending of a LIN bitstream is started or stopped."
+      },
+      {
+        "function": "TestWaitForLinCSError",
+        "description": "Waits for a checksum error for the specified amount of time."
+      },
+      {
+        "function": "TestWaitForLinETFSingleResponse",
+        "description": "Waits for the occurrence of a LIN Event-triggered frame with a single response for the specified associated frame."
+      },
+      {
+        "function": "TestWaitForLinHeader",
+        "description": "Waits for the Header occurrence of the specified LIN frame."
+      },
+      {
+        "function": "TestWaitForLinLongDominantSignal",
+        "description": "Waits for the occurrence of a LIN long dominant signal."
+      },
+      {
+        "function": "TestWaitForLinReceiveError",
+        "description": "Waits for the occurrence of LIN Receive Error event."
+      },
+      {
+        "function": "TestWaitForLinScheduleChange",
+        "description": "Waits until the LIN scheduler reaches the specified table and slot index."
+      },
+      {
+        "function": "TestWaitForLinSpike",
+        "description": "Waits for the occurrence of a LIN Spike event."
+      },
+      {
+        "function": "TestWaitForLinTransmError",
+        "description": "Waits for the occurrence of LIN Transmission Error event."
+      },
+      {
+        "function": "TestWaitForLinWakeupFrame",
+        "description": "Waits for the occurrence of LIN Wakeup frame."
+      },
+      {
+        "function": "TestWaitForMessage",
+        "description": "Waits for the occurrence of a specified message."
+      },
+      {
+        "function": "TestWaitForSignalAvailable",
+        "description": "Tests the availability of a specific signal and waits if necessary until its availability."
+      },
+      {
+        "function": "TestWaitForSignalsAvailable",
+        "description": "Tests the availability of all the send signals of a node and waits if necessary until all the send signals of the node are available."
+      },
+      {
+        "function": "testWaitForScopeEvent",
+        "description": "Waits for the occurrence of Scope event."
+      },
+      {
+        "function": "TestWaitForJ1939DTC",
+        "description": "Waits until a defined parameter group and a defined Suspect Parameter Number (SPN) is received or a timeout occurred."
+      },
+      {
+        "function": "TestWaitForJ1939PG",
+        "description": "Waits for the occurrence of the specified message."
+      }
+    ]
+  }
+}
