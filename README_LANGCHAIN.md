@@ -76,8 +76,28 @@ knowledge_base/
 ├── capl_examples.txt      # CAPL代码示例
 ├── test_standards.txt     # 测试标准文档
 ├── best_practices.txt     # 最佳实践
+├── capl_api_lists.json  # CAPL API列表（JSON格式）
 └── ...
 ```
+
+### 支持的知识库格式
+
+系统支持以下格式的知识库文档：
+- `.txt` - 纯文本文件
+- `.md` - Markdown文档
+- `.capl` - CAPL代码文件
+- `.py` - Python代码文件
+- `.json` - JSON文档（包括CAPL API列表等结构化数据）
+
+### JSON文档支持
+
+系统现在支持JSON格式的知识库文档，会自动将JSON数据转换为可搜索的文本格式。例如：
+- CAPL API列表 (`capl_api_lists.json`)
+- 测试用例数据
+- 配置信息
+- 其他结构化数据
+
+JSON文档会被格式化为易读的文本格式，保留所有字段和层次结构信息，便于RAG系统检索和使用。
 
 ## 编程接口
 
