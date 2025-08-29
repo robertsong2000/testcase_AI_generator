@@ -28,8 +28,10 @@ def create_parser() -> argparse.ArgumentParser:
   %(prog)s requirements.txt --no-use-example-code  # 禁用示例代码
   %(prog)s requirements.txt --use-example-code     # 强制使用示例代码
   %(prog)s requirements.txt --chunk-size 600       # 平衡场景配置
-  %(prog)s requirements.txt --chunk-overlap 100    # 平衡场景配置
+  %(prog)s requirements.txt --chunk-overlap 100      # 平衡场景配置
   %(prog)s requirements.txt --chunk-size 800 --chunk-overlap 150  # 完整上下文配置
+  %(prog)s requirements.txt --api-key sk-xxx         # 使用指定的API密钥
+  %(prog)s requirements.txt --api-type openai --api-key sk-xxx --api-url https://api.openai.com/v1
         """
     )
     
@@ -60,6 +62,12 @@ def create_parser() -> argparse.ArgumentParser:
         '--api-url',
         type=str,
         help='API基础URL (用于自定义或本地API)'
+    )
+    
+    parser.add_argument(
+        '--api-key',
+        type=str,
+        help='API密钥 (用于替换.env文件中的配置)'
     )
     
     parser.add_argument(
@@ -199,14 +207,24 @@ def load_config(args) -> CAPLGeneratorConfig:
     if args.output:
         config.output_dir = Path(args.output)
     
+    # LLM配置 - 命令行参数优先
     if args.api_type:
         config.api_type = args.api_type
     
     if args.api_url:
-        config.api_base = args.api_url
+        config.api_url = args.api_url
+    
+    if args.api_key:
+        # 设置环境变量，覆盖.env文件中的配置
+        import os
+        if config.api_type == 'openai':
+            os.environ['OPENAI_API_KEY'] = args.api_key
+        elif config.api_type == 'ollama':
+            # 对于ollama，可以设置OLLAMA_API_KEY（如果有的话）
+            os.environ['OLLAMA_API_KEY'] = args.api_key
     
     if args.model:
-        config.model_name = args.model
+        config.model = args.model
     
     if args.use_example_code is not None:
         config.use_example_code = args.use_example_code
