@@ -280,9 +280,9 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
     
-    # 检查输入参数
-    if not args.input and not args.info and not args.search and not args.test_rag:
-        parser.error("the following arguments are required: input (or use --info/--search/--test-rag)")
+    # 检查输入参数 - 重建RAG不需要input
+    if not args.input and not args.info and not args.search and not args.test_rag and not args.rebuild_rag:
+        parser.error("the following arguments are required: input (or use --info/--search/--test-rag/--rebuild-rag)")
     
     try:
         # 加载配置
@@ -335,7 +335,8 @@ def main():
 
         # 重建RAG知识库
         if args.rebuild_rag:
-            service.process_file("dummy", rebuild_rag=True)
+            print("🔄 正在重建RAG知识库...")
+            service.process_file("重建RAG知识库", rebuild_rag=True)
             return
         
         # 处理输入
