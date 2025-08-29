@@ -52,9 +52,8 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '--api-type',
         type=str,
-        default='ollama',
         choices=['ollama', 'openai'],
-        help='API类型 (ollama/openai)'
+        help='API类型 (ollama/openai)，默认使用环境变量API_TYPE的值'
     )
     
     parser.add_argument(

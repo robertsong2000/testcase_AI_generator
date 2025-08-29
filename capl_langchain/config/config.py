@@ -15,7 +15,12 @@ class CAPLGeneratorConfig:
         # API配置
         self.api_type = os.getenv('API_TYPE', 'ollama')  # ollama, openai
         self.api_url = os.getenv('API_URL', 'http://localhost:11434')
-        self.model = os.getenv("OLLAMA_MODEL", "qwen3:30b-a3b")
+        
+        # 根据API类型选择正确的模型环境变量
+        if self.api_type == "openai":
+            self.model = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+        else:
+            self.model = os.getenv("OLLAMA_MODEL", "qwen3:30b-a3b")
         self.context_length = int(os.getenv("OLLAMA_CONTEXT_LENGTH", "8192"))
         self.max_tokens = int(os.getenv("OLLAMA_MAX_TOKENS", "4096"))
         self.temperature = float(os.getenv("TEMPERATURE", "0.2"))
@@ -51,7 +56,11 @@ class CAPLGeneratorConfig:
         else:
             self.vector_db_dir = config_vector_dir
             
-        self.embedding_model = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
+        # 根据API类型选择正确的嵌入模型
+        if self.api_type == "openai":
+            self.embedding_model = os.getenv("EMBEDDING_MODEL", "text-embedding-ada-002")
+        else:
+            self.embedding_model = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
         
         # 显示配置
         self.show_doc_summary = os.getenv("SHOW_DOC_SUMMARY", "true").lower() == "true"
