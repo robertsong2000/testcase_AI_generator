@@ -12,7 +12,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from capl_generator_langchain import CAPLGeneratorConfig, KnowledgeBaseManager
+from capl_langchain.config.config import CAPLGeneratorConfig
+from capl_langchain.managers.knowledge_manager import KnowledgeBaseManager
 
 def test_rag_comprehensive():
     """综合RAG功能测试"""
