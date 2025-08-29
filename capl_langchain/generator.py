@@ -254,4 +254,8 @@ class CAPLGenerator:
         if not self.config.enable_rag:
             return []
         
+        # 确保知识库已初始化
+        if self.kb_manager.vector_store is None:
+            self.kb_manager.initialize_knowledge_base()
+        
         return self.kb_manager.search_documents(query, k)
