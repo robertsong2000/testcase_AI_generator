@@ -37,6 +37,16 @@ python capl_generator_langchain.py test_requirements.md --model qwen3:8b --api-u
 
 # 启用RAG功能
 python capl_generator_langchain.py test_requirements.md --enable-rag
+
+# 使用OpenAI API并指定密钥
+python capl_generator_langchain.py test_requirements.md \
+  --api-type openai \
+  --api-key sk-your-api-key-here \
+  --api-url https://api.openai.com/v1 \
+  --model gpt-3.5-turbo
+
+# 使用自定义API密钥（覆盖.env配置）
+python capl_generator_langchain.py test_requirements.md --api-key sk-your-custom-key
 ```
 
 ### 命令行参数
@@ -44,6 +54,7 @@ python capl_generator_langchain.py test_requirements.md --enable-rag
 - `file_path`: 输入的测试需求文件路径
 - `--api-type`: API类型 (ollama/openai)
 - `--api-url`: API服务地址
+- `--api-key`: API密钥 (用于替换.env文件中的配置)
 - `--model`: 使用的模型名称
 - `--output-dir`: 输出目录
 - `--enable-rag`: 启用RAG功能
