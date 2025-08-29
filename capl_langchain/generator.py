@@ -249,7 +249,7 @@ class CAPLGenerator:
         
         return info
     
-    def search_knowledge_base(self, query: str, k: int = 4) -> List[Dict[str, Any]]:
+    def search_knowledge_base(self, query: str, k: int = 6) -> List[Dict[str, Any]]:
         """搜索知识库"""
         if not self.config.enable_rag:
             return []

@@ -59,3 +59,5 @@ knowledge_base/body_library.json
 
 testcases_frontwiper/
 testcases_head_lamps/
+head_lamps_generated/
+test/fine_tuning_data/

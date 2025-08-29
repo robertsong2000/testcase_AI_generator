@@ -40,7 +40,7 @@ class CAPLGeneratorConfig:
         
         # RAG配置
         self.enable_rag = os.getenv("ENABLE_RAG", "true").lower() == "true"
-        self.k = int(os.getenv("RAG_K", "4"))  # RAG检索返回的文档数量
+        self.k = int(os.getenv("RAG_K", "6"))  # RAG检索返回的文档数量 - 优化为6，适合复杂测试用例
         self.chunk_size = int(os.getenv("CHUNK_SIZE", "400"))  # 文档分块大小 - 高精度场景默认值
         self.chunk_overlap = int(os.getenv("CHUNK_OVERLAP", "50"))  # 文档分块重叠大小 - 高精度场景默认值
         
