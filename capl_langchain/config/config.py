@@ -12,9 +12,13 @@ class CAPLGeneratorConfig:
     def __init__(self):
         load_dotenv()
         
-        # API配置
+        # API配置 - 主模型
         self.api_type = os.getenv('API_TYPE', 'ollama')  # ollama, openai
         self.api_url = os.getenv('API_URL', 'http://localhost:11434')
+        
+        # 嵌入模型独立配置
+        self.embedding_api_type = os.getenv('EMBEDDING_API_TYPE', self.api_type)  # 默认跟随主模型
+        self.embedding_api_url = os.getenv('EMBEDDING_API_URL', self.api_url)   # 默认跟随主模型
         
         # 根据API类型选择正确的模型环境变量
         if self.api_type == "openai":
@@ -56,8 +60,8 @@ class CAPLGeneratorConfig:
         else:
             self.vector_db_dir = config_vector_dir
             
-        # 根据API类型选择正确的嵌入模型
-        if self.api_type == "openai":
+        # 嵌入模型配置 - 独立于主模型
+        if self.embedding_api_type == "openai":
             self.embedding_model = os.getenv("EMBEDDING_MODEL", "text-embedding-ada-002")
         else:
             self.embedding_model = os.getenv("EMBEDDING_MODEL", "nomic-embed-text")
