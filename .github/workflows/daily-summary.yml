@@ -1,4 +1,4 @@
-name: Daily Commit Summary
+name: Daily Commit Summary (No Dependencies)
 
 on:
   schedule:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
+    - name: Checkout target repository
       uses: actions/checkout@v4
       with:
         fetch-depth: 0  # 获取完整的git历史
@@ -21,12 +21,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'npm'
         
-    - name: Install dependencies
-      run: npm ci
+    - name: Install tsx
+      run: npm install -g tsx
       
-    - name: Generate daily summary
+    - name: Download and run summary script
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL || 'https://api.openai.com' }}
@@ -37,15 +36,13 @@ jobs:
         DIFF_CHUNK_MAX_CHARS: ${{ secrets.DIFF_CHUNK_MAX_CHARS || '80000' }}
         TZ: ${{ secrets.TZ || 'Asia/Shanghai' }}
         DAYS_BACK: ${{ secrets.DAYS_BACK || '1' }}
-        # 设置使用提交信息模式（可选）
         USE_COMMIT_INFO_ONLY: ${{ secrets.USE_COMMIT_INFO_ONLY || 'true' }}
       run: |
-        npx tsx scripts/daily-summary.ts
+        # 下载脚本
+        curl -s -o daily-summary.ts https://raw.githubusercontent.com/robertsong2000/daily-commit-summarizer/main/scripts/daily-summary.ts
         
-    - name: Upload summary as artifact (optional)
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: daily-summary-${{ github.run_number }}
-        path: summary-*.md
-        retention-days: 7
+        # 运行脚本
+        npx tsx daily-summary.ts
+        
+        # 清理（可选）
+        rm daily-summary.ts
