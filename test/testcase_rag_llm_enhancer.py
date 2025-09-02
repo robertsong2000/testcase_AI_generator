@@ -73,9 +73,6 @@ class TestcaseLLMEnhancer:
                     enhanced_step['description'] = enhanced_description
                     enhanced_step['original_description'] = step['description']
                     
-                    # 添加处理标记
-                    enhanced_step['enhanced_by'] = f"llm_{self.config.api_type}"
-                    
                     # 输出处理结果（如果verbose模式开启）
                     if self.verbose:
                         print(f"\n📋 步骤 {i+1} 处理详情:")
