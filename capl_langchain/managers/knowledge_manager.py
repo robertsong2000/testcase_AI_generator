@@ -32,7 +32,7 @@ except ImportError:
     ResultReranker = None
 
 
-class UnifiedKnowledgeBaseManager:
+class KnowledgeManager:
     """统一知识库管理器，支持混合检索和纯向量检索"""
     
     def __init__(self, config: CAPLGeneratorConfig):
