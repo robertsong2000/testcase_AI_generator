@@ -242,7 +242,6 @@ class UnifiedKnowledgeBaseManager:
         
         try:
             print(f"🔍 开始文档检索...")
-            print(f"   查询: {query}")
             print(f"   混合检索: {'启用' if use_hybrid else '禁用'}")
             print(f"   重排序: {'启用' if enable_rerank and self.reranker else '禁用'}")
             
