@@ -8,6 +8,7 @@ from typing import Dict, Any, List, Optional
 
 from ..generator import CAPLGenerator
 from ..config.config import CAPLGeneratorConfig
+from ..managers.knowledge_manager_factory import KnowledgeManagerFactory
 
 
 class CAPLGeneratorService:

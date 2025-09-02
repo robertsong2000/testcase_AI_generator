@@ -13,7 +13,7 @@ from langchain.chains import RetrievalQA
 from .config.config import CAPLGeneratorConfig
 from .factories.llm_factory import LLMFactory
 from .managers.prompt_manager import PromptTemplateManager
-from .managers.knowledge_manager import KnowledgeBaseManager
+from .managers.knowledge_manager_factory import KnowledgeManagerFactory
 
 
 class CAPLGenerator:
@@ -22,7 +22,7 @@ class CAPLGenerator:
     def __init__(self, config: Optional[CAPLGeneratorConfig] = None):
         self.config = config or CAPLGeneratorConfig()
         self.prompt_manager = PromptTemplateManager(self.config)
-        self.kb_manager = KnowledgeBaseManager(self.config)
+        self.kb_manager = KnowledgeManagerFactory.create_manager(self.config)
         self.llm = LLMFactory.create_llm(self.config)
         self.chain = None
         
