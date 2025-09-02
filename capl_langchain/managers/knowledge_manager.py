@@ -41,8 +41,9 @@ class UnifiedKnowledgeBaseManager:
         self.hybrid_search = None
         self.reranker = None
         
-        # 初始化重排序器
-        self._init_reranker()
+        # 仅在启用重排序时初始化重排序器
+        if config.enable_rerank:
+            self._init_reranker()
         
         # 根据配置初始化混合检索
         if config.use_hybrid_search and HYBRID_SEARCH_AVAILABLE:
@@ -52,40 +53,42 @@ class UnifiedKnowledgeBaseManager:
     
     def _init_reranker(self):
         """初始化重排序器"""
-        if ResultReranker is not None:
-            # 获取API文件路径
-            api_files = []
-            if hasattr(self.config, 'api_files') and self.config.api_files:
-                api_files = self.config.api_files
-            else:
-                # 使用默认的API文件
-                kb_dir = Path(self.config.knowledge_base_dir)
-                api_files = [
-                    str(kb_dir / "interfaces_analysis_common-libraries.json"),
-                    str(kb_dir / "interfaces_analysis_libraries.json")
-                ]
-        
-            # 检查是否有优先级映射文件
-            priority_mapping_file = None
-            if hasattr(self.config, 'api_priority_mapping_file') and self.config.api_priority_mapping_file:
-                if Path(self.config.api_priority_mapping_file).exists():
-                    priority_mapping_file = str(self.config.api_priority_mapping_file)
-                    print(f"📊 使用API优先级映射文件: {priority_mapping_file}")
+        if not self.config.enable_rerank or ResultReranker is None:
+            return
             
-            # 只使用存在的API文件
-            valid_api_files = [f for f in api_files if Path(f).exists()]
-            if priority_mapping_file:
-                # 使用优先级映射文件
-                self.reranker = ResultReranker(
-                    api_files=valid_api_files,
-                    priority_mapping_file=priority_mapping_file
-                )
-            elif valid_api_files:
-                # 使用API文件
-                self.reranker = ResultReranker(api_files=valid_api_files)
-            else:
-                # 使用空API文件列表创建重排序器（使用默认行为）
-                self.reranker = ResultReranker(api_files=[])
+        # 获取API文件路径
+        api_files = []
+        if hasattr(self.config, 'api_files') and self.config.api_files:
+            api_files = self.config.api_files
+        else:
+            # 使用默认的API文件
+            kb_dir = Path(self.config.knowledge_base_dir)
+            api_files = [
+                str(kb_dir / "interfaces_analysis_common-libraries.json"),
+                str(kb_dir / "interfaces_analysis_libraries.json")
+            ]
+    
+        # 检查是否有优先级映射文件
+        priority_mapping_file = None
+        if hasattr(self.config, 'api_priority_mapping_file') and self.config.api_priority_mapping_file:
+            if Path(self.config.api_priority_mapping_file).exists():
+                priority_mapping_file = str(self.config.api_priority_mapping_file)
+                print(f"📊 使用API优先级映射文件: {priority_mapping_file}")
+        
+        # 只使用存在的API文件
+        valid_api_files = [f for f in api_files if Path(f).exists()]
+        if priority_mapping_file:
+            # 使用优先级映射文件
+            self.reranker = ResultReranker(
+                api_files=valid_api_files,
+                priority_mapping_file=priority_mapping_file
+            )
+        elif valid_api_files:
+            # 使用API文件
+            self.reranker = ResultReranker(api_files=valid_api_files)
+        else:
+            # 使用空API文件列表创建重排序器（使用默认行为）
+            self.reranker = ResultReranker(api_files=[])
     
     def initialize_knowledge_base(self) -> bool:
         """初始化知识库，支持混合检索配置"""
