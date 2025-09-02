@@ -66,9 +66,26 @@ class CAPLGenerator:
                 elif not isinstance(requirement_str, str):
                     requirement_str = str(requirement_str)
                 
-                # 获取相关文档并显示检索信息
+                # 使用search_documents方法获取文档，这样可以显示重排序信息
                 print(f"\n🔍 正在检索知识库...")
-                docs = retriever.invoke(requirement_str)
+                
+                # 获取重排序状态
+                enable_rerank = self.config.enable_rerank and self.kb_manager.reranker is not None
+                
+                # 使用search_documents方法，它会显示重排序信息
+                docs_info = self.kb_manager.search_documents(
+                    query=requirement_str,
+                    k=self.config.k,
+                    enable_rerank=enable_rerank
+                )
+                
+                # 将文档信息转换为LangChain文档对象
+                docs = []
+                for doc_info in docs_info:
+                    doc = type('Document', (), {})()
+                    doc.page_content = doc_info.get('content', '')
+                    doc.metadata = doc_info.get('metadata', {})
+                    docs.append(doc)
                 
                 if docs:
                     print(f"✅ 检索完成，找到 {len(docs)} 个相关文档")

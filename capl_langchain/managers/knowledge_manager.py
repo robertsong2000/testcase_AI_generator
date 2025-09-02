@@ -355,22 +355,52 @@ class KnowledgeBaseManager:
             # 使用更大的k值进行初始检索，为重排序留出空间
             search_k = max(k * 2, 6) if enable_rerank and self.reranker else k
             
+            print(f"🔍 开始文档检索...")
+            print(f"   查询: '{query}'")
+            print(f"   初始检索数量: {search_k}")
+            print(f"   重排序: {'启用' if enable_rerank and self.reranker else '禁用'}")
+            
             retriever = self.vector_store.as_retriever(
                 search_type="similarity",
                 search_kwargs={"k": search_k}
             )
             
             docs = retriever.invoke(query)
+            print(f"   初始检索结果: {len(docs)} 个文档")
             
             # 应用重排序
             if enable_rerank and self.reranker:
+                print("⚖️  开始重排序处理...")
+                
+                # 获取重排序详细信息
+                rerank_info = self.reranker.get_rerank_info(docs, query)
+                
+                # 显示重排序前的文档信息
+                print("   📊 重排序前:")
+                for i, doc_info in enumerate(rerank_info['reranked_results']):
+                    print(f"      {i+1}. {doc_info['source']} (API优先级: {doc_info['api_priority']}, "
+                          f"关键词匹配: {doc_info['keyword_match']:.2f})")
+                
+                # 执行重排序
                 docs = self.reranker.rerank(docs, query)
+                
+                # 获取重排序后的详细信息
+                rerank_info_after = self.reranker.get_rerank_info(docs, query)
+                
+                # 显示重排序后的文档信息
+                print("   🎯 重排序后:")
+                for i, doc_info in enumerate(rerank_info_after['reranked_results'][:k]):
+                    print(f"      {i+1}. {doc_info['source']} (API优先级: {doc_info['api_priority']}, "
+                          f"关键词匹配: {doc_info['keyword_match']:.2f})")
+                
                 # 截取前k个结果
                 docs = docs[:k]
+                print(f"   最终返回: {len(docs)} 个文档")
             
             # 提取文档信息
             results = []
-            for doc in docs:
+            print("📋 最终结果:")
+            for i, doc in enumerate(docs):
                 # 获取文档元信息
                 metadata = doc.metadata if hasattr(doc, 'metadata') else {}
                 source = metadata.get('source', '未知来源')
@@ -394,6 +424,8 @@ class KnowledgeBaseManager:
                 content = doc.page_content if hasattr(doc, 'page_content') else str(doc)
                 summary = content[:200] + "..." if len(content) > 200 else content
                 
+                print(f"   {i+1}. {source} (长度: {len(content)} 字符)")
+                
                 results.append({
                     'source': source,
                     'content': content,
@@ -404,7 +436,7 @@ class KnowledgeBaseManager:
             return results
             
         except Exception as e:
-            print(f"文档检索失败: {e}")
+            print(f"❌ 文档检索失败: {e}")
             return []
     
     def get_rerank_info(self, query: str, k: int = 4) -> Dict[str, Any]:
