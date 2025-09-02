@@ -356,7 +356,6 @@ class KnowledgeBaseManager:
             search_k = max(k * 2, 6) if enable_rerank and self.reranker else k
             
             print(f"🔍 开始文档检索...")
-            print(f"   查询: '{query}'")
             print(f"   初始检索数量: {search_k}")
             print(f"   重排序: {'启用' if enable_rerank and self.reranker else '禁用'}")
             
