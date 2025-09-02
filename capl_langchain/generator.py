@@ -258,4 +258,4 @@ class CAPLGenerator:
         if self.kb_manager.vector_store is None:
             self.kb_manager.initialize_knowledge_base()
         
-        return self.kb_manager.search_documents(query, k)
+        return self.kb_manager.search_documents(query, k, enable_rerank=self.config.enable_rerank)

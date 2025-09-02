@@ -38,8 +38,12 @@ class CAPLGeneratorConfig:
         self.prompt_template_file = self._get_prompt_template_path()
         self.example_code_file = self.project_root / "example_code.txt"
         
+        # API优先级映射文件
+        self.api_priority_mapping_file = self.project_root / "test" / "api_priority_mapping.json"
+        
         # RAG配置
         self.enable_rag = os.getenv("ENABLE_RAG", "true").lower() == "true"
+        self.enable_rerank = os.getenv("ENABLE_RERANK", "true").lower() == "true"  # 是否启用重排序
         self.k = int(os.getenv("RAG_K", "6"))  # RAG检索返回的文档数量 - 优化为6，适合复杂测试用例
         self.chunk_size = int(os.getenv("CHUNK_SIZE", "400"))  # 文档分块大小 - 高精度场景默认值
         self.chunk_overlap = int(os.getenv("CHUNK_OVERLAP", "50"))  # 文档分块重叠大小 - 高精度场景默认值

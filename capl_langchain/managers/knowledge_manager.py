@@ -15,6 +15,12 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from ..config.config import CAPLGeneratorConfig
 from ..factories.embedding_factory import EmbeddingFactory
 
+# 导入重排序器
+try:
+    from ..utils.result_reranker import ResultReranker
+except ImportError:
+    ResultReranker = None
+
 
 class KnowledgeBaseManager:
     """知识库管理器，处理RAG相关功能"""
@@ -22,6 +28,43 @@ class KnowledgeBaseManager:
     def __init__(self, config: CAPLGeneratorConfig):
         self.config = config
         self.vector_store = None
+        self.reranker = None
+        
+        # 初始化重排序器
+        if ResultReranker is not None:
+            # 获取API文件路径
+            api_files = []
+            if hasattr(config, 'api_files') and config.api_files:
+                api_files = config.api_files
+            else:
+                # 使用默认的API文件
+                kb_dir = Path(config.knowledge_base_dir)
+                api_files = [
+                    str(kb_dir / "interfaces_analysis_common-libraries.json"),
+                    str(kb_dir / "interfaces_analysis_libraries.json")
+                ]
+        
+            # 检查是否有优先级映射文件
+            priority_mapping_file = None
+            if hasattr(config, 'api_priority_mapping_file') and config.api_priority_mapping_file:
+                if Path(config.api_priority_mapping_file).exists():
+                    priority_mapping_file = str(config.api_priority_mapping_file)
+                    print(f"📊 使用API优先级映射文件: {priority_mapping_file}")
+            
+            # 只使用存在的API文件
+            valid_api_files = [f for f in api_files if Path(f).exists()]
+            if priority_mapping_file:
+                # 使用优先级映射文件
+                self.reranker = ResultReranker(
+                    api_files=valid_api_files,
+                    priority_mapping_file=priority_mapping_file
+                )
+            elif valid_api_files:
+                # 使用API文件
+                self.reranker = ResultReranker(api_files=valid_api_files)
+            else:
+                # 使用空API文件列表创建重排序器（使用默认行为）
+                self.reranker = ResultReranker(api_files=[])
         
     def initialize_knowledge_base(self) -> bool:
         """初始化知识库，支持智能缓存"""
@@ -297,18 +340,33 @@ class KnowledgeBaseManager:
         
         return documents
     
-    def search_documents(self, query: str, k: int = 4) -> List[Dict[str, Any]]:
-        """搜索相关文档并返回详细信息"""
+    def search_documents(self, query: str, k: int = 4, enable_rerank: bool = True) -> List[Dict[str, Any]]:
+        """搜索相关文档并返回详细信息
+        
+        Args:
+            query: 查询字符串
+            k: 返回的文档数量
+            enable_rerank: 是否启用重排序
+        """
         if not self.vector_store:
             return []
         
         try:
+            # 使用更大的k值进行初始检索，为重排序留出空间
+            search_k = max(k * 2, 6) if enable_rerank and self.reranker else k
+            
             retriever = self.vector_store.as_retriever(
                 search_type="similarity",
-                search_kwargs={"k": k}
+                search_kwargs={"k": search_k}
             )
             
             docs = retriever.invoke(query)
+            
+            # 应用重排序
+            if enable_rerank and self.reranker:
+                docs = self.reranker.rerank(docs, query)
+                # 截取前k个结果
+                docs = docs[:k]
             
             # 提取文档信息
             results = []
@@ -348,3 +406,37 @@ class KnowledgeBaseManager:
         except Exception as e:
             print(f"文档检索失败: {e}")
             return []
+    
+    def get_rerank_info(self, query: str, k: int = 4) -> Dict[str, Any]:
+        """获取重排序详细信息（用于调试）"""
+        if not self.vector_store or not self.reranker:
+            return {"error": "重排序器未初始化"}
+        
+        try:
+            retriever = self.vector_store.as_retriever(
+                search_type="similarity",
+                search_kwargs={"k": max(k * 2, 6)}
+            )
+            
+            docs = retriever.invoke(query)
+            
+            # 获取重排序信息
+            rerank_info = self.reranker.get_rerank_info(docs, query)
+            reranked_docs = self.reranker.rerank(docs, query)
+            
+            return {
+                "original_count": len(docs),
+                "reranked_count": len(reranked_docs),
+                "query": query,
+                "rerank_details": rerank_info,
+                "final_results": [
+                    {
+                        "source": doc.metadata.get('source', 'unknown'),
+                        "content_length": len(doc.page_content)
+                    }
+                    for doc in reranked_docs[:k]
+                ]
+            }
+            
+        except Exception as e:
+            return {"error": str(e)}
