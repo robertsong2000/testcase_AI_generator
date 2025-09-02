@@ -23,10 +23,11 @@ from capl_langchain.factories.llm_factory import LLMFactory
 class TestcaseLLMEnhancer:
     """基于LLM+RAG的测试用例增强器"""
     
-    def __init__(self, config: CAPLGeneratorConfig):
+    def __init__(self, config: CAPLGeneratorConfig, verbose: bool = False):
         self.config = config
         self.knowledge_manager = KnowledgeManager(config)
         self.llm = LLMFactory.create_llm(config)
+        self.verbose = verbose
         
     def enhance_testcase(self, testcase_path: str) -> Dict[str, Any]:
         """增强单个测试用例"""
@@ -75,6 +76,14 @@ class TestcaseLLMEnhancer:
                     # 添加处理标记
                     enhanced_step['enhanced_by'] = f"llm_{self.config.api_type}"
                     
+                    # 输出处理结果（如果verbose模式开启）
+                    if self.verbose:
+                        print(f"\n📋 步骤 {i+1} 处理详情:")
+                        print(f"   原始描述: {step['description']}")
+                        print(f"   增强描述: {enhanced_description}")
+                        print(f"   上下文: {context[:100]}..." if context else "   无上下文")
+                        print("-" * 50)
+                        
                 enhanced_steps.append(enhanced_step)
             enhanced['steps'] = enhanced_steps
             
@@ -127,8 +136,19 @@ class TestcaseLLMEnhancer:
             response = self.llm.invoke(prompt)
             enhanced_desc = response.content if hasattr(response, 'content') else str(response)
             
-            # 清理响应
+            # 清理响应 - 移除<think>标签内的思考内容
             enhanced_desc = enhanced_desc.strip()
+            
+            # 移除<think>...</think>标签及其内容
+            import re
+            enhanced_desc = re.sub(r'<think>.*?</think>', '', enhanced_desc, flags=re.DOTALL)
+            enhanced_desc = re.sub(r'</?think>', '', enhanced_desc)
+            
+            # 清理多余空行和空格
+            enhanced_desc = re.sub(r'\n\s*\n', '\n', enhanced_desc)
+            enhanced_desc = enhanced_desc.strip()
+            
+            # 移除可能的引号
             if enhanced_desc.startswith('"') and enhanced_desc.endswith('"'):
                 enhanced_desc = enhanced_desc[1:-1]
                 
@@ -153,6 +173,8 @@ def main():
                        help="使用的模型类型")
     parser.add_argument("--suffix", default=".llm_enhanced", 
                        help="输出文件后缀")
+    parser.add_argument("--verbose", action="store_true", 
+                       help="显示详细的处理过程信息")
     
     args = parser.parse_args()
     
@@ -167,8 +189,15 @@ def main():
     # 设置使用小模型qwen3:1.7b
     config.model = "qwen3:1.7b"
     
-    # 创建增强器
-    enhancer = TestcaseLLMEnhancer(config)
+    # 创建增强器（传入verbose参数）
+    enhancer = TestcaseLLMEnhancer(config, verbose=args.verbose)
+    
+    if args.verbose:
+        print(f"🔧 详细模式已开启")
+        print(f"   使用模型: {config.model}")
+        print(f"   知识库目录: {config.knowledge_base_dir}")
+        print(f"   向量数据库目录: {config.vector_db_dir}")
+        print()
     
     # 增强测试用例
     enhanced = enhancer.enhance_testcase(args.testcase_path)
@@ -190,6 +219,9 @@ def main():
         print(f"   ✅ 总步骤数: {total_steps}")
         print(f"   ✅ 已增强步骤: {enhanced_steps}")
         print(f"   ✅ 增强比例: {enhanced_steps/total_steps*100:.1f}%")
+        
+        if args.verbose:
+            print(f"   📁 输出文件: {output_path}")
     else:
         print("❌ 增强失败")
 
