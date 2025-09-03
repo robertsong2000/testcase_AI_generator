@@ -13,7 +13,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from capl_generator_langchain import CAPLGenerator, CAPLGeneratorConfig
+from capl_langchain.services.generator_service import CAPLGenerator
+from capl_langchain.config.config import CAPLGeneratorConfig
 
 def setup_output_directory():
     """设置输出目录结构"""
@@ -66,7 +67,7 @@ def test_rag_integration():
             
             try:
                 # 使用RAG生成CAPL代码
-                capl_code = generator.generate_capl_code(requirement)
+                capl_code = generator.generate_code(requirement)
                 
                 # 分析生成的代码
                 lines = capl_code.count('\n') + 1
@@ -119,7 +120,7 @@ def test_rag_vs_no_rag():
         generator_no_rag.initialize()
         
         start_time = __import__('time').time()
-        code_no_rag = generator_no_rag.generate_capl_code(requirement)
+        code_no_rag = generator_no_rag.generate_code(requirement)
         no_rag_time = __import__('time').time() - start_time
         
         lines_no_rag = code_no_rag.count('\n') + 1
@@ -144,7 +145,7 @@ def test_rag_vs_no_rag():
         generator_rag.initialize()
         
         start_time = __import__('time').time()
-        code_rag = generator_rag.generate_capl_code(requirement)
+        code_rag = generator_rag.generate_code(requirement)
         rag_time = __import__('time').time() - start_time
         
         lines_rag = code_rag.count('\n') + 1
