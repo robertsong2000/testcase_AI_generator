@@ -40,10 +40,7 @@ class TestcaseLLMEnhancer:
             if self.verbose:
                 print(f"🔍 首次分析测试用例目的: {testcase.get('title', cache_key)}")
             self._testcase_purpose_cache[cache_key] = self._analyze_testcase_purpose(testcase)
-
-        if self.verbose:
-            print(f"📋 使用缓存的测试目的: {self._testcase_purpose_cache[cache_key]}...")
-                
+               
         return self._testcase_purpose_cache[cache_key]
         
     def enhance_testcase(self, testcase_path: str, step_index: Optional[int] = None) -> Dict[str, Any]:
@@ -94,7 +91,6 @@ class TestcaseLLMEnhancer:
             if self.verbose:
                 print(f"\n📋 处理步骤 {i+1}/{len(enhanced_testcase['steps'])}")
                 print(f"   原始描述: {step.get('description', '无描述')}")
-                print(f"   整体目的: {overall_purpose}")
             
             # 获取增强的上下文
             enhanced_context = self._get_enhanced_context(step, enhanced_testcase, i, overall_purpose)
@@ -110,7 +106,7 @@ class TestcaseLLMEnhancer:
             step['description'] = enhanced_description
             
             if self.verbose:
-                print(f"   增强描述: {enhanced_description[:100]}...")
+                print(f"   增强描述: {enhanced_description}...")
         
         return enhanced_testcase
         
@@ -152,7 +148,7 @@ class TestcaseLLMEnhancer:
 - 原始描述: {original_desc}
 
 **重写要求：**
-1. **理解整体目的**: 基于整体测试用例目的"{overall_purpose}"，明确此步骤在流程中的作用
+1. **理解整体目的**: 基于上下文信息的整体测试用例目的，明确此步骤在流程中的作用
 2. **保持技术准确性**: 确保描述符合汽车电子测试标准
 3. **添加具体细节**: 包含具体的测试目的、预期结果和验证方法
 4. **步骤关联性**: 考虑与前后步骤的衔接关系
