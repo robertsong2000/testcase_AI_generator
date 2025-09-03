@@ -104,6 +104,8 @@ class TestcaseLLMEnhancer:
             if 'original_description' not in step:
                 step['original_description'] = step.get('description', '')
             step['description'] = enhanced_description
+            # 添加增强标记
+            step['enhanced_by'] = 'llm_rag'
             
             if self.verbose:
                 print(f"   增强描述: {enhanced_description}...")
@@ -150,14 +152,15 @@ class TestcaseLLMEnhancer:
 **重写要求：**
 1. **理解整体目的**: 基于上下文信息的整体测试用例目的，明确此步骤在流程中的作用
 2. **保持技术准确性**: 确保描述符合汽车电子测试标准
-3. **添加具体细节**: 包含具体的测试目的、预期结果和验证方法
+3. **精简具体细节**: 包含必要的测试目的、预期结果和验证方法，但避免冗余信息
 4. **步骤关联性**: 考虑与前后步骤的衔接关系
 5. **API规范**: 包含相关的API或函数调用信息，但必须严格按照以下规则：
    - 只能使用知识库中提供的API格式
    - 如果API是无参函数，不能添加任何参数
    - 如果API有参数，必须使用正确的参数类型和数量
    - 不能编造不存在的API或参数
-6. **语言规范**: 使用清晰的测试语言，不超过200字
+6. **语言规范**: 使用清晰简洁的测试语言，严格控制在100字以内
+7. **重点突出**: 只保留最核心的测试信息，删除重复或不必要的描述
 
 **重写后的描述:**"""
 
@@ -183,6 +186,11 @@ class TestcaseLLMEnhancer:
             
     def save_enhanced_testcase(self, enhanced_testcase: Dict[str, Any], output_path: str):
         """保存增强后的测试用例"""
+        # 移除步骤中的enhanced_by字段，避免输出到最终文件
+        if 'steps' in enhanced_testcase:
+            for step in enhanced_testcase['steps']:
+                step.pop('enhanced_by', None)
+        
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(enhanced_testcase, f, ensure_ascii=False, indent=2)
         print(f"✅ 增强后的测试用例已保存: {output_path}")
@@ -360,15 +368,14 @@ def main():
         output_path = input_path.with_suffix(f"{input_path.suffix}{suffix}")
         
         # 保存结果
-        enhancer.save_enhanced_testcase(enhanced, str(output_path))
-        
-        # 打印统计信息
+        # 先计算统计信息，再保存（因为保存会移除enhanced_by字段）
         total_steps = len(enhanced.get('steps', []))
         
         if args.step_index is not None:
             print(f"\n📊 增强完成统计:")
             print(f"   ✅ 总步骤数: {total_steps}")
             print(f"   ✅ 已处理步骤: 第 {args.step_index + 1} 步")
+            enhanced_steps = 1  # 指定步骤处理时，认为已增强1步
         else:
             enhanced_steps = sum(1 for step in enhanced.get('steps', []) 
                                if 'enhanced_by' in step)
@@ -376,6 +383,8 @@ def main():
             print(f"   ✅ 总步骤数: {total_steps}")
             print(f"   ✅ 已增强步骤: {enhanced_steps}")
             print(f"   ✅ 增强比例: {enhanced_steps/total_steps*100:.1f}%")
+            
+        enhancer.save_enhanced_testcase(enhanced, str(output_path))
         
         if args.verbose:
             print(f"   📁 输出文件: {output_path}")
