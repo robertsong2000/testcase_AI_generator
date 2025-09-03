@@ -11,7 +11,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from capl_generator_langchain import CAPLGeneratorService, CAPLGeneratorConfig
+from capl_langchain.services.generator_service import CAPLGeneratorService
+from capl_langchain.config.config import CAPLGeneratorConfig
 
 def test_rag_document_display():
     """测试RAG文档信息显示功能"""
