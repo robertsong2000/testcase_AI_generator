@@ -13,7 +13,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from capl_langchain.config.config import CAPLGeneratorConfig
-from capl_langchain.managers.knowledge_manager import KnowledgeBaseManager
+from capl_langchain.managers.knowledge_manager import KnowledgeManager
 
 def test_rag_comprehensive():
     """综合RAG功能测试"""
@@ -42,7 +42,7 @@ def test_rag_comprehensive():
             print("ℹ️  向量数据库不存在，将创建新的")
         
         # 创建知识库管理器
-        kb_manager = KnowledgeBaseManager(config)
+        kb_manager = KnowledgeManager(config)
         
         # 重新初始化知识库（确保检索器可用）
         print("\n🔄 重新初始化知识库...")
@@ -130,7 +130,7 @@ def test_rag_performance():
         
         config = CAPLGeneratorConfig()
         config.enable_rag = True
-        kb_manager = KnowledgeBaseManager(config)
+        kb_manager = KnowledgeManager(config)
         
         # 测量初始化时间
         start_time = time.time()
