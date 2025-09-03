@@ -29,9 +29,12 @@ class TestcaseLLMEnhancer:
         self.llm = LLMFactory.create_llm(config)
         self.verbose = verbose
         
-    def enhance_testcase(self, testcase_path: str) -> Dict[str, Any]:
+    def enhance_testcase(self, testcase_path: str, step_index: Optional[int] = None) -> Dict[str, Any]:
         """增强单个测试用例"""
         print(f"🚀 开始增强测试用例: {testcase_path}")
+        
+        if step_index is not None:
+            print(f"📍 指定处理步骤: 第 {step_index + 1} 步")
         
         # 初始化知识库
         if not self.knowledge_manager.initialize_knowledge_base():
@@ -45,11 +48,11 @@ class TestcaseLLMEnhancer:
         print("🔍 正在分析测试用例结构...")
         
         # 增强测试步骤描述
-        enhanced_testcase = self._enhance_with_llm(testcase)
+        enhanced_testcase = self._enhance_with_llm(testcase, step_index)
         
         return enhanced_testcase
         
-    def _enhance_with_llm(self, testcase: Dict[str, Any]) -> Dict[str, Any]:
+    def _enhance_with_llm(self, testcase: Dict[str, Any], step_index: Optional[int] = None) -> Dict[str, Any]:
         """使用LLM智能重写description字段"""
         enhanced = testcase.copy()
         
@@ -58,6 +61,12 @@ class TestcaseLLMEnhancer:
             enhanced_steps = []
             for i, step in enumerate(testcase['steps']):
                 enhanced_step = step.copy()
+                
+                # 如果指定了步骤索引，只处理该步骤
+                if step_index is not None and i != step_index:
+                    enhanced_steps.append(enhanced_step)
+                    continue
+                    
                 if 'description' in step and 'test_step' in step:
                     print(f"🤖 正在处理第 {i+1} 个步骤: {step['test_step']}")
                     
@@ -123,7 +132,11 @@ class TestcaseLLMEnhancer:
 要求：
 1. 保持技术准确性
 2. 添加具体的测试目的和预期结果
-3. 包含相关的API或函数调用信息
+3. 包含相关的API或函数调用信息，但必须严格按照以下规则：
+   - 只能使用知识库中提供的API格式
+   - 如果API是无参函数，不能添加任何参数
+   - 如果API有参数，必须使用正确的参数类型和数量
+   - 不能编造不存在的API或参数
 4. 使用清晰的测试语言
 5. 不超过200字
 
@@ -172,6 +185,8 @@ def main():
                        help="输出文件后缀")
     parser.add_argument("--verbose", action="store_true", 
                        help="显示详细的处理过程信息")
+    parser.add_argument("--step-index", type=int, 
+                       help="指定要处理的步骤索引（从0开始），不指定则处理所有步骤")
     
     args = parser.parse_args()
     
@@ -179,7 +194,7 @@ def main():
     config = CAPLGeneratorConfig()
     config.api_type = args.model
     config.enable_rag = True
-    config.use_hybrid_search = False
+    config.use_hybrid_search = True
     config.knowledge_base_dir = project_root / "knowledge_base"
     config.vector_db_dir = project_root / "vector_db"
     
@@ -194,28 +209,42 @@ def main():
         print(f"   使用模型: {config.model}")
         print(f"   知识库目录: {config.knowledge_base_dir}")
         print(f"   向量数据库目录: {config.vector_db_dir}")
+        if args.step_index is not None:
+            print(f"   指定步骤索引: {args.step_index}")
         print()
     
     # 增强测试用例
-    enhanced = enhancer.enhance_testcase(args.testcase_path)
+    enhanced = enhancer.enhance_testcase(args.testcase_path, args.step_index)
     
     if enhanced:
         # 生成输出路径
         input_path = Path(args.testcase_path)
-        output_path = input_path.with_suffix(f"{input_path.suffix}{args.suffix}")
+        
+        # 如果指定了步骤索引，修改后缀以区分
+        if args.step_index is not None:
+            suffix = f"{args.suffix}_step_{args.step_index}"
+        else:
+            suffix = args.suffix
+            
+        output_path = input_path.with_suffix(f"{input_path.suffix}{suffix}")
         
         # 保存结果
         enhancer.save_enhanced_testcase(enhanced, str(output_path))
         
         # 打印统计信息
         total_steps = len(enhanced.get('steps', []))
-        enhanced_steps = sum(1 for step in enhanced.get('steps', []) 
-                           if 'enhanced_by' in step)
         
-        print(f"\n📊 增强完成统计:")
-        print(f"   ✅ 总步骤数: {total_steps}")
-        print(f"   ✅ 已增强步骤: {enhanced_steps}")
-        print(f"   ✅ 增强比例: {enhanced_steps/total_steps*100:.1f}%")
+        if args.step_index is not None:
+            print(f"\n📊 增强完成统计:")
+            print(f"   ✅ 总步骤数: {total_steps}")
+            print(f"   ✅ 已处理步骤: 第 {args.step_index + 1} 步")
+        else:
+            enhanced_steps = sum(1 for step in enhanced.get('steps', []) 
+                               if 'enhanced_by' in step)
+            print(f"\n📊 增强完成统计:")
+            print(f"   ✅ 总步骤数: {total_steps}")
+            print(f"   ✅ 已增强步骤: {enhanced_steps}")
+            print(f"   ✅ 增强比例: {enhanced_steps/total_steps*100:.1f}%")
         
         if args.verbose:
             print(f"   📁 输出文件: {output_path}")
