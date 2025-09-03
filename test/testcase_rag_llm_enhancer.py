@@ -129,7 +129,8 @@ class TestcaseLLMEnhancer:
         context_parts = []
         for doc in relevant_docs:
             context_parts.append(f"相关技术文档: {doc['source']}")
-            context_parts.append(f"内容摘要: {doc['summary']}")
+            context_parts.append(f"完整内容:")
+            context_parts.append(doc['content'])  # 使用完整内容而不是摘要
             context_parts.append("")
             
         return "\n".join(context_parts)
