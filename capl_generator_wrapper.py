@@ -11,11 +11,9 @@ from pathlib import Path
 from typing import Optional
 
 # 导入新的LangChain实现
-from capl_generator_langchain import (
-    CAPLGeneratorService, 
-    CAPLGeneratorConfig,
-    CAPLGenerator
-)
+from capl_langchain.services.generator_service import CAPLGeneratorService
+from capl_langchain.services.generator_service import CAPLGenerator
+from capl_langchain.config.config import CAPLGeneratorConfig
 
 # 向后兼容的API
 class CAPLGeneratorWrapper:
