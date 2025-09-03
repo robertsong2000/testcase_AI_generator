@@ -40,9 +40,9 @@ class TestcaseLLMEnhancer:
             if self.verbose:
                 print(f"🔍 首次分析测试用例目的: {testcase.get('title', cache_key)}")
             self._testcase_purpose_cache[cache_key] = self._analyze_testcase_purpose(testcase)
-        else:
-            if self.verbose:
-                print(f"📋 使用缓存的测试目的: {self._testcase_purpose_cache[cache_key][:50]}...")
+
+        if self.verbose:
+            print(f"📋 使用缓存的测试目的: {self._testcase_purpose_cache[cache_key]}...")
                 
         return self._testcase_purpose_cache[cache_key]
         
@@ -166,6 +166,8 @@ class TestcaseLLMEnhancer:
 **重写后的描述:**"""
 
         try:
+            if self.verbose:
+                print(f"📝 发送给LLM的提示词: {prompt}")
             response = self.llm.invoke(prompt)
             enhanced_desc = response.content if hasattr(response, 'content') else str(response)
             
