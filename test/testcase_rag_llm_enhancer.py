@@ -88,8 +88,8 @@ class TestcaseLLMEnhancer:
         
         # 处理每个步骤
         for i, step in steps_to_process:
+            print(f"\n📋 处理步骤 {i+1}/{len(enhanced_testcase['steps'])}")
             if self.verbose:
-                print(f"\n📋 处理步骤 {i+1}/{len(enhanced_testcase['steps'])}")
                 print(f"   原始描述: {step.get('description', '无描述')}")
             
             # 获取增强的上下文
