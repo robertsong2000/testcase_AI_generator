@@ -13,7 +13,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from capl_langchain.config.config import CAPLGeneratorConfig
-from capl_langchain.managers.knowledge_manager import KnowledgeBaseManager
+from capl_langchain.managers.knowledge_manager import KnowledgeManager
 
 def check_vector_db_status():
     """检查向量数据库状态"""
@@ -75,7 +75,7 @@ def check_vector_db_status():
     # 测试知识库功能
     print(f"\n🧪 功能测试:")
     try:
-        kb_manager = KnowledgeBaseManager(config)
+        kb_manager = KnowledgeManager(config)
         success = kb_manager.initialize_knowledge_base()
         
         if success:
